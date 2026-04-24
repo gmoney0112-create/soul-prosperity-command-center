@@ -431,6 +431,47 @@ function bindBuilderEvents() {
   document.querySelector("[data-builder-reset]")?.addEventListener("click", resetBuilder);
 }
 
+function setCopyStatus(key, message, tone) {
+  const el = document.querySelector(`[data-copy-status="${key}"]`);
+  if (!el) return;
+  el.textContent = message || "";
+  el.dataset.tone = tone || "";
+}
+
+async function handleCopyClick(event) {
+  const button = event.currentTarget;
+  const key = button.dataset.copyTarget;
+  if (!key) return;
+  const source = document.querySelector(`[data-copy-source="${key}"]`);
+  if (!source) return;
+  const text = source.value;
+
+  if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyStatus(key, "Copied.", "success");
+      return;
+    } catch (_err) {
+      // fall through
+    }
+  }
+
+  if (fallbackCopy(text)) {
+    setCopyStatus(key, "Copied using fallback.", "success");
+    return;
+  }
+
+  source.focus();
+  source.select();
+  setCopyStatus(key, "Copy blocked — press Cmd/Ctrl+C.", "warn");
+}
+
+function bindCopyButtons() {
+  document.querySelectorAll("[data-copy-target]").forEach((btn) => {
+    btn.addEventListener("click", handleCopyClick);
+  });
+}
+
 function bindEvents() {
   document.querySelectorAll("[data-scroll-target]").forEach((control) => {
     control.addEventListener("click", () => scrollToSection(control.dataset.scrollTarget));
@@ -452,6 +493,7 @@ function bindEvents() {
 setTheme(state.theme);
 bindEvents();
 bindBuilderEvents();
+bindCopyButtons();
 updateReadiness();
 updateCalculator();
 applyConfigLinks();

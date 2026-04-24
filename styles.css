@@ -1104,6 +1104,253 @@ main {
   letter-spacing: 0.04em;
 }
 
+.buildsheet-panel {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.buildsheet-block {
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.buildsheet-block-head {
+  display: grid;
+  gap: var(--space-2);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.buildsheet-block-head h3 {
+  margin: var(--space-2) 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  line-height: 0.95;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.buildsheet-block-head p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.buildsheet-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+}
+
+.buildsheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.buildsheet-table th,
+.buildsheet-table td {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.buildsheet-table thead th {
+  background: var(--surface-2);
+  color: var(--gold);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.buildsheet-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.buildsheet-table code {
+  color: var(--gold);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  background: var(--gold-soft);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.buildsheet-copy {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.buildsheet-copy-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.buildsheet-copy-head strong {
+  flex: 1 1 auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.copy-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  color: #0d0d0d;
+  background: var(--gold);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.copy-button:hover {
+  background: var(--gold-2);
+}
+
+.buildsheet-copy-status {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  min-height: 1em;
+}
+
+.buildsheet-copy-status[data-tone="success"] {
+  color: var(--green);
+}
+
+.buildsheet-copy-status[data-tone="warn"] {
+  color: var(--orange);
+}
+
+.buildsheet-copy-text {
+  width: 100%;
+  resize: vertical;
+  min-height: 180px;
+  padding: var(--space-4);
+  color: var(--gold);
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+  white-space: pre;
+  overflow: auto;
+}
+
+.buildsheet-copy-text:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.buildsheet-workflows {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.buildsheet-workflow {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.buildsheet-workflow.priority {
+  border-color: var(--gold);
+  background: linear-gradient(180deg, var(--gold-soft), var(--surface-2));
+}
+
+.buildsheet-workflow header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.buildsheet-workflow .wf-num {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+}
+
+.buildsheet-workflow h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  line-height: 0.95;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.buildsheet-workflow dl {
+  display: grid;
+  grid-template-columns: minmax(90px, max-content) 1fr;
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+}
+
+.buildsheet-workflow dt {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.buildsheet-workflow dd {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.buildsheet-workflow code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--gold);
+  background: var(--gold-soft);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+}
+
+.buildsheet-qa {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.buildsheet-qa code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--gold);
+}
+
 .site-footer {
   margin-top: var(--space-16);
   padding: var(--space-8) var(--space-4);
@@ -1168,6 +1415,11 @@ main {
   .builder-grid {
     grid-template-columns: 1fr;
   }
+
+  .buildsheet-workflows,
+  .buildsheet-qa {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
@@ -1223,6 +1475,18 @@ main {
 
   .workflow-card {
     grid-template-columns: 38px 1fr;
+  }
+
+  .buildsheet-block {
+    padding: var(--space-5);
+  }
+
+  .buildsheet-workflow dl {
+    grid-template-columns: 1fr;
+  }
+
+  .buildsheet-workflow dt {
+    margin-top: var(--space-2);
   }
 }
 

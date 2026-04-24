@@ -52,6 +52,7 @@
         <button class="nav-link" data-scroll-target="metrics">Money</button>
         <button class="nav-link" data-scroll-target="wiring">Wiring</button>
         <button class="nav-link" data-scroll-target="builder">Builder</button>
+        <button class="nav-link" data-scroll-target="buildsheet">Build Sheet</button>
       </nav>
 
       <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch theme">
@@ -554,6 +555,447 @@
               tap in the box above, select all, and copy manually.
             </p>
           </div>
+        </div>
+      </section>
+
+      <section class="panel-section" id="buildsheet" aria-labelledby="buildsheet-title">
+        <div class="section-heading wide-heading">
+          <p class="eyebrow gold">GHL Build Sheet</p>
+          <h2 id="buildsheet-title">Translate the funnel into a GoHighLevel build</h2>
+          <p>
+            This is the operator build sheet. Open GHL in one tab, this page in
+            another, and walk it top to bottom: tag taxonomy, custom fields,
+            pipeline, workflow-by-workflow implementation, then QA before
+            traffic. Everything here is static — no data is saved in the
+            browser.
+          </p>
+        </div>
+
+        <div class="buildsheet-panel">
+          <article class="buildsheet-block" aria-labelledby="bs-tags-title">
+            <header class="buildsheet-block-head">
+              <div>
+                <p class="eyebrow gold">Step 1</p>
+                <h3 id="bs-tags-title">Tag taxonomy</h3>
+                <p>
+                  Build these tags in <strong>Settings → Tags</strong> first.
+                  Every workflow below reads or writes at least one of them.
+                  Use lowercase, dash-separated names so filters and exports
+                  stay predictable.
+                </p>
+              </div>
+            </header>
+
+            <div class="buildsheet-table-wrap">
+              <table class="buildsheet-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Tag</th>
+                    <th scope="col">Applied when</th>
+                    <th scope="col">Used by</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><code>lead-freebie</code></td><td>Freebie opt-in form submitted</td><td>WF-01 nurture, WF-02 pitch</td></tr>
+                  <tr><td><code>buyer-ebook7</code></td><td>$7 eBook purchase</td><td>WF-02 delivery, WF-03, WF-04</td></tr>
+                  <tr><td><code>buyer-audio17</code></td><td>$17 audiobook purchase / bump</td><td>WF-03 exit, WF-04 entry</td></tr>
+                  <tr><td><code>buyer-paperback27</code></td><td>$27 paperback purchase</td><td>WF-04 exit, WF-05 entry</td></tr>
+                  <tr><td><code>buyer-course67</code></td><td>$67 course purchase</td><td>WF-05 exit, WF-06 entry</td></tr>
+                  <tr><td><code>skool-trial</code></td><td>Skool 7-day trial started</td><td>WF-06 exit, WF-07 entry</td></tr>
+                  <tr><td><code>skool-monthly</code></td><td>Skool $47/mo active</td><td>WF-07 upgrade pitch</td></tr>
+                  <tr><td><code>skool-annual</code></td><td>Skool $247/yr active</td><td>WF-07 lifetime pitch</td></tr>
+                  <tr><td><code>lifetime</code></td><td>$497 lifetime purchase</td><td>Exit condition for WF-05..WF-07</td></tr>
+                  <tr><td><code>abandoned-checkout</code></td><td>Checkout started, not completed in 30m</td><td>WF-08 save sequence</td></tr>
+                  <tr><td><code>refund-risk</code></td><td>Refund requested OR low engagement post-purchase</td><td>WF-08 save-before-refund</td></tr>
+                  <tr><td><code>refunded</code></td><td>Refund processed</td><td>Global suppression, exit all sales WFs</td></tr>
+                  <tr><td><code>testimonial-requested</code></td><td>30 days post-purchase and active</td><td>Social proof ask</td></tr>
+                  <tr><td><code>unsubscribed-email</code></td><td>Email unsubscribe or bounce</td><td>Suppression from email sends</td></tr>
+                  <tr><td><code>sms-opt-out</code></td><td>STOP reply or manual opt-out</td><td>Suppression from SMS sends</td></tr>
+                  <tr><td><code>vip</code></td><td>Two or more paid purchases</td><td>Priority replies, testimonial ask first</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="buildsheet-copy" data-copy-block>
+              <div class="buildsheet-copy-head">
+                <strong>Paste-ready tag list</strong>
+                <button
+                  type="button"
+                  class="copy-button"
+                  data-copy-target="tags-copy"
+                >
+                  Copy tag list
+                </button>
+                <span
+                  class="buildsheet-copy-status"
+                  data-copy-status="tags-copy"
+                  role="status"
+                  aria-live="polite"
+                ></span>
+              </div>
+              <textarea
+                class="buildsheet-copy-text"
+                data-copy-source="tags-copy"
+                readonly
+                rows="9"
+                spellcheck="false"
+                aria-label="Paste-ready tag list"
+              >lead-freebie
+buyer-ebook7
+buyer-audio17
+buyer-paperback27
+buyer-course67
+skool-trial
+skool-monthly
+skool-annual
+lifetime
+abandoned-checkout
+refund-risk
+refunded
+testimonial-requested
+unsubscribed-email
+sms-opt-out
+vip</textarea>
+            </div>
+          </article>
+
+          <article class="buildsheet-block" aria-labelledby="bs-fields-title">
+            <header class="buildsheet-block-head">
+              <div>
+                <p class="eyebrow gold">Step 2</p>
+                <h3 id="bs-fields-title">Custom fields</h3>
+                <p>
+                  Create in <strong>Settings → Custom Fields → Contact</strong>.
+                  Keep the field keys stable — workflows, email templates, and
+                  Skool invite links all reference them directly.
+                </p>
+              </div>
+            </header>
+
+            <div class="buildsheet-table-wrap">
+              <table class="buildsheet-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Field</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Purpose</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><code>first_purchase_date</code></td><td>Date</td><td>Sort buyers for testimonial ask timing</td></tr>
+                  <tr><td><code>last_purchase_product</code></td><td>Text</td><td>Most recent paid offer key (ebook7, audio17…)</td></tr>
+                  <tr><td><code>ltv_cents</code></td><td>Number</td><td>Lifetime value in cents, incremented per purchase</td></tr>
+                  <tr><td><code>freebie_source</code></td><td>Text</td><td>Which post or channel drove the opt-in</td></tr>
+                  <tr><td><code>skool_invite_sent</code></td><td>Date</td><td>Prevents double-inviting on re-entry</td></tr>
+                  <tr><td><code>refund_reason</code></td><td>Text</td><td>Captured when refund is requested, used by WF-08</td></tr>
+                  <tr><td><code>nps_score</code></td><td>Number</td><td>Captured post-course for testimonial routing</td></tr>
+                  <tr><td><code>preferred_channel</code></td><td>Dropdown</td><td>email · sms · both — respected by all sends</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="buildsheet-block" aria-labelledby="bs-pipeline-title">
+            <header class="buildsheet-block-head">
+              <div>
+                <p class="eyebrow gold">Step 3</p>
+                <h3 id="bs-pipeline-title">Pipeline &amp; stages</h3>
+                <p>
+                  One pipeline — <strong>Soul Prosperity Ladder</strong> — with
+                  stages that mirror the offer ladder. Opportunity moves on
+                  purchase events; use <em>Move Opportunity</em> actions inside
+                  each workflow rather than manual drags.
+                </p>
+              </div>
+            </header>
+
+            <div class="buildsheet-table-wrap">
+              <table class="buildsheet-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Stage</th>
+                    <th scope="col">Enter on</th>
+                    <th scope="col">Exit on</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>01 · Freebie lead</td><td>Form submit → <code>lead-freebie</code></td><td>$7 purchase</td></tr>
+                  <tr><td>02 · $7 buyer</td><td><code>buyer-ebook7</code> applied</td><td>$17 or $27 purchase</td></tr>
+                  <tr><td>03 · Bundle buyer</td><td><code>buyer-audio17</code> or <code>buyer-paperback27</code></td><td>$67 course purchase</td></tr>
+                  <tr><td>04 · Course buyer</td><td><code>buyer-course67</code></td><td>Skool trial or $497 lifetime</td></tr>
+                  <tr><td>05 · Community member</td><td><code>skool-trial</code>, <code>skool-monthly</code>, <code>skool-annual</code></td><td>Lifetime upgrade, refund, or churn</td></tr>
+                  <tr><td>06 · Lifetime / VIP</td><td><code>lifetime</code> or <code>vip</code></td><td>Terminal — no exit</td></tr>
+                  <tr><td>07 · Saved / recovered</td><td>Abandoned cart recovered</td><td>Moves back into matching buyer stage</td></tr>
+                  <tr><td>08 · Churned</td><td><code>refunded</code> or sub cancelled</td><td>Manual only</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="buildsheet-block" aria-labelledby="bs-workflows-title">
+            <header class="buildsheet-block-head">
+              <div>
+                <p class="eyebrow gold">Step 4</p>
+                <h3 id="bs-workflows-title">Workflow-by-workflow build</h3>
+                <p>
+                  Build each of the eight workflows in
+                  <strong>Automation → Workflows</strong>. Names are exact —
+                  copy from the block below so filter-by-name stays clean.
+                  Every workflow ends in <em>Wait until exit condition</em> so a
+                  later purchase immediately stops the current pitch.
+                </p>
+              </div>
+            </header>
+
+            <div class="buildsheet-copy" data-copy-block>
+              <div class="buildsheet-copy-head">
+                <strong>Paste-ready workflow names</strong>
+                <button
+                  type="button"
+                  class="copy-button"
+                  data-copy-target="wf-copy"
+                >
+                  Copy workflow names
+                </button>
+                <span
+                  class="buildsheet-copy-status"
+                  data-copy-status="wf-copy"
+                  role="status"
+                  aria-live="polite"
+                ></span>
+              </div>
+              <textarea
+                class="buildsheet-copy-text"
+                data-copy-source="wf-copy"
+                readonly
+                rows="9"
+                spellcheck="false"
+                aria-label="Paste-ready workflow names"
+              >WF-01 · Freebie nurture
+WF-02 · $7 buyer delivery
+WF-03 · Order bump recovery ($17 audio)
+WF-04 · Paperback upgrade ($27)
+WF-05 · $67 course pitch
+WF-06 · Skool 7-day trial invite
+WF-07 · Annual / lifetime upgrade
+WF-08 · Abandoned checkout &amp; refund save</textarea>
+            </div>
+
+            <div class="buildsheet-workflows">
+              <article class="buildsheet-workflow">
+                <header>
+                  <span class="wf-num">WF-01</span>
+                  <h4>Freebie nurture</h4>
+                </header>
+                <dl>
+                  <dt>Trigger</dt><dd>Form submitted: <em>Freebie opt-in</em></dd>
+                  <dt>Entry action</dt><dd>Add tag <code>lead-freebie</code>; set <code>freebie_source</code>; send delivery email with download + $7 pitch.</dd>
+                  <dt>Sequence</dt><dd>Day 0 deliver · Day 1 story email · Day 2 SMS nudge (respect <code>preferred_channel</code>) · Day 3 $7 pitch email · Day 5 final pitch.</dd>
+                  <dt>If / else</dt><dd>If opened Day 3 but no click → send Day 4 objection email. Else skip to Day 5.</dd>
+                  <dt>Exit condition</dt><dd>Tag <code>buyer-ebook7</code> applied OR <code>unsubscribed-email</code> applied.</dd>
+                </dl>
+              </article>
+
+              <article class="buildsheet-workflow priority">
+                <header>
+                  <span class="wf-num">WF-02</span>
+                  <h4>$7 buyer delivery</h4>
+                </header>
+                <dl>
+                  <dt>Trigger</dt><dd>Order submitted / form payment: $7 eBook product.</dd>
+                  <dt>Entry action</dt><dd>Add <code>buyer-ebook7</code>; remove <code>lead-freebie</code> is optional (keep for source); set <code>first_purchase_date</code>, <code>last_purchase_product=ebook7</code>; increment <code>ltv_cents</code> by 700.</dd>
+                  <dt>Sequence</dt><dd>Minute 0 delivery email with PDF · Minute 5 SMS "check your inbox" · Hour 1 $17 audio pitch · Day 1 $27 paperback pitch · Day 2 story.</dd>
+                  <dt>If / else</dt><dd>If <code>buyer-audio17</code> present → skip audio pitch. If <code>buyer-paperback27</code> → skip paperback pitch.</dd>
+                  <dt>Exit condition</dt><dd>Tag <code>buyer-course67</code> (jump to WF-05) OR <code>refunded</code>.</dd>
+                </dl>
+              </article>
+
+              <article class="buildsheet-workflow">
+                <header>
+                  <span class="wf-num">WF-03</span>
+                  <h4>Order bump recovery ($17 audio)</h4>
+                </header>
+                <dl>
+                  <dt>Trigger</dt><dd>Tag added: <code>buyer-ebook7</code>.</dd>
+                  <dt>Wait</dt><dd>2 hours, then check for <code>buyer-audio17</code>. If present, exit.</dd>
+                  <dt>Sequence</dt><dd>Hour 2 audio bridge email · Day 1 SMS "still reading? listen instead" · Day 3 final $17 offer.</dd>
+                  <dt>If / else</dt><dd>If <code>preferred_channel=email</code>, skip SMS steps.</dd>
+                  <dt>Exit condition</dt><dd><code>buyer-audio17</code>, <code>buyer-course67</code>, or <code>refunded</code>.</dd>
+                </dl>
+              </article>
+
+              <article class="buildsheet-workflow">
+                <header>
+                  <span class="wf-num">WF-04</span>
+                  <h4>Paperback upgrade ($27)</h4>
+                </header>
+                <dl>
+                  <dt>Trigger</dt><dd>Tag added: <code>buyer-ebook7</code> OR <code>buyer-audio17</code>.</dd>
+                  <dt>Wait</dt><dd>Day 2 after trigger.</dd>
+                  <dt>Sequence</dt><dd>Day 2 study-copy pitch · Day 4 gift-copy angle · Day 7 last call with scarcity copy.</dd>
+                  <dt>If / else</dt><dd>If <code>buyer-paperback27</code> present → exit immediately.</dd>
+                  <dt>Exit condition</dt><dd><code>buyer-paperback27</code>, <code>buyer-course67</code>, or <code>refunded</code>.</dd>
+                </dl>
+              </article>
+
+              <article class="buildsheet-workflow priority">
+                <header>
+                  <span class="wf-num">WF-05</span>
+                  <h4>$67 course pitch</h4>
+                </header>
+                <dl>
+                  <dt>Trigger</dt><dd>Tag added: <code>buyer-ebook7</code>, or engagement score high (multi-open, multi-click).</dd>
+                  <dt>Wait</dt><dd>Day 5 after first purchase.</dd>
+                  <dt>Sequence</dt><dd>Day 5 method teaser · Day 6 case study · Day 7 curriculum email · Day 8 SMS CTA · Day 10 final deadline email.</dd>
+                  <dt>If / else</dt><dd>If <code>buyer-paperback27</code> → lead with "you already have the book, now build yours." Else default method copy.</dd>
+                  <dt>Exit condition</dt><dd><code>buyer-course67</code>, <code>lifetime</code>, or <code>refunded</code>.</dd>
+                </dl>
+              </article>
+
+              <article class="buildsheet-workflow">
+                <header>
+                  <span class="wf-num">WF-06</span>
+                  <h4>Skool 7-day trial invite</h4>
+                </header>
+                <dl>
+                  <dt>Trigger</dt><dd>Tag added: <code>buyer-course67</code> OR engagement threshold.</dd>
+                  <dt>Entry action</dt><dd>Set <code>skool_invite_sent</code> to today.</dd>
+                  <dt>Sequence</dt><dd>Day 0 trial invite email with Skool link · Day 2 SMS check-in · Day 5 social proof · Day 6 "trial ends tomorrow".</dd>
+                  <dt>If / else</dt><dd>If <code>skool-trial</code> already present → exit.</dd>
+                  <dt>Exit condition</dt><dd><code>skool-trial</code>, <code>skool-monthly</code>, <code>skool-annual</code>, or <code>lifetime</code>.</dd>
+                </dl>
+              </article>
+
+              <article class="buildsheet-workflow">
+                <header>
+                  <span class="wf-num">WF-07</span>
+                  <h4>Annual / lifetime upgrade</h4>
+                </header>
+                <dl>
+                  <dt>Trigger</dt><dd>Tag added: <code>skool-monthly</code> (day 21), or <code>skool-annual</code> (day 60).</dd>
+                  <dt>Sequence</dt><dd>For monthly → pitch <code>$247/yr</code> annual. For annual → pitch <code>$497</code> lifetime at day 60 + 30-day save path.</dd>
+                  <dt>If / else</dt><dd>Branch on current sub tag to pick the next-rung pitch.</dd>
+                  <dt>Exit condition</dt><dd><code>lifetime</code> applied, or sub cancelled (moves to WF-08 save).</dd>
+                </dl>
+              </article>
+
+              <article class="buildsheet-workflow">
+                <header>
+                  <span class="wf-num">WF-08</span>
+                  <h4>Abandoned checkout &amp; refund save</h4>
+                </header>
+                <dl>
+                  <dt>Trigger A</dt><dd>Checkout started, not completed in 30 min → add <code>abandoned-checkout</code>.</dd>
+                  <dt>Trigger B</dt><dd>Refund requested / sub cancel → add <code>refund-risk</code>; capture <code>refund_reason</code>.</dd>
+                  <dt>Sequence A</dt><dd>30 min email "finish your order" · Hour 4 SMS · Day 1 bonus-added email · Day 2 final.</dd>
+                  <dt>Sequence B</dt><dd>Minute 5 human-tone email from Terrance · Hour 2 offer downgrade / extension · Day 1 pause-instead-of-cancel option.</dd>
+                  <dt>Exit condition</dt><dd>Matching buyer tag applied (A) OR <code>refunded</code> finalized (B).</dd>
+                </dl>
+              </article>
+            </div>
+          </article>
+
+          <article class="buildsheet-block" aria-labelledby="bs-qa-title">
+            <header class="buildsheet-block-head">
+              <div>
+                <p class="eyebrow gold">Step 5</p>
+                <h3 id="bs-qa-title">QA before traffic</h3>
+                <p>
+                  Run every check below with a real test contact (use a
+                  throwaway email + phone). Do not point paid traffic at the
+                  funnel until every item passes. These boxes are intentionally
+                  transient — checking them does not persist across reloads.
+                </p>
+              </div>
+            </header>
+
+            <div class="buildsheet-qa" data-buildsheet-qa>
+              <label class="check-item">
+                <input type="checkbox" />
+                <span>
+                  <strong>Create a test contact</strong>
+                  <small>Manually add a contact, confirm tags and custom fields can be applied by hand.</small>
+                </span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" />
+                <span>
+                  <strong>Freebie opt-in fires WF-01</strong>
+                  <small>Submit the opt-in form; confirm <code>lead-freebie</code> applied and delivery email received.</small>
+                </span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" />
+                <span>
+                  <strong>$7 test purchase fires WF-02</strong>
+                  <small>Run a real $7 transaction, confirm <code>buyer-ebook7</code> applied, PDF delivered, pipeline moved to stage 02.</small>
+                </span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" />
+                <span>
+                  <strong>Tag changes stop active pitches</strong>
+                  <small>Apply <code>buyer-course67</code> mid-sequence in WF-03/04 and confirm the contact exits both workflows.</small>
+                </span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" />
+                <span>
+                  <strong>Delivery email renders correctly</strong>
+                  <small>Test in Gmail, Apple Mail, Outlook web, and on mobile. Check images, links, and unsubscribe footer.</small>
+                </span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" />
+                <span>
+                  <strong>SMS timing respects quiet hours</strong>
+                  <small>Confirm no SMS fires between 9pm and 9am contact-local; verify SMS follows <code>preferred_channel</code>.</small>
+                </span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" />
+                <span>
+                  <strong>Unsubscribe compliance</strong>
+                  <small>Click unsubscribe in a test email — contact is tagged <code>unsubscribed-email</code>, suppressed from future sends, CAN-SPAM footer present.</small>
+                </span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" />
+                <span>
+                  <strong>SMS STOP works</strong>
+                  <small>Reply STOP to a test SMS — confirm <code>sms-opt-out</code> tag and suppression.</small>
+                </span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" />
+                <span>
+                  <strong>Abandoned checkout recovery fires</strong>
+                  <small>Start a checkout, wait 30m, confirm <code>abandoned-checkout</code> tag + WF-08 save sequence begins.</small>
+                </span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" />
+                <span>
+                  <strong>Skool trial invite delivered</strong>
+                  <small>After course purchase, verify Skool invite email arrives with working trial link and <code>skool_invite_sent</code> is set.</small>
+                </span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" />
+                <span>
+                  <strong>Refund path is human</strong>
+                  <small>Trigger a refund request; confirm <code>refund-risk</code> applied and WF-08 save email is from Terrance, not a robot template.</small>
+                </span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" />
+                <span>
+                  <strong>Pipeline opportunity moves correctly</strong>
+                  <small>Each purchase step should advance the opportunity stage; confirm in the pipeline board.</small>
+                </span>
+              </label>
+            </div>
+          </article>
         </div>
       </section>
     </main>

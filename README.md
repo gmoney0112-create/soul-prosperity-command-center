@@ -102,6 +102,27 @@ How to use it:
 
 The Config Builder is static by design: it reads the loaded `window.SP_CONFIG` and generates text. Nothing is written to the browser (no `localStorage`, `sessionStorage`, cookies, or server calls), so if you reload the page before committing you will lose what you typed. Copy the generated block first, then reload.
 
+## GHL Build Sheet (operator workflow)
+
+The **Build Sheet** section (reachable from the top nav) is the operator-facing build plan for GoHighLevel. Use it to translate the funnel strategy into the concrete GHL automations before traffic turns on.
+
+What it contains:
+
+1. **Tag taxonomy** — the exact tag names to create in GHL (`lead-freebie`, `buyer-ebook7`, `buyer-audio17`, `buyer-paperback27`, `buyer-course67`, `skool-trial`, `skool-monthly`, `skool-annual`, `lifetime`, `abandoned-checkout`, `refund-risk`, `refunded`, `testimonial-requested`, `unsubscribed-email`, `sms-opt-out`, `vip`), plus when each is applied and which workflows consume it.
+2. **Custom fields** — contact-level fields (`first_purchase_date`, `last_purchase_product`, `ltv_cents`, `freebie_source`, `skool_invite_sent`, `refund_reason`, `nps_score`, `preferred_channel`) to create in `Settings → Custom Fields → Contact`.
+3. **Pipeline and stages** — one `Soul Prosperity Ladder` pipeline, with stages mirroring the offer ladder and explicit enter / exit conditions.
+4. **Workflow-by-workflow implementation** — cards for each of the eight core workflows (`WF-01` through `WF-08`) covering trigger, entry action, sequence, if/else branches, and exit conditions.
+5. **QA checklist** — pre-traffic tests: test contact, opt-in firing, purchase tagging, tag-change exits, delivery email rendering, SMS quiet hours, unsubscribe + STOP compliance, abandoned checkout recovery, Skool invite, human refund path, and pipeline movement.
+
+How to use it:
+
+1. Open the site (`npm run dev`) and click **Build Sheet** in the top nav.
+2. Open GHL in a second tab. Walk the sheet top to bottom — start with tags in `Settings → Tags`, then custom fields, then the pipeline, then each workflow in `Automation → Workflows`.
+3. Use the **Copy tag list** and **Copy workflow names** buttons to paste the canonical names into GHL so filters and exports stay consistent. The clipboard call uses `navigator.clipboard` with a `document.execCommand('copy')` fallback; if both fail, tap into the textarea and copy manually — the UI will tell you to.
+4. After the build, use the **QA before traffic** checklist with a throwaway test contact. Every item should pass before paid traffic is pointed at the funnel.
+
+The Build Sheet is static by design: it is documentation + copyable text blocks + a transient QA checklist. Nothing is written to the browser (no `localStorage`, `sessionStorage`, cookies, or server calls). Reloading the page resets the QA checks — treat it as a walk-through, not a persistence layer.
+
 ## Design direction
 
 Black and gold street-gospel command dashboard. The site defaults to dark mode and includes a temporary in-memory light mode toggle for accessibility checks.
