@@ -50,6 +50,7 @@
         <button class="nav-link" data-scroll-target="launch">Launch</button>
         <button class="nav-link" data-scroll-target="content">Content</button>
         <button class="nav-link" data-scroll-target="metrics">Money</button>
+        <button class="nav-link" data-scroll-target="wiring">Wiring</button>
       </nav>
 
       <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch theme">
@@ -75,6 +76,12 @@
             </button>
             <a class="secondary-action" href="./source-assets/sales-page-7-ebook.html">
               Open $7 sales page
+            </a>
+            <a class="secondary-action" href="#" data-config-link="ebook7Checkout" data-config-fallback-hide>
+              Buy $7 eBook
+            </a>
+            <a class="secondary-action" href="#" data-config-link="freebieOptIn" data-config-fallback-hide>
+              Freebie opt-in
             </a>
           </div>
         </div>
@@ -138,6 +145,7 @@
             <p class="price">Free</p>
             <p>Capture the writer, the testimony, the person who knows they have a story but needs a first win.</p>
             <span class="job-label">Job: opt-in</span>
+            <a class="ladder-link" href="#" data-config-link="freebieOptIn">Open opt-in →</a>
           </article>
           <article class="ladder-card core" role="listitem">
             <span class="stage-num">02</span>
@@ -145,6 +153,7 @@
             <p class="price">$7</p>
             <p>The clean buyer conversion. Low friction, clear promise, instant delivery, money page priority.</p>
             <span class="job-label">Job: buyer</span>
+            <a class="ladder-link" href="#" data-config-link="ebook7Checkout">Open checkout →</a>
           </article>
           <article class="ladder-card bundle" role="listitem">
             <span class="stage-num">03</span>
@@ -152,6 +161,7 @@
             <p class="price">$17</p>
             <p>Upgrade the reader who wants the message in their ears, on the job, or in the car.</p>
             <span class="job-label">Job: order bump</span>
+            <a class="ladder-link" href="#" data-config-link="audio17Checkout">Open checkout →</a>
           </article>
           <article class="ladder-card bundle" role="listitem">
             <span class="stage-num">04</span>
@@ -159,6 +169,7 @@
             <p class="price">$27</p>
             <p>Physical product for people who mark pages, gift copies, and want the book on the shelf.</p>
             <span class="job-label">Job: tangible trust</span>
+            <a class="ladder-link" href="#" data-config-link="paperback27Checkout">Open checkout →</a>
           </article>
           <article class="ladder-card course" role="listitem">
             <span class="stage-num">05</span>
@@ -166,6 +177,7 @@
             <p class="price">$67</p>
             <p>The implementation layer. Turn the book from inspiration into a repeatable writing system.</p>
             <span class="job-label">Job: transformation</span>
+            <a class="ladder-link" href="#" data-config-link="course67Checkout">Open checkout →</a>
           </article>
           <article class="ladder-card recurring" role="listitem">
             <span class="stage-num">06</span>
@@ -173,6 +185,7 @@
             <p class="price">$47/mo</p>
             <p>Community, accountability, live help, and momentum after the course energy fades.</p>
             <span class="job-label">Job: recurring revenue</span>
+            <a class="ladder-link" href="#" data-config-link="skoolTrial">Start trial →</a>
           </article>
           <article class="ladder-card recurring" role="listitem">
             <span class="stage-num">07</span>
@@ -180,6 +193,7 @@
             <p class="price">$247/yr</p>
             <p>Commitment path for people who want the community but prefer the annual save.</p>
             <span class="job-label">Job: cash acceleration</span>
+            <a class="ladder-link" href="#" data-config-link="skoolAnnual">Join annual →</a>
           </article>
           <article class="ladder-card lifetime" role="listitem">
             <span class="stage-num">08</span>
@@ -187,6 +201,7 @@
             <p class="price">$497</p>
             <p>Lifetime access for committed buyers who already believe the mission and want the vault.</p>
             <span class="job-label">Job: premium close</span>
+            <a class="ladder-link" href="#" data-config-link="lifetimeAccess">Open checkout →</a>
           </article>
         </div>
       </section>
@@ -334,6 +349,10 @@
           <a href="./source-assets/launch-checklist.html">Full launch checklist</a>
           <a href="./source-assets/social-content-pack.html">Social pack</a>
           <a href="./source-assets/soul-prosperity-wealth-report-v2.html">Wealth report</a>
+          <a href="#" data-config-link="ghlDashboard">GHL dashboard</a>
+          <a href="#" data-config-link="ghlWorkflows">GHL workflows</a>
+          <a href="#" data-config-link="analytics">Analytics</a>
+          <a href="#" data-config-link="socialBioLink">Social bio link</a>
         </div>
       </section>
 
@@ -436,12 +455,44 @@
           </article>
         </div>
       </section>
+      <section class="panel-section" id="wiring" aria-labelledby="wiring-title">
+        <div class="section-heading wide-heading">
+          <p class="eyebrow gold">Launch Links</p>
+          <h2 id="wiring-title">Wiring status for every external destination</h2>
+          <p>
+            Every button, checkout, and opt-in on this page points at a URL
+            stored in <code>config.js</code>. Edit that file to point at
+            real GHL, Skool, and analytics URLs. Anything still showing
+            <strong>placeholder</strong> below needs to be replaced before traffic goes live.
+          </p>
+        </div>
+
+        <div class="wiring-panel">
+          <div class="wiring-summary" aria-label="Wiring summary">
+            <article>
+              <span>Ready</span>
+              <strong data-wiring-ready>0</strong>
+            </article>
+            <article>
+              <span>Placeholders</span>
+              <strong data-wiring-pending>0</strong>
+            </article>
+            <article>
+              <span>Total links</span>
+              <strong data-wiring-total>0</strong>
+            </article>
+          </div>
+
+          <ul class="wiring-list" data-wiring-list role="list"></ul>
+        </div>
+      </section>
     </main>
 
     <footer class="site-footer">
       <p>Soul Prosperity Funnel Command Center · Built from the ebook offer ladder source assets.</p>
     </footer>
 
+    <script src="./config.js" defer></script>
     <script src="./app.js" defer></script>
   </body>
 </html>

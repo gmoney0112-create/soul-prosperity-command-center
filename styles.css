@@ -495,6 +495,27 @@ main {
   color: var(--gold);
 }
 
+.ladder-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: var(--space-3);
+  padding: var(--space-2) 0;
+  color: var(--gold);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--transition);
+  min-height: 44px;
+}
+
+.ladder-link:hover {
+  border-bottom-color: currentColor;
+}
+
 .two-column {
   display: grid;
   grid-template-columns: 0.82fr 1.18fr;
@@ -720,6 +741,131 @@ main {
   grid-column: span 1;
 }
 
+.wiring-panel {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.wiring-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.wiring-summary article {
+  padding: var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.wiring-summary span {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.wiring-summary strong {
+  display: block;
+  margin-top: var(--space-3);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  line-height: 0.9;
+  color: var(--gold);
+}
+
+.wiring-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.wiring-item {
+  padding: var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: grid;
+  gap: var(--space-3);
+}
+
+.wiring-item[data-status="ready"] {
+  border-color: var(--green);
+}
+
+.wiring-item[data-status="pending"] {
+  border-color: var(--orange);
+  background: var(--surface-2);
+}
+
+.wiring-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.wiring-head strong {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  line-height: 0.95;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.wiring-badge {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid currentColor;
+}
+
+.wiring-item[data-status="ready"] .wiring-badge {
+  color: var(--green);
+}
+
+.wiring-item[data-status="pending"] .wiring-badge {
+  color: var(--orange);
+}
+
+.wiring-purpose {
+  margin: 0;
+  color: var(--muted);
+}
+
+.wiring-meta {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--faint);
+  word-break: break-all;
+}
+
+.wiring-meta a {
+  color: var(--gold);
+}
+
+[data-config-link][data-pending="true"] {
+  position: relative;
+}
+
+[data-config-link][data-pending="true"]::after {
+  content: " · placeholder";
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--orange);
+  margin-left: var(--space-2);
+  text-transform: lowercase;
+  letter-spacing: 0.08em;
+}
+
 .site-footer {
   margin-top: var(--space-16);
   padding: var(--space-8) var(--space-4);
@@ -772,6 +918,10 @@ main {
   .results-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .wiring-list {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
@@ -812,7 +962,9 @@ main {
   .checklist-grid,
   .content-calendar,
   .calculator,
-  .results-grid {
+  .results-grid,
+  .wiring-summary,
+  .wiring-list {
     grid-template-columns: 1fr;
   }
 
