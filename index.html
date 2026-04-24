@@ -51,6 +51,7 @@
         <button class="nav-link" data-scroll-target="content">Content</button>
         <button class="nav-link" data-scroll-target="metrics">Money</button>
         <button class="nav-link" data-scroll-target="wiring">Wiring</button>
+        <button class="nav-link" data-scroll-target="builder">Builder</button>
       </nav>
 
       <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch theme">
@@ -484,6 +485,75 @@
           </div>
 
           <ul class="wiring-list" data-wiring-list role="list"></ul>
+        </div>
+      </section>
+
+      <section class="panel-section" id="builder" aria-labelledby="builder-title">
+        <div class="section-heading wide-heading">
+          <p class="eyebrow gold">Config Builder</p>
+          <h2 id="builder-title">Paste real URLs, generate config.js</h2>
+          <p>
+            Fill in the fields below with the real GHL, checkout, Skool,
+            and social URLs as each piece of the funnel goes live. The
+            generator below rewrites the exact <code>window.SP_CONFIG</code>
+            block to paste into <code>config.js</code>. Nothing is saved
+            in the browser — this is a pure local utility.
+          </p>
+        </div>
+
+        <div class="builder-panel">
+          <div class="builder-summary" aria-label="Builder readiness summary">
+            <article>
+              <span>Ready</span>
+              <strong data-builder-ready>0</strong>
+            </article>
+            <article>
+              <span>Placeholders</span>
+              <strong data-builder-placeholder>0</strong>
+            </article>
+            <article>
+              <span>Invalid</span>
+              <strong data-builder-invalid>0</strong>
+            </article>
+            <article>
+              <span>Total</span>
+              <strong data-builder-total>0</strong>
+            </article>
+          </div>
+
+          <form class="builder-form" data-builder-form aria-label="Config Builder form" novalidate>
+            <div class="builder-grid" data-builder-fields></div>
+
+            <div class="builder-actions">
+              <button type="button" class="primary-action" data-builder-copy>
+                Copy config.js
+              </button>
+              <button type="button" class="secondary-action" data-builder-reset>
+                Reset to current config
+              </button>
+              <span class="builder-status" data-builder-status role="status" aria-live="polite"></span>
+            </div>
+          </form>
+
+          <div class="builder-output">
+            <label class="builder-output-label" for="builder-output-text">
+              Generated <code>config.js</code>
+              <small>Copy this whole block, paste it into <code>config.js</code>, then commit and push.</small>
+            </label>
+            <textarea
+              id="builder-output-text"
+              class="builder-output-text"
+              data-builder-output
+              spellcheck="false"
+              readonly
+              rows="18"
+              aria-describedby="builder-output-help"
+            ></textarea>
+            <p id="builder-output-help" class="builder-output-help">
+              If the Copy button fails (older browsers, insecure contexts),
+              tap in the box above, select all, and copy manually.
+            </p>
+          </div>
         </div>
       </section>
     </main>

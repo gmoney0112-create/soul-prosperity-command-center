@@ -75,6 +75,33 @@ The **Launch Links** panel at the bottom of the page lists every required link, 
 
 No build step is required — edit `config.js`, save, and reload the page.
 
+## Config Builder (operator workflow)
+
+The **Config Builder** section (reachable from the top nav) is a local utility for generating the exact `config.js` block without hand-editing the file.
+
+How to use it:
+
+1. Open the site (`npm run dev`) and click **Builder** in the top nav.
+2. Each key in `window.SP_CONFIG` is rendered as a labeled input, pre-filled with the current value from `config.js`. Every field is validated as you type:
+   - **placeholder** — empty, `#`, or starts with `REPLACE_`
+   - **ready** — a valid `http://` or `https://` URL
+   - **invalid** — anything else (wrong protocol, malformed, typo)
+3. The readiness summary at the top updates live with the ready / placeholder / invalid counts.
+4. Paste the real GHL checkout, Skool, freebie opt-in, analytics, and social bio URLs into each field.
+5. The generated `config.js` block at the bottom rewrites itself on every keystroke, preserving the `window.SP_CONFIG = { ... }` format, grouping comments, and trailing commas.
+6. Click **Copy config.js**. On modern browsers this uses `navigator.clipboard`; if the browser blocks it (insecure origin, permission denied), a `document.execCommand('copy')` fallback runs. If both fail, tap inside the generated block, select all, and copy manually — the UI will tell you to do this.
+7. Open `config.js` in the repo root, replace the entire file contents with what you copied, then commit and push:
+
+   ```bash
+   git add config.js
+   git commit -m "Wire live GHL / checkout / Skool URLs"
+   git push origin main
+   ```
+
+8. Vercel (and GitHub Pages, if enabled) will redeploy automatically. Reload the site — the **Launch Links** panel should now show every destination as **ready**.
+
+The Config Builder is static by design: it reads the loaded `window.SP_CONFIG` and generates text. Nothing is written to the browser (no `localStorage`, `sessionStorage`, cookies, or server calls), so if you reload the page before committing you will lose what you typed. Copy the generated block first, then reload.
+
 ## Design direction
 
 Black and gold street-gospel command dashboard. The site defaults to dark mode and includes a temporary in-memory light mode toggle for accessibility checks.
