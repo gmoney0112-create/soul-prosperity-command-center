@@ -5,7 +5,9 @@
   "description": "Soul Prosperity Funnel Command Center dashboard for the $7 eBook offer ladder.",
   "scripts": {
     "dev": "serve . -l 3000 --no-clipboard --single",
-    "start": "serve . -l 3000 --no-clipboard --single"
+    "start": "serve . -l 3000 --no-clipboard --single",
+    "validate": "node scripts/validate.js",
+    "check": "node --check app.js && node --check config.js && node scripts/validate.js"
   },
   "devDependencies": {
     "serve": "^14.2.4"
