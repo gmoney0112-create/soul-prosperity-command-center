@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Write a 40-Page eBook — Terrance Gee</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@700;800&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background-color: #0D0D0D !important;
+  color: #FFFFFF !important;
+  font-family: 'Lora', Georgia, serif;
+  overflow-x: hidden;
+}
+
+/* ANNOUNCE */
+.announce {
+  background: #FFD600;
+  padding: 12px 20px;
+  text-align: center;
+  font-family: 'Barlow Condensed', Arial, sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #000000;
+}
+
+/* HERO */
+.hero {
+  background-color: #0D0D0D;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255,214,0,0.10) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-inner { max-width: 800px; margin: 0 auto; position: relative; z-index: 2; }
+
+.badge {
+  display: inline-block;
+  background: #FFD600;
+  color: #000000;
+  font-family: 'Barlow Condensed', Arial, sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 7px 20px;
+  margin-bottom: 30px;
+}
+
+.hero h1 {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: clamp(52px, 11vw, 120px);
+  line-height: 0.88;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+}
+.hero h1 .gold { color: #FFD600; display: block; }
+
+.hero-sub {
+  font-size: clamp(17px, 2.5vw, 22px);
+  line-height: 1.6;
+  color: #CCCCCC;
+  max-width: 560px;
+  margin: 22px auto 0;
+}
+.hero-sub strong { color: #FFD600; font-style: italic; }
+
+.price-block { margin-top: 44px; }
+.was { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; color: #888888; text-decoration: line-through; letter-spacing: 0.05em; }
+.big-price { font-family: 'Bebas Neue', sans-serif; font-size: clamp(72px, 14vw, 120px); color: #FFD600; line-height: 1; }
+.price-sub { font-size: 14px; color: #888888; font-style: italic; margin-top: 4px; }
+
+.cta-wrap { margin-top: 32px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+
+.btn {
+  display: inline-block;
+  background: #FFD600;
+  color: #000000;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 0.07em;
+  padding: 20px 60px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.btn:hover { background: #FFE033; transform: translateY(-2px); }
+
+.guar-note { font-size: 13px; color: #888888; font-style: italic; }
+
+/* PROOF BAR */
+.proof-bar {
+  background-color: #141414;
+  border-top: 1px solid #2A2A2A;
+  border-bottom: 1px solid #2A2A2A;
+  padding: 28px 24px;
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  flex-wrap: wrap;
+  text-align: center;
+}
+.stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 44px; color: #FFD600; line-height: 1; display: block; }
+.stat-lbl { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #888888; margin-top: 2px; }
+
+/* SECTIONS */
+.sec { padding: 80px 24px; }
+.sec-dark { background-color: #141414; }
+.sec-black { background-color: #0D0D0D; }
+.inner { max-width: 780px; margin: 0 auto; }
+
+.sec-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #FFD600;
+  margin-bottom: 14px;
+}
+.sec-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(38px, 7vw, 72px);
+  line-height: 0.92;
+  color: #FFFFFF;
+  margin-bottom: 36px;
+}
+.sec-title span { color: #FFD600; }
+
+/* WHO GRID */
+.who-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+@media(max-width:540px){ .who-grid { grid-template-columns: 1fr; } }
+
+.who-card {
+  background-color: #1A1A1A;
+  padding: 22px 20px;
+  display: flex;
+  gap: 14px;
+  border-left: 3px solid transparent;
+  transition: border-color 0.2s;
+}
+.who-card:hover { border-left-color: #FFD600; }
+.who-icon { font-size: 24px; flex-shrink: 0; }
+.who-strong { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px; text-transform: uppercase; color: #FFFFFF; display: block; margin-bottom: 4px; letter-spacing: 0.04em; }
+.who-desc { font-size: 14px; color: #BBBBBB; line-height: 1.5; }
+
+/* SCRIPTURE */
+.scripture {
+  background-color: #FFD600;
+  padding: 44px 24px;
+  text-align: center;
+}
+.scripture blockquote {
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(19px, 3vw, 28px);
+  font-style: italic;
+  color: #000000;
+  max-width: 620px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+.scripture cite {
+  display: block;
+  margin-top: 12px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,0.5);
+  font-style: normal;
+}
+
+/* CHAPTERS */
+.ch-list { display: flex; flex-direction: column; gap: 3px; }
+.ch-row {
+  background-color: #1A1A1A;
+  display: flex;
+  gap: 18px;
+  padding: 20px 18px;
+  border-left: 3px solid transparent;
+  transition: border-color 0.2s;
+  align-items: flex-start;
+}
+.ch-row:hover { border-left-color: #FFD600; }
+.ch-n { font-family: 'Bebas Neue', sans-serif; font-size: 38px; color: #333333; line-height: 1; flex-shrink: 0; width: 38px; }
+.ch-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px; text-transform: uppercase; letter-spacing: 0.04em; color: #FFFFFF; margin-bottom: 4px; }
+.ch-desc { font-size: 14px; color: #BBBBBB; line-height: 1.5; margin-bottom: 6px; }
+.ch-tag { display: inline-block; background: rgba(255,214,0,0.12); color: #FFD600; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; padding: 2px 8px; }
+
+/* AUTHOR */
+.author-grid { display: grid; grid-template-columns: 220px 1fr; gap: 48px; align-items: start; }
+@media(max-width:600px){ .author-grid { grid-template-columns: 1fr; } }
+
+.author-box {
+  background-color: #0D0D0D;
+  border: 1px solid #2A2A2A;
+  padding: 28px 22px;
+  text-align: center;
+}
+.av { width: 72px; height: 72px; border-radius: 50%; background: #FFD600; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 30px; color: #000000; }
+.a-name { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: #FFFFFF; letter-spacing: 0.04em; }
+.a-role { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #FFD600; margin-top: 4px; }
+
+.about-p { font-size: 16px; line-height: 1.8; color: #CCCCCC; margin-bottom: 14px; }
+.about-p strong { color: #FFD600; font-style: italic; }
+
+/* TESTIMONIALS */
+.testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+@media(max-width:660px){ .testi-grid { grid-template-columns: 1fr; } }
+
+.testi {
+  background-color: #1A1A1A;
+  padding: 26px 20px;
+  border-top: 3px solid transparent;
+  transition: border-color 0.2s;
+}
+.testi:hover { border-top-color: #FFD600; }
+.stars { color: #FFD600; font-size: 15px; letter-spacing: 2px; margin-bottom: 12px; }
+.testi-q { font-size: 15px; line-height: 1.7; color: #CCCCCC; font-style: italic; margin-bottom: 14px; }
+.testi-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase; color: #FFD600; }
+.testi-role { font-size: 12px; color: #888888; margin-top: 2px; }
+
+/* GUARANTEE */
+.guar-sec { background-color: #141414; border-top: 1px solid #222; border-bottom: 1px solid #222; }
+.guar-inner { max-width: 600px; margin: 0 auto; padding: 80px 24px; text-align: center; }
+.guar-ring { width: 88px; height: 88px; border: 3px solid #FFD600; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 34px; }
+.guar-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 7vw, 62px); color: #FFFFFF; line-height: 0.95; margin-bottom: 18px; }
+.guar-title span { color: #FFD600; }
+.guar-text { font-size: 17px; line-height: 1.75; color: #CCCCCC; font-style: italic; }
+
+/* BOTTOM CTA */
+.bottom {
+  background-color: #0D0D0D;
+  padding: 100px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.bottom::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,214,0,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+.bottom-eyebrow {
+  display: inline-block;
+  background: #FFD600;
+  color: #000000;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 6px 18px;
+  margin-bottom: 24px;
+  position: relative;
+}
+.bottom-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(48px, 10vw, 108px); line-height: 0.88; color: #FFFFFF; margin-bottom: 14px; position: relative; }
+.bottom-title span { color: #FFD600; }
+.bottom-sub { font-size: 18px; color: #CCCCCC; max-width: 480px; margin: 0 auto 36px; font-style: italic; line-height: 1.6; position: relative; }
+
+.price-final { margin-bottom: 28px; position: relative; }
+.pf-old { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; color: #666666; text-decoration: line-through; }
+.pf-new { font-family: 'Bebas Neue', sans-serif; font-size: clamp(80px, 15vw, 130px); color: #FFD600; line-height: 1; }
+.pf-note { font-size: 13px; color: #888888; font-style: italic; }
+
+.fine { margin-top: 16px; font-size: 13px; color: #888888; font-style: italic; position: relative; }
+
+/* FOOTER */
+footer {
+  background-color: #0A0A0A;
+  padding: 28px 24px;
+  border-top: 1px solid #1E1E1E;
+  text-align: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #666666;
+  line-height: 2;
+}
+footer a { color: #666666; text-decoration: none; margin: 0 12px; }
+footer a:hover { color: #FFD600; }
+
+/* STICKY */
+.sticky {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #FFD600;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  z-index: 200;
+  transform: translateY(100%);
+  transition: transform 0.35s ease;
+  flex-wrap: wrap;
+}
+.sticky.on { transform: translateY(0); }
+.sticky-txt { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px; letter-spacing: 0.04em; text-transform: uppercase; color: #000000; }
+.sticky-btn { background: #000000; color: #FFD600; font-family: 'Bebas Neue', sans-serif; font-size: 19px; letter-spacing: 0.06em; padding: 10px 30px; text-decoration: none; transition: background 0.2s; white-space: nowrap; }
+.sticky-btn:hover { background: #111; }
+
+/* REVEAL ANIMATION */
+.rv { opacity: 0; transform: translateY(24px); transition: opacity 0.55s ease, transform 0.55s ease; }
+.rv.in { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="announce">🔥 Limited Launch Price — Only $7 &nbsp;·&nbsp; 30-Day Money-Back Guarantee</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="badge">New from Terrance Gee</div>
+    <h1>
+      How to Write a
+      <span class="gold">40-Page eBook</span>
+      Even If You've Never<br>Written a Grocery List
+    </h1>
+    <p class="hero-sub">
+      You have a story God <strong>assigned</strong> to you. This book shows you exactly how to write it, publish it, and turn it into income — in 40 pages or less.
+    </p>
+    <div class="price-block">
+      <div class="was">Valued at $27</div>
+      <div class="big-price">$7</div>
+      <div class="price-sub">One-time · Instant download · No fluff</div>
+    </div>
+    <div class="cta-wrap">
+      <a href="#buy" class="btn">YES — Give Me the eBook</a>
+      <span class="guar-note">🛡️ 30-day satisfaction guarantee. No questions asked.</span>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF -->
+<div class="proof-bar rv">
+  <div><span class="stat-num">12</span><div class="stat-lbl">Chapters</div></div>
+  <div><span class="stat-num">40</span><div class="stat-lbl">Pages</div></div>
+  <div><span class="stat-num">1</span><div class="stat-lbl">Weekend to Finish</div></div>
+  <div><span class="stat-num">$0</span><div class="stat-lbl">Needed to Publish</div></div>
+</div>
+
+<!-- FOR WHO -->
+<section class="sec sec-dark">
+  <div class="inner">
+    <div class="sec-label rv">This Book Is For You If…</div>
+    <h2 class="sec-title rv">You've Got a <span>Story</span><br>But Don't Know<br>Where to Start</h2>
+    <div class="who-grid">
+      <div class="who-card rv"><div class="who-icon">🙏</div><div><span class="who-strong">You have faith but no platform</span><span class="who-desc">You know God gave you a message — you just don't know how to package it.</span></div></div>
+      <div class="who-card rv"><div class="who-icon">💰</div><div><span class="who-strong">You want to generate income online</span><span class="who-desc">Your story is your product. A $7–$27 eBook can turn into real passive revenue.</span></div></div>
+      <div class="who-card rv"><div class="who-icon">😩</div><div><span class="who-strong">You've tried before and quit</span><span class="who-desc">You started writing and stopped. This book kills writer's block on page one.</span></div></div>
+      <div class="who-card rv"><div class="who-icon">🔥</div><div><span class="who-strong">You're a first-time author</span><span class="who-desc">Never written anything longer than a text message? Perfect. This was made for you.</span></div></div>
+      <div class="who-card rv"><div class="who-icon">✝️</div><div><span class="who-strong">You want to leave a legacy</span><span class="who-desc">Paul wrote letters from prison. Your 40 pages could outlive you too.</span></div></div>
+      <div class="who-card rv"><div class="who-icon">📱</div><div><span class="who-strong">You're a young adult hustler</span><span class="who-desc">Broke, busy, and building? This book meets you exactly where you are.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SCRIPTURE -->
+<div class="scripture rv">
+  <blockquote>"Write the vision and make it plain — so that whoever reads it may run with it."<cite>— Habakkuk 2:2</cite></blockquote>
+</div>
+
+<!-- CHAPTERS -->
+<section class="sec sec-black">
+  <div class="inner">
+    <div class="sec-label rv">What's Inside</div>
+    <h2 class="sec-title rv">12 Chapters.<br><span>One Mission.</span><br>Your Legacy.</h2>
+    <div class="ch-list">
+      <div class="ch-row rv"><div class="ch-n">1</div><div><div class="ch-title">Why Write an eBook? (And Why God Cares About Your Voice)</div><div class="ch-desc">Your story isn't an accident. It's an assignment. Learn why your voice matters — and why now is the time.</div><span class="ch-tag">Foundation</span></div></div>
+      <div class="ch-row rv"><div class="ch-n">2</div><div><div class="ch-title">Choosing Your Message (What's in Your Spirit to Share)</div><div class="ch-desc">Stop overthinking. Your message is hiding in what you've survived, learned, and care about.</div><span class="ch-tag">Clarity</span></div></div>
+      <div class="ch-row rv"><div class="ch-n">3</div><div><div class="ch-title">Viral Inspiration (From Beyoncé to Paul the Apostle)</div><div class="ch-desc">How to make your eBook memorable, shareable, and built to spread across culture and Kingdom.</div><span class="ch-tag">Reach</span></div></div>
+      <div class="ch-row rv"><div class="ch-n">4</div><div><div class="ch-title">Structuring Like a Pro (12 Chapters, 40 Pages, One Mission)</div><div class="ch-desc">The exact blueprint to go from blank page to structured manuscript. Build it like a mixtape.</div><span class="ch-tag">Structure</span></div></div>
+      <div class="ch-row rv"><div class="ch-n">5</div><div><div class="ch-title">Writing with Flow (How to Sound Smart, Funny, and Spirit-Led)</div><div class="ch-desc">Write how you talk. Real, raw, Spirit-filled. Practical hacks to kill the blank page for good.</div><span class="ch-tag">Writing</span></div></div>
+      <div class="ch-row rv"><div class="ch-n">6</div><div><div class="ch-title">Storytelling That Hits (Making Readers Laugh, Cry, and Say "Amen")</div><div class="ch-desc">The 3-part formula to turn your experiences into pages people screenshot and share.</div><span class="ch-tag">Storytelling</span></div></div>
+      <div class="ch-row rv"><div class="ch-n">7</div><div><div class="ch-title">Adding the Faith Factor (Scripture, Testimony & Transformation)</div><div class="ch-desc">The secret sauce that makes your eBook eternal. How to weave in faith without sounding preachy.</div><span class="ch-tag">Faith</span></div></div>
+      <div class="ch-row rv"><div class="ch-n">8</div><div><div class="ch-title">Editing Without Losing Your Sauce (Holy Ghost + Grammarly)</div><div class="ch-desc">Polish your manuscript without stripping your personality. Know when to stop editing.</div><span class="ch-tag">Editing</span></div></div>
+      <div class="ch-row rv"><div class="ch-n">9</div><div><div class="ch-title">Design & Covers (Making It Look TikTok-Viral Ready)</div><div class="ch-desc">People judge books by covers. Make yours scroll-stopping using free tools in under an hour.</div><span class="ch-tag">Design</span></div></div>
+      <div class="ch-row rv"><div class="ch-n">10</div><div><div class="ch-title">Publishing Like a Boss (From PDF to Amazon KDP)</div><div class="ch-desc">From finished manuscript to live product on Amazon and your own platform. Worldwide in 24 hours.</div><span class="ch-tag">Publishing</span></div></div>
+      <div class="ch-row rv"><div class="ch-n">11</div><div><div class="ch-title">Marketing Like You're Drake Dropping an Album</div><div class="ch-desc">Build anticipation. Use social media right. Make your launch feel like an event.</div><span class="ch-tag">Marketing</span></div></div>
+      <div class="ch-row rv"><div class="ch-n">12</div><div><div class="ch-title">Leaving Legacy (How Your eBook Can Change Lives Forever)</div><div class="ch-desc">This isn't about sales or likes. Plant seeds that grow beyond you into eternity.</div><span class="ch-tag">Legacy</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- AUTHOR -->
+<section class="sec sec-dark">
+  <div class="inner">
+    <div class="author-grid">
+      <div class="author-box rv">
+        <div class="av">TG</div>
+        <div class="a-name">Terrance Gee</div>
+        <div class="a-role">Author · Founder · Kingdom Builder</div>
+      </div>
+      <div>
+        <div class="sec-label rv">About the Author</div>
+        <h2 class="rv" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,6vw,58px);line-height:0.95;color:#FFFFFF;margin-bottom:20px;">Built From <span style="color:#FFD600">Faith &amp; Hustle</span></h2>
+        <p class="about-p rv">Terrance Gee is the founder of Soul Prosperity — a Kingdom-first business built on the belief that faith and strategy aren't opposites. They're a power combo.</p>
+        <p class="about-p rv">He wrote this book because he knows what it's like to have a message burning inside you with no roadmap for getting it out. <strong>This is that roadmap.</strong></p>
+        <p class="about-p rv">Terrance also runs the AI Automation Mastery Course and builds automation systems for blue-collar Christian business owners. He moves like Paul — building while the world sleeps.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="sec sec-black">
+  <div class="inner">
+    <div class="sec-label rv">What Readers Are Saying</div>
+    <h2 class="sec-title rv">Real <span>Talk</span><br>From Real People</h2>
+    <div class="testi-grid">
+      <div class="testi rv">
+        <div class="stars">★★★★★</div>
+        <p class="testi-q">"I've been saying I'd write a book for 3 years. Read this Saturday, had my outline done Sunday night. No more excuses."</p>
+        <div class="testi-name">Marcus T.</div>
+        <div class="testi-role">First-time author, Atlanta GA</div>
+      </div>
+      <div class="testi rv">
+        <div class="stars">★★★★★</div>
+        <p class="testi-q">"Terrance mixes faith with practical steps unlike anything I've read. Felt like a conversation, not a textbook. Finished it in one sitting."</p>
+        <div class="testi-name">Jasmine R.</div>
+        <div class="testi-role">Youth leader &amp; blogger</div>
+      </div>
+      <div class="testi rv">
+        <div class="stars">★★★★★</div>
+        <p class="testi-q">"$7 for something that helped me finally publish what I've been carrying for years? Best money I've spent."</p>
+        <div class="testi-name">DeShawn M.</div>
+        <div class="testi-role">Entrepreneur, Houston TX</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GUARANTEE -->
+<section class="guar-sec">
+  <div class="guar-inner">
+    <div class="guar-ring rv">🛡️</div>
+    <h2 class="guar-title rv">30-Day <span>Money-Back</span> Guarantee</h2>
+    <p class="guar-text rv">If you read this book and don't feel equipped, inspired, and ready to write — email Terrance and get every dollar back. No drama. No hoops. God doesn't do scams and neither does Soul Prosperity.</p>
+  </div>
+</section>
+
+<!-- BOTTOM CTA -->
+<section class="bottom" id="buy">
+  <div class="bottom-eyebrow">Your Story Is Waiting</div>
+  <h2 class="bottom-title">Stop Waiting.<br><span>Start Writing.</span></h2>
+  <p class="bottom-sub">For less than a combo meal, you get everything you need to write, publish, and sell your first eBook — starting today.</p>
+  <div class="price-final">
+    <div class="pf-old">Valued at $27</div>
+    <div class="pf-new">$7</div>
+    <div class="pf-note">One-time payment · Instant PDF download</div>
+  </div>
+  <a href="#" class="btn">GET INSTANT ACCESS — $7</a>
+  <p class="fine">🛡️ 30-day guarantee · Secure checkout · Instant delivery</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>© 2025 Terrance Gee · Soul Prosperity · All Rights Reserved</div>
+  <div style="margin-top:6px;">
+    <a href="#">Privacy Policy</a>
+    <a href="#">Terms</a>
+    <a href="#">Contact</a>
+  </div>
+</footer>
+
+<!-- STICKY BAR -->
+<div class="sticky" id="stickyBar">
+  <span class="sticky-txt">How to Write a 40-Page eBook — Only $7</span>
+  <a href="#buy" class="sticky-btn">Get It Now →</a>
+</div>
+
+<script>
+  // Scroll reveal
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.rv').forEach(el => obs.observe(el));
+
+  // Sticky
+  const bar = document.getElementById('stickyBar');
+  window.addEventListener('scroll', () => {
+    bar.classList.toggle('on', window.scrollY > 500);
+  });
+</script>
+</body>
+</html>

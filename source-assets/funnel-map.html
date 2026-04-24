@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soul Prosperity — Funnel Map</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  background-color: #0D0D0D;
+  color: #FFFFFF;
+  font-family: 'Barlow Condensed', Arial, sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+  padding: 48px 32px 36px;
+  border-bottom: 1px solid #222;
+  position: relative;
+}
+.header::after {
+  content: '';
+  position: absolute; bottom:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, #FFD600, transparent);
+}
+.h-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #FFD600;
+  margin-bottom: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.h-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px, 8vw, 84px);
+  line-height: 0.9;
+  color: #FFFFFF;
+}
+.h-title span { color: #FFD600; }
+.h-sub {
+  font-size: 16px;
+  color: #AAAAAA;
+  margin-top: 10px;
+  letter-spacing: 0.03em;
+}
+
+/* LEGEND */
+.legend {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 20px 32px;
+  border-bottom: 1px solid #1A1A1A;
+  background-color: #111111;
+}
+.leg-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #AAAAAA; letter-spacing: 0.08em; text-transform: uppercase; }
+.leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* MAIN CANVAS */
+.canvas {
+  padding: 48px 32px 80px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* FUNNEL STAGE */
+.stage {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 0;
+  margin-bottom: 4px;
+  position: relative;
+}
+
+.stage-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 20px 0 0;
+  border-right: 2px solid #222;
+  text-align: right;
+  min-height: 100px;
+}
+.sl-step {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: #444;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.sl-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+.sl-price {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: #FFD600;
+  margin-top: 4px;
+  font-weight: 700;
+}
+
+/* OFFER CARD */
+.offer-wrap {
+  padding: 16px 0 16px 28px;
+  position: relative;
+}
+
+/* arrow from label to card */
+.offer-wrap::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 2px;
+  background: #333;
+}
+
+.offer-card {
+  background-color: #161616;
+  border: 1px solid #2A2A2A;
+  border-left: 4px solid #333;
+  padding: 18px 20px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: start;
+  transition: border-color 0.2s, background 0.2s;
+  cursor: default;
+  position: relative;
+}
+.offer-card:hover {
+  background-color: #1C1C1C;
+}
+
+/* color-coded left borders */
+.c-free  { border-left-color: #4CAF50; }
+.c-low   { border-left-color: #2196F3; }
+.c-mid   { border-left-color: #FF9800; }
+.c-high  { border-left-color: #F44336; }
+.c-rec   { border-left-color: #9C27B0; }
+.c-life  { border-left-color: #FFD600; }
+
+.card-left { flex: 1; }
+.card-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  color: #FFFFFF;
+  margin-bottom: 4px;
+}
+.card-hook {
+  font-size: 14px;
+  color: #CCCCCC;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  letter-spacing: 0.02em;
+}
+
+.card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 1px solid;
+}
+.tag-gold  { border-color: #FFD600; color: #FFD600; background: rgba(255,214,0,0.07); }
+.tag-blue  { border-color: #2196F3; color: #2196F3; background: rgba(33,150,243,0.07); }
+.tag-green { border-color: #4CAF50; color: #4CAF50; background: rgba(76,175,80,0.07); }
+.tag-orange{ border-color: #FF9800; color: #FF9800; background: rgba(255,152,0,0.07); }
+.tag-purple{ border-color: #9C27B0; color: #CE93D8; background: rgba(156,39,176,0.07); }
+.tag-red   { border-color: #F44336; color: #EF9A9A; background: rgba(244,67,54,0.07); }
+.tag-white { border-color: #555; color: #AAAAAA; background: rgba(255,255,255,0.04); }
+
+.auto-block {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background-color: #0D0D0D;
+  border: 1px solid #222;
+}
+.auto-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #FFD600;
+  margin-bottom: 6px;
+}
+.auto-steps { list-style: none; }
+.auto-steps li {
+  font-size: 12px;
+  color: #AAAAAA;
+  padding: 3px 0 3px 14px;
+  position: relative;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid #1A1A1A;
+}
+.auto-steps li:last-child { border-bottom: none; }
+.auto-steps li::before {
+  content: '→';
+  position: absolute; left: 0;
+  color: #FFD600;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* right side of card */
+.card-right {
+  text-align: right;
+  min-width: 110px;
+}
+.card-price {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  color: #FFD600;
+  line-height: 1;
+}
+.card-price-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: #666;
+  letter-spacing: 0.1em;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+.card-rev {
+  margin-top: 12px;
+  padding: 8px 10px;
+  background: rgba(255,214,0,0.06);
+  border: 1px solid rgba(255,214,0,0.15);
+}
+.card-rev-label { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #666; margin-bottom: 3px; font-family: 'JetBrains Mono', monospace; }
+.card-rev-val { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: #FFD600; }
+
+/* CONNECTOR ARROW */
+.connector {
+  display: flex;
+  align-items: center;
+  padding: 0 0 0 188px;
+  height: 40px;
+  position: relative;
+}
+.conn-line {
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(180deg, #333, #FFD600);
+  margin-left: 20px;
+  position: relative;
+}
+.conn-line::after {
+  content: '▼';
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #FFD600;
+  font-size: 12px;
+}
+.conn-trigger {
+  margin-left: 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #555;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: #111;
+  border: 1px solid #222;
+  padding: 4px 12px;
+}
+
+/* REVENUE SUMMARY */
+.rev-summary {
+  margin-top: 56px;
+  padding: 36px 32px;
+  background-color: #111111;
+  border: 1px solid #222;
+  border-top: 3px solid #FFD600;
+}
+.rs-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  color: #FFFFFF;
+  margin-bottom: 24px;
+  letter-spacing: 0.04em;
+}
+.rs-title span { color: #FFD600; }
+.rs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 2px;
+  margin-bottom: 28px;
+}
+.rs-cell {
+  background-color: #161616;
+  padding: 16px 18px;
+  border-left: 3px solid #222;
+}
+.rs-cell-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #666; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; }
+.rs-cell-val { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #FFD600; }
+.rs-cell-note { font-size: 12px; color: #888; margin-top: 3px; }
+
+.rs-note {
+  font-size: 14px;
+  color: #AAAAAA;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  border-top: 1px solid #222;
+  padding-top: 20px;
+}
+.rs-note strong { color: #FFD600; }
+
+/* MOBILE */
+@media(max-width: 640px) {
+  .stage { grid-template-columns: 100px 1fr; }
+  .connector { padding-left: 118px; }
+  .card-right { min-width: 80px; }
+  .card-price { font-size: 26px; }
+  .legend { padding: 16px 20px; gap: 14px; }
+  .canvas { padding: 32px 16px 60px; }
+  .header { padding: 36px 20px 28px; }
+}
+
+/* ANIMATE */
+.fade-in {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.fade-in.in { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="h-eyebrow">Soul Prosperity · Kingdom Offer Architecture</div>
+  <h1 class="h-title">THE <span>FUNNEL</span> MAP</h1>
+  <p class="h-sub">8 offers · 1 mission · Every step automated · Built from Terrance Gee's eBook</p>
+</div>
+
+<div class="legend">
+  <div class="leg-item"><div class="leg-dot" style="background:#4CAF50"></div> Free Entry</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#2196F3"></div> Low Ticket ($7–$27)</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#FF9800"></div> Mid Ticket ($67)</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#9C27B0"></div> Recurring (Monthly/Annual)</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#FFD600"></div> Lifetime / Premium</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#F44336"></div> High Intent Upsell</div>
+</div>
+
+<div class="canvas">
+
+  <!-- STAGE 1 — FREEBIE -->
+  <div class="stage fade-in">
+    <div class="stage-label">
+      <div class="sl-step">Step 01</div>
+      <div class="sl-name" style="color:#4CAF50">Entry<br>Point</div>
+      <div class="sl-price">FREE</div>
+    </div>
+    <div class="offer-wrap">
+      <div class="offer-card c-free">
+        <div class="card-left">
+          <div class="card-title">The eBook Starter Kit — Free Download</div>
+          <div class="card-hook">A one-page checklist: 5 steps to go from blank page to published eBook. Gives a quick win and makes the $7 eBook the obvious next move.</div>
+          <div class="card-tags">
+            <span class="tag tag-green">Lead Magnet</span>
+            <span class="tag tag-white">Instant Download</span>
+            <span class="tag tag-white">GHL Opt-in</span>
+          </div>
+          <div class="auto-block">
+            <div class="auto-label">GHL Automation Sequence</div>
+            <ul class="auto-steps">
+              <li>Opt-in → tag "freebie-download" → deliver PDF via email</li>
+              <li>Day 0: Welcome email + freebie link + tease $7 eBook</li>
+              <li>Day 1: SMS — "Did you get your starter kit? Here's what's next…"</li>
+              <li>Day 2: Email — "Here's the story behind why I wrote this book"</li>
+              <li>Day 3: Email — Hard pitch for $7 eBook with guarantee</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-right">
+          <div class="card-price">$0</div>
+          <div class="card-price-sub">Free</div>
+          <div class="card-rev" style="margin-top:16px;">
+            <div class="card-rev-label">Goal</div>
+            <div class="card-rev-val" style="font-size:14px;color:#4CAF50;">Build List</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector fade-in">
+    <div class="conn-line"></div>
+    <div class="conn-trigger">Trigger: Downloaded freebie → 3-day sequence → $7 offer</div>
+  </div>
+
+  <!-- STAGE 2 — $7 EBOOK -->
+  <div class="stage fade-in">
+    <div class="stage-label">
+      <div class="sl-step">Step 02</div>
+      <div class="sl-name" style="color:#2196F3">First<br>Purchase</div>
+      <div class="sl-price">$7</div>
+    </div>
+    <div class="offer-wrap">
+      <div class="offer-card c-low">
+        <div class="card-left">
+          <div class="card-title">How to Write a 40-Page eBook</div>
+          <div class="card-hook">The core product. 12 chapters, faith-meets-hustle voice, zero fluff. Turns a stranger into a buyer. First dollar converts cold audience into warm community.</div>
+          <div class="card-tags">
+            <span class="tag tag-blue">Core eBook</span>
+            <span class="tag tag-white">PDF Download</span>
+            <span class="tag tag-gold">30-Day Guarantee</span>
+          </div>
+          <div class="auto-block">
+            <div class="auto-label">Post-Purchase Automation</div>
+            <ul class="auto-steps">
+              <li>Purchase → tag "buyer-ebook7" → remove from cold sequence</li>
+              <li>Immediate: Delivery email + thank you + what's next</li>
+              <li>Day 1: "Quick win" email — which chapter to read first</li>
+              <li>Day 2: Introduce the Audiobook Bundle upsell ($17)</li>
+              <li>Day 4: SMS — "How's the book? Here's the audiobook version"</li>
+              <li>Day 7: If no $17 purchase → send final $17 offer with urgency</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-right">
+          <div class="card-price">$7</div>
+          <div class="card-price-sub">One-time</div>
+          <div class="card-rev">
+            <div class="card-rev-label">10 sales/day</div>
+            <div class="card-rev-val">$2,100/mo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector fade-in">
+    <div class="conn-line"></div>
+    <div class="conn-trigger">Trigger: Purchased $7 → 48hr upsell sequence → $17 offer</div>
+  </div>
+
+  <!-- STAGE 3 — $17 AUDIOBOOK -->
+  <div class="stage fade-in">
+    <div class="stage-label">
+      <div class="sl-step">Step 03</div>
+      <div class="sl-name" style="color:#2196F3">Upsell<br>One</div>
+      <div class="sl-price">$17</div>
+    </div>
+    <div class="offer-wrap">
+      <div class="offer-card c-low">
+        <div class="card-left">
+          <div class="card-title">Audiobook Bundle</div>
+          <div class="card-hook">The eBook in audio form — narrated in Terrance's voice. Perfect for busy hustlers who consume on the go. Positioned as "take it with you everywhere."</div>
+          <div class="card-tags">
+            <span class="tag tag-blue">Audio Product</span>
+            <span class="tag tag-white">Instant Access</span>
+            <span class="tag tag-white">No extra production per sale</span>
+          </div>
+          <div class="auto-block">
+            <div class="auto-label">Post-Purchase Automation</div>
+            <ul class="auto-steps">
+              <li>Purchase → tag "buyer-audio17" → deliver access link</li>
+              <li>Day 1: "You're listening — here's the next level" → tease $27</li>
+              <li>Day 3: Introduce Paperback Bundle ($27) — "hold it in your hands"</li>
+              <li>Day 5: SMS — "Grab the physical copy — ship it anywhere"</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-right">
+          <div class="card-price">$17</div>
+          <div class="card-price-sub">One-time</div>
+          <div class="card-rev">
+            <div class="card-rev-label">40% take rate</div>
+            <div class="card-rev-val">$680/mo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector fade-in">
+    <div class="conn-line"></div>
+    <div class="conn-trigger">Trigger: Purchased $17 → 3-day sequence → $27 offer</div>
+  </div>
+
+  <!-- STAGE 4 — $27 PAPERBACK -->
+  <div class="stage fade-in">
+    <div class="stage-label">
+      <div class="sl-step">Step 04</div>
+      <div class="sl-name" style="color:#2196F3">Upsell<br>Two</div>
+      <div class="sl-price">$27</div>
+    </div>
+    <div class="offer-wrap">
+      <div class="offer-card c-low">
+        <div class="card-left">
+          <div class="card-title">Paperback Bundle</div>
+          <div class="card-hook">The physical book — shipped to their door. Psychological upgrade: holding it makes the mission feel real. Strongest gift option in the ladder.</div>
+          <div class="card-tags">
+            <span class="tag tag-blue">Physical Product</span>
+            <span class="tag tag-white">KDP / Print-on-Demand</span>
+            <span class="tag tag-gold">Gift-ready</span>
+          </div>
+          <div class="auto-block">
+            <div class="auto-label">Post-Purchase Automation</div>
+            <ul class="auto-steps">
+              <li>Purchase → tag "buyer-paperback27" → order confirmation</li>
+              <li>Day 2: "Book's on the way — here's what comes next" → tease course</li>
+              <li>Day 5: Introduce Online Course Bundle ($67) — "go deeper"</li>
+              <li>Day 8: SMS — "Your book should have arrived — ready to level up?"</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-right">
+          <div class="card-price">$27</div>
+          <div class="card-price-sub">One-time</div>
+          <div class="card-rev">
+            <div class="card-rev-label">30% take rate</div>
+            <div class="card-rev-val">$810/mo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector fade-in">
+    <div class="conn-line"></div>
+    <div class="conn-trigger">Trigger: Purchased $27 → 5-day warm sequence → $67 offer</div>
+  </div>
+
+  <!-- STAGE 5 — $67 COURSE -->
+  <div class="stage fade-in">
+    <div class="stage-label">
+      <div class="sl-step">Step 05</div>
+      <div class="sl-name" style="color:#FF9800">Course<br>Bundle</div>
+      <div class="sl-price">$67</div>
+    </div>
+    <div class="offer-wrap">
+      <div class="offer-card c-mid">
+        <div class="card-left">
+          <div class="card-title">Online Course Bundle</div>
+          <div class="card-hook">The eBook expanded into a full video course. Step-by-step walkthroughs, templates, bonus training. Bridges low-ticket buyers into the Skool community.</div>
+          <div class="card-tags">
+            <span class="tag tag-orange">Video Course</span>
+            <span class="tag tag-white">Templates Included</span>
+            <span class="tag tag-gold">Community Bridge</span>
+          </div>
+          <div class="auto-block">
+            <div class="auto-label">Post-Purchase Automation</div>
+            <ul class="auto-steps">
+              <li>Purchase → tag "buyer-course67" → deliver course access</li>
+              <li>Day 1: Welcome to the course — module 1 unlock email</li>
+              <li>Day 3: Progress check SMS — "How's module 1 going?"</li>
+              <li>Day 7: Introduce Skool Monthly ($47/mo) — "join the community"</li>
+              <li>Day 10: Annual plan pitch ($247/yr) — "save 56% vs monthly"</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-right">
+          <div class="card-price">$67</div>
+          <div class="card-price-sub">One-time</div>
+          <div class="card-rev">
+            <div class="card-rev-label">25% take rate</div>
+            <div class="card-rev-val">$1,675/mo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector fade-in">
+    <div class="conn-line"></div>
+    <div class="conn-trigger">Trigger: Purchased $67 → 7-day nurture → $47/mo Skool offer</div>
+  </div>
+
+  <!-- STAGE 6 — $47/mo SKOOL -->
+  <div class="stage fade-in">
+    <div class="stage-label">
+      <div class="sl-step">Step 06</div>
+      <div class="sl-name" style="color:#9C27B0">Monthly<br>Recurring</div>
+      <div class="sl-price">$47/mo</div>
+    </div>
+    <div class="offer-wrap">
+      <div class="offer-card c-rec">
+        <div class="card-left">
+          <div class="card-title">Skool Monthly Membership</div>
+          <div class="card-hook">7-day free trial, then $47/month. Live Q&As, accountability, new content drops, community of Kingdom-minded writers and hustlers. This is your recurring revenue engine.</div>
+          <div class="card-tags">
+            <span class="tag tag-purple">Recurring Revenue</span>
+            <span class="tag tag-white">7-Day Free Trial</span>
+            <span class="tag tag-white">Skool Platform</span>
+            <span class="tag tag-gold">Retention Focus</span>
+          </div>
+          <div class="auto-block">
+            <div class="auto-label">Retention Automation</div>
+            <ul class="auto-steps">
+              <li>Trial start → tag "trial-skool" → day 3 check-in SMS</li>
+              <li>Day 5: "Trial ends in 2 days" — value reminder email</li>
+              <li>Day 7: Trial converts → tag "member-monthly" → welcome sequence</li>
+              <li>Monthly: Re-engagement email for inactive members</li>
+              <li>Month 2: Pitch annual plan ($247) → "lock in your savings"</li>
+              <li>Churn trigger: Cancelled → winback sequence (3 emails + 1 SMS)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-right">
+          <div class="card-price">$47</div>
+          <div class="card-price-sub">Per Month</div>
+          <div class="card-rev">
+            <div class="card-rev-label">50 members</div>
+            <div class="card-rev-val">$2,350/mo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector fade-in">
+    <div class="conn-line"></div>
+    <div class="conn-trigger">Trigger: Active 60+ days → annual upgrade pitch</div>
+  </div>
+
+  <!-- STAGE 7 — $247/yr -->
+  <div class="stage fade-in">
+    <div class="stage-label">
+      <div class="sl-step">Step 07</div>
+      <div class="sl-name" style="color:#9C27B0">Annual<br>Upgrade</div>
+      <div class="sl-price">$247/yr</div>
+    </div>
+    <div class="offer-wrap">
+      <div class="offer-card c-rec">
+        <div class="card-left">
+          <div class="card-title">Skool Annual Membership</div>
+          <div class="card-hook">$247/year vs $564/year monthly — saves them $317 (56% off). One payment, full year. Best for committed members who are serious about the mission.</div>
+          <div class="card-tags">
+            <span class="tag tag-purple">Annual Plan</span>
+            <span class="tag tag-white">56% Savings</span>
+            <span class="tag tag-gold">Committed Buyers</span>
+          </div>
+          <div class="auto-block">
+            <div class="auto-label">Post-Upgrade Automation</div>
+            <ul class="auto-steps">
+              <li>Purchase → tag "member-annual" → VIP welcome email</li>
+              <li>Month 6: Mid-year check-in + early renewal offer</li>
+              <li>Month 11: Renewal reminder → pitch Lifetime ($497) instead</li>
+              <li>"Why upgrade to Lifetime?" email sequence</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-right">
+          <div class="card-price">$247</div>
+          <div class="card-price-sub">Per Year</div>
+          <div class="card-rev">
+            <div class="card-rev-label">20 members</div>
+            <div class="card-rev-val">$4,940/yr</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector fade-in">
+    <div class="conn-line"></div>
+    <div class="conn-trigger">Trigger: Month 11 renewal → Lifetime pitch → $497</div>
+  </div>
+
+  <!-- STAGE 8 — $497 LIFETIME -->
+  <div class="stage fade-in">
+    <div class="stage-label">
+      <div class="sl-step">Step 08</div>
+      <div class="sl-name" style="color:#FFD600">Lifetime<br>Access</div>
+      <div class="sl-price">$497</div>
+    </div>
+    <div class="offer-wrap">
+      <div class="offer-card c-life">
+        <div class="card-left">
+          <div class="card-title">Life Skool — Lifetime Access</div>
+          <div class="card-hook">One payment. Everything. Forever. Breaks even at 10.5 months of monthly. Targets the most committed members — Kingdom builders who are all in.</div>
+          <div class="card-tags">
+            <span class="tag tag-gold">Lifetime Access</span>
+            <span class="tag tag-white">Highest LTV</span>
+            <span class="tag tag-white">All Future Content</span>
+            <span class="tag tag-gold">Best ROI for Buyer</span>
+          </div>
+          <div class="auto-block">
+            <div class="auto-label">Post-Purchase Automation</div>
+            <ul class="auto-steps">
+              <li>Purchase → tag "member-lifetime" → VIP Lifetime welcome</li>
+              <li>Access to all current + future course content</li>
+              <li>Personal thank you SMS from Terrance</li>
+              <li>Ask for video testimonial (30 days in)</li>
+              <li>Referral ask — "know someone who needs this?"</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-right">
+          <div class="card-price">$497</div>
+          <div class="card-price-sub">One-time</div>
+          <div class="card-rev">
+            <div class="card-rev-label">5 sales/mo</div>
+            <div class="card-rev-val">$2,485/mo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVENUE SUMMARY -->
+  <div class="rev-summary fade-in">
+    <div class="rs-title">Projected Monthly <span>Revenue Stack</span></div>
+    <div class="rs-grid">
+      <div class="rs-cell" style="border-left-color:#4CAF50;">
+        <div class="rs-cell-label">Freebie</div>
+        <div class="rs-cell-val">$0</div>
+        <div class="rs-cell-note">List builder</div>
+      </div>
+      <div class="rs-cell" style="border-left-color:#2196F3;">
+        <div class="rs-cell-label">$7 eBook</div>
+        <div class="rs-cell-val">$2,100</div>
+        <div class="rs-cell-note">10 sales/day</div>
+      </div>
+      <div class="rs-cell" style="border-left-color:#2196F3;">
+        <div class="rs-cell-label">$17 Audio</div>
+        <div class="rs-cell-val">$680</div>
+        <div class="rs-cell-note">40% take rate</div>
+      </div>
+      <div class="rs-cell" style="border-left-color:#2196F3;">
+        <div class="rs-cell-label">$27 Paperback</div>
+        <div class="rs-cell-val">$810</div>
+        <div class="rs-cell-note">30% take rate</div>
+      </div>
+      <div class="rs-cell" style="border-left-color:#FF9800;">
+        <div class="rs-cell-label">$67 Course</div>
+        <div class="rs-cell-val">$1,675</div>
+        <div class="rs-cell-note">25% take rate</div>
+      </div>
+      <div class="rs-cell" style="border-left-color:#9C27B0;">
+        <div class="rs-cell-label">$47/mo Skool</div>
+        <div class="rs-cell-val">$2,350</div>
+        <div class="rs-cell-note">50 members</div>
+      </div>
+      <div class="rs-cell" style="border-left-color:#FFD600;">
+        <div class="rs-cell-label">$497 Lifetime</div>
+        <div class="rs-cell-val">$2,485</div>
+        <div class="rs-cell-note">5 sales/mo</div>
+      </div>
+      <div class="rs-cell" style="border-left-color:#FFD600; background:#1A1600;">
+        <div class="rs-cell-label">Total / Month</div>
+        <div class="rs-cell-val" style="font-size:32px;">$10,100</div>
+        <div class="rs-cell-note">At scale targets</div>
+      </div>
+    </div>
+    <div class="rs-note">
+      <strong>The engine:</strong> The $7 eBook is the front door. Every other offer exists because someone bought that book. The Skool membership ($47/mo) is the recurring backbone — 50 members covers your base. The $497 lifetime closes every month from your most committed buyers. <strong>Total addressable monthly revenue at these targets: $10,100+</strong> — all automated through GHL sequences with zero additional client work.
+    </div>
+  </div>
+
+</div><!-- end canvas -->
+
+<script>
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soul Prosperity — GHL Automation Sequences</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@600;700;800&family=JetBrains+Mono:wght@400;700&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  background-color: #0D0D0D;
+  color: #FFFFFF;
+  font-family: 'Lora', Georgia, serif;
+  overflow-x: hidden;
+}
+
+/* HEADER */
+.header {
+  padding: 48px 32px 36px;
+  border-bottom: 1px solid #222;
+  position: relative;
+  background-color: #0D0D0D;
+}
+.header::after {
+  content: '';
+  position: absolute; bottom:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, #FFD600, transparent);
+}
+.h-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #FFD600;
+  margin-bottom: 10px;
+}
+.h-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px, 8vw, 84px);
+  line-height: 0.9;
+  color: #FFFFFF;
+}
+.h-title span { color: #FFD600; }
+.h-sub { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; color: #AAAAAA; margin-top: 10px; letter-spacing: 0.04em; }
+
+/* NAV TABS */
+.nav {
+  background-color: #111111;
+  border-bottom: 1px solid #222;
+  padding: 0 32px;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav::-webkit-scrollbar { display: none; }
+.nav-tab {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #555555;
+  padding: 16px 20px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+  user-select: none;
+}
+.nav-tab:hover { color: #CCCCCC; }
+.nav-tab.active { color: #FFD600; border-bottom-color: #FFD600; }
+
+/* CONTENT */
+.content { max-width: 900px; margin: 0 auto; padding: 48px 32px 80px; }
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* SEQUENCE HEADER */
+.seq-header {
+  margin-bottom: 36px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #222;
+}
+.seq-stage {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #FFD600;
+  margin-bottom: 8px;
+}
+.seq-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(32px, 6vw, 58px);
+  line-height: 0.9;
+  color: #FFFFFF;
+  margin-bottom: 10px;
+}
+.seq-title span { color: #FFD600; }
+.seq-desc {
+  font-size: 15px;
+  color: #AAAAAA;
+  line-height: 1.6;
+  max-width: 680px;
+}
+.seq-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.meta-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid #333;
+  color: #AAAAAA;
+}
+.meta-pill.gold { border-color: rgba(255,214,0,0.4); color: #FFD600; }
+
+/* MESSAGE CARD */
+.msg-card {
+  background-color: #141414;
+  border: 1px solid #242424;
+  border-left: 4px solid #333;
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.msg-card:hover { border-color: #333; border-left-color: #FFD600; }
+
+.msg-card.email { border-left-color: #2196F3; }
+.msg-card.sms   { border-left-color: #4CAF50; }
+.msg-card.email:hover { border-left-color: #64B5F6; }
+.msg-card.sms:hover   { border-left-color: #81C784; }
+
+.msg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background-color: #191919;
+  border-bottom: 1px solid #222;
+  cursor: pointer;
+  user-select: none;
+  gap: 12px;
+}
+.msg-header-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+
+.msg-type {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 1px solid;
+  flex-shrink: 0;
+}
+.email .msg-type { border-color: #2196F3; color: #2196F3; background: rgba(33,150,243,0.08); }
+.sms   .msg-type { border-color: #4CAF50; color: #4CAF50; background: rgba(76,175,80,0.08); }
+
+.msg-timing {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #FFD600;
+  flex-shrink: 0;
+}
+.msg-subject {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.03em;
+  color: #FFFFFF;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.msg-toggle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: #555;
+  flex-shrink: 0;
+  transition: transform 0.3s;
+}
+.msg-card.open .msg-toggle { transform: rotate(180deg); color: #FFD600; }
+
+.msg-body {
+  display: none;
+  padding: 24px 22px;
+  border-top: 1px solid #1E1E1E;
+}
+.msg-card.open .msg-body { display: block; }
+
+/* EMAIL BODY STYLES */
+.email-meta {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 4px 12px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #222;
+}
+.em-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #555;
+  padding-top: 2px;
+}
+.em-value {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  color: #CCCCCC;
+  letter-spacing: 0.02em;
+}
+.em-value.subj { color: #FFFFFF; font-size: 15px; font-weight: 700; }
+
+.email-copy {
+  font-size: 15px;
+  line-height: 1.85;
+  color: #CCCCCC;
+  white-space: pre-wrap;
+}
+.email-copy .highlight { color: #FFD600; font-style: italic; }
+
+/* SMS BODY */
+.sms-bubble {
+  background-color: #1E2E1E;
+  border: 1px solid #2A4A2A;
+  border-radius: 12px 12px 12px 2px;
+  padding: 16px 18px;
+  max-width: 480px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #CCCCCC;
+  white-space: pre-wrap;
+  margin-bottom: 10px;
+}
+.sms-note {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: #555;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* COPY BTN */
+.copy-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid #333;
+  color: #666;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  margin-top: 16px;
+  display: inline-block;
+}
+.copy-btn:hover { border-color: #FFD600; color: #FFD600; }
+.copy-btn.copied { border-color: #4CAF50; color: #4CAF50; }
+
+/* GHL SETUP BOX */
+.setup-box {
+  background-color: #0D0D0D;
+  border: 1px solid #222;
+  border-left: 3px solid #FFD600;
+  padding: 20px 22px;
+  margin-bottom: 32px;
+}
+.setup-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #FFD600;
+  margin-bottom: 10px;
+}
+.setup-list { list-style: none; }
+.setup-list li {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: #AAAAAA;
+  padding: 5px 0 5px 16px;
+  position: relative;
+  border-bottom: 1px solid #1A1A1A;
+  line-height: 1.5;
+}
+.setup-list li:last-child { border-bottom: none; }
+.setup-list li::before { content: '→'; position: absolute; left: 0; color: #FFD600; }
+
+/* SECTION DIVIDER */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #333, transparent);
+  margin: 40px 0;
+}
+
+/* FOOTER */
+footer {
+  background-color: #0A0A0A;
+  padding: 28px 32px;
+  border-top: 1px solid #1E1E1E;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #444;
+  text-align: center;
+}
+
+@media(max-width:600px){
+  .content { padding: 32px 16px 60px; }
+  .header { padding: 36px 16px 24px; }
+  .nav { padding: 0 16px; }
+  .nav-tab { padding: 14px 14px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="h-eyebrow">Soul Prosperity · GHL Automation Sequences</div>
+  <h1 class="h-title">COPY. <span>PASTE.</span> AUTOMATE.</h1>
+  <p class="h-sub">Every email + SMS for all 8 funnel stages — written in Terrance's voice, ready for GHL</p>
+</div>
+
+<nav class="nav">
+  <div class="nav-tab active" onclick="showPanel(0)">01 Freebie</div>
+  <div class="nav-tab" onclick="showPanel(1)">02 $7 eBook</div>
+  <div class="nav-tab" onclick="showPanel(2)">03 $17 Audio</div>
+  <div class="nav-tab" onclick="showPanel(3)">04 $27 Paperback</div>
+  <div class="nav-tab" onclick="showPanel(4)">05 $67 Course</div>
+  <div class="nav-tab" onclick="showPanel(5)">06 Skool Monthly</div>
+  <div class="nav-tab" onclick="showPanel(6)">07 Annual</div>
+  <div class="nav-tab" onclick="showPanel(7)">08 Lifetime</div>
+</nav>
+
+<div class="content">
+
+<!-- ══════════════════════════════════════════
+     PANEL 0 — FREEBIE SEQUENCE
+════════════════════════════════════════════ -->
+<div class="panel active" id="panel-0">
+  <div class="seq-header">
+    <div class="seq-stage">Stage 01 · Entry Point</div>
+    <h2 class="seq-title">Freebie <span>Download</span> Sequence</h2>
+    <p class="seq-desc">Triggered when someone opts in for the free eBook Starter Kit. Goal: deliver the freebie, build trust, and convert to the $7 eBook within 3 days.</p>
+    <div class="seq-meta">
+      <span class="meta-pill gold">Trigger: Freebie Opt-in</span>
+      <span class="meta-pill">Tag: freebie-download</span>
+      <span class="meta-pill">Duration: 3 Days</span>
+      <span class="meta-pill">4 Messages</span>
+    </div>
+  </div>
+
+  <div class="setup-box">
+    <div class="setup-title">GHL Setup Instructions</div>
+    <ul class="setup-list">
+      <li>Create workflow: Trigger = Form Submitted (Freebie Opt-in form)</li>
+      <li>Action 1: Add tag "freebie-download"</li>
+      <li>Action 2: Send Email — Immediate (Message 1 below)</li>
+      <li>Action 3: Wait 1 day → Send SMS (Message 2)</li>
+      <li>Action 4: Wait 1 day → Send Email (Message 3)</li>
+      <li>Action 5: Wait 1 day → Send Email (Message 4 — $7 pitch)</li>
+      <li>If contact purchases $7 eBook at any point → remove from this workflow</li>
+    </ul>
+  </div>
+
+  <!-- MSG 1 -->
+  <div class="msg-card email open">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 0 · Immediate</span>
+        <span class="msg-subject">Your Free eBook Starter Kit is inside 👇</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">Your Free eBook Starter Kit is inside 👇</span>
+        <span class="em-label">Preview</span><span class="em-value">5 steps. No excuses. Let's go.</span>
+        <span class="em-label">From</span><span class="em-value">Terrance Gee · Soul Prosperity</span>
+      </div>
+      <div class="email-copy">Hey {{contact.first_name}} —
+
+Your free eBook Starter Kit is attached. Click below to download it.
+
+[DOWNLOAD YOUR STARTER KIT →]
+
+5 steps. One page. No fluff.
+
+This checklist is exactly what I wish I had when I first sat down to write. I stared at a blank screen for two weeks before I figured out the thing I'm about to tell you:
+
+<span class="highlight">Your story is already written. You just have to type it out.</span>
+
+The checklist shows you where to start. But if you want the full roadmap — every chapter, every strategy, every publishing step — that's what my $7 eBook is for.
+
+I'll tell you more about it in a couple days. For now, go download your kit and pick ONE thing from the checklist to do today.
+
+That's all. One thing.
+
+— Terrance
+Founder, Soul Prosperity
+
+P.S. Habakkuk 2:2 says "Write the vision and make it plain." You already took the first step by opting in. Don't stop here.</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+
+  <!-- MSG 2 -->
+  <div class="msg-card sms">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">SMS</span>
+        <span class="msg-timing">Day 1</span>
+        <span class="msg-subject">Check-in SMS — did they open it?</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="sms-bubble">Hey {{contact.first_name}}, it's Terrance from Soul Prosperity. Did you get a chance to check out your free starter kit? 👀
+
+One of those 5 steps is going to hit different — I promise. Reply and let me know which one got you.</div>
+      <div class="sms-note">Keep it conversational. No pitch yet.</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy SMS</button>
+    </div>
+  </div>
+
+  <!-- MSG 3 -->
+  <div class="msg-card email">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 2</span>
+        <span class="msg-subject">Why I wrote this book (real talk)</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">Why I wrote this book (real talk)</span>
+        <span class="em-label">Preview</span><span class="em-value">It wasn't about money. It was about obedience.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+Let me be honest with you about why I wrote this book.
+
+It wasn't because I'm some big-time author. It wasn't because I had it all figured out. It was because I kept meeting people — talented, faith-filled, SMART people — who had something powerful to say and were staying silent.
+
+Not because they didn't have a message. But because they didn't have a map.
+
+I was one of those people.
+
+I had stories. Lessons. Faith testimonies. Things that happened to me that I KNOW could help someone else. But every time I sat down to write, I froze. Didn't know where to start. Felt like my voice wasn't good enough.
+
+Then I remembered something Paul did. That dude wrote letters from a jail cell. No laptop. No WiFi. No Canva. Just a message so urgent that he had to get it out — bars or no bars.
+
+<span class="highlight">That's the energy I want you to have about your story.</span>
+
+Tomorrow I'm going to share how the full 40-page eBook can get you from blank page to published — without ever having written anything before.
+
+Stay ready.
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+
+  <!-- MSG 4 -->
+  <div class="msg-card email">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 3</span>
+        <span class="msg-subject">The $7 book that could change everything (30-day guarantee)</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">The $7 book that could change everything (30-day guarantee)</span>
+        <span class="em-label">Preview</span><span class="em-value">Less than a McDouble. More than a moment.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+I'll make this quick because I know you're busy.
+
+My eBook — "How to Write a 40-Page eBook (Even If You've Never Written a Grocery List)" — is $7.
+
+That's it. Seven dollars.
+
+For that you get:
+→ 12 chapters walking you through every step
+→ How to find your message (even if you think you don't have one)
+→ How to structure 40 pages in one weekend
+→ How to publish on Amazon KDP for free
+→ How to market it like Drake dropping an album
+→ The faith factor that makes your words last longer than trends
+
+<span class="highlight">And if you read it and don't feel equipped to write your book — I'll refund every dollar. No questions. No drama. 30-day guarantee.</span>
+
+You've already shown me you're serious by downloading the starter kit. This is the next step.
+
+[GET THE EBOOK FOR $7 →]
+
+Your story is assigned. Time to write it.
+
+— Terrance
+Soul Prosperity</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PANEL 1 — $7 EBOOK BUYER SEQUENCE
+════════════════════════════════════════════ -->
+<div class="panel" id="panel-1">
+  <div class="seq-header">
+    <div class="seq-stage">Stage 02 · First Purchase</div>
+    <h2 class="seq-title">$7 eBook <span>Buyer</span> Sequence</h2>
+    <p class="seq-desc">Triggered on purchase of the $7 eBook. Deliver the book, build excitement, and move them toward the $17 Audiobook Bundle within 7 days.</p>
+    <div class="seq-meta">
+      <span class="meta-pill gold">Trigger: $7 Purchase</span>
+      <span class="meta-pill">Tag: buyer-ebook7</span>
+      <span class="meta-pill">Duration: 7 Days</span>
+      <span class="meta-pill">5 Messages</span>
+    </div>
+  </div>
+
+  <div class="setup-box">
+    <div class="setup-title">GHL Setup Instructions</div>
+    <ul class="setup-list">
+      <li>Trigger = Purchase of $7 eBook product</li>
+      <li>Action 1: Add tag "buyer-ebook7" → Remove tag "freebie-download"</li>
+      <li>Action 2: Remove contact from Freebie workflow if still active</li>
+      <li>Action 3: Send immediate delivery email (Message 1)</li>
+      <li>Action 4: Wait 1 day → Email (Message 2)</li>
+      <li>Action 5: Wait 1 day → Email (Message 3 — $17 intro)</li>
+      <li>Action 6: Wait 2 days → SMS (Message 4)</li>
+      <li>Action 7: Wait 2 days → Email (Message 5 — $17 final push)</li>
+      <li>If $17 purchased at any point → remove from this workflow</li>
+    </ul>
+  </div>
+
+  <div class="msg-card email open">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 0 · Immediate</span>
+        <span class="msg-subject">You're in. Here's your eBook. 📖</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">You're in. Here's your eBook. 📖</span>
+        <span class="em-label">Preview</span><span class="em-value">Welcome to the family. Let's get you writing.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+You just did something most people only talk about.
+
+You invested in your voice. In your story. In your legacy.
+
+$7 isn't a lot of money. But the decision to bet on yourself? That's everything.
+
+Here's your eBook:
+[DOWNLOAD YOUR EBOOK →]
+
+<span class="highlight">My suggestion: start with Chapter 2 (Choosing Your Message) and Chapter 4 (Structuring Like a Pro).</span>
+
+Those two chapters alone will have you with a full outline before you finish your coffee.
+
+Welcome to Soul Prosperity. I'm genuinely glad you're here.
+
+— Terrance
+
+P.S. Hit reply and tell me — what's the story you've been holding onto? I read every response.</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+
+  <div class="msg-card email">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 1</span>
+        <span class="msg-subject">The chapter that changes everything</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">The chapter that changes everything</span>
+        <span class="em-label">Preview</span><span class="em-value">Chapter 6 hit me different when I wrote it.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+Quick check-in. How far have you gotten?
+
+If you haven't started yet — no guilt. Life is busy. But when you do get to Chapter 6 (Storytelling That Hits), I want you to slow down.
+
+That's the chapter where most people feel something shift.
+
+Because we spend so much time thinking our story needs to be PERFECT before we share it. Chapter 6 is where you realize that the mess IS the message.
+
+The card-declined moment. The 2am prayer nobody saw. The time you almost quit.
+
+<span class="highlight">That's your gold. And Chapter 6 shows you exactly how to mine it.</span>
+
+Go read it today. Even if it's just that one chapter.
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+
+  <div class="msg-card email">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 2</span>
+        <span class="msg-subject">Some people read it. Some people HEAR it. 🎧</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">Some people read it. Some people HEAR it. 🎧</span>
+        <span class="em-label">Preview</span><span class="em-value">The audiobook drops different.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+Real question: are you a reader or a listener?
+
+Because I know some of you are going to devour this eBook. And I know some of you are going to let it sit in your downloads folder while life happens.
+
+If you're the second type — I got you.
+
+I made an audiobook version of "How to Write a 40-Page eBook." Same content. Same energy. But narrated in my voice so you can absorb it while you're driving, working out, or doing literally anything else.
+
+<span class="highlight">It's $17. And when you combine it with the eBook you already have — you've got a system for every situation.</span>
+
+Read when you can sit down. Listen when you can't.
+
+[GET THE AUDIOBOOK BUNDLE — $17 →]
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+
+  <div class="msg-card sms">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">SMS</span>
+        <span class="msg-timing">Day 4</span>
+        <span class="msg-subject">Audiobook nudge SMS</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="sms-bubble">{{contact.first_name}} — Terrance here. Have you had a chance to dig into the eBook yet? 
+
+If you're more of an audio person, I dropped the audiobook version for $17. Hit the link and grab it 👉 [LINK]
+
+Sometimes hearing it clicks different than reading it.</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy SMS</button>
+    </div>
+  </div>
+
+  <div class="msg-card email">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 7</span>
+        <span class="msg-subject">Last call on the audiobook (this week only)</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">Last call on the audiobook (this week only)</span>
+        <span class="em-label">Preview</span><span class="em-value">$17 before I move on.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+I don't like to linger, so I'll keep it real.
+
+This is the last time I'm mentioning the audiobook bundle for a while. If you want it, grab it now for $17 before I focus on other stuff.
+
+If not — no worries. The eBook is enough to get you writing.
+
+But if you know you learn better by listening, this is your shot.
+
+[GRAB THE AUDIOBOOK — $17 →]
+
+Either way, I'm rooting for you. Go write something this week.
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PANEL 2 — $17 AUDIO SEQUENCE
+════════════════════════════════════════════ -->
+<div class="panel" id="panel-2">
+  <div class="seq-header">
+    <div class="seq-stage">Stage 03 · Upsell One</div>
+    <h2 class="seq-title">$17 Audiobook <span>Buyer</span> Sequence</h2>
+    <p class="seq-desc">Triggered on $17 purchase. Deliver access, keep momentum, introduce the $27 Paperback as the physical upgrade.</p>
+    <div class="seq-meta">
+      <span class="meta-pill gold">Trigger: $17 Purchase</span>
+      <span class="meta-pill">Tag: buyer-audio17</span>
+      <span class="meta-pill">Duration: 5 Days</span>
+      <span class="meta-pill">4 Messages</span>
+    </div>
+  </div>
+
+  <div class="msg-card email open">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 0 · Immediate</span>
+        <span class="msg-subject">Your audiobook is ready. Hit play. 🎧</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">Your audiobook is ready. Hit play. 🎧</span>
+        <span class="em-label">Preview</span><span class="em-value">Take your message everywhere you go.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+You just leveled up. 
+
+Your audiobook access is live:
+[ACCESS YOUR AUDIOBOOK →]
+
+Now you can take this message with you everywhere — in the car, at the gym, during lunch. No excuses for not getting through it.
+
+<span class="highlight">My challenge: listen to at least 2 chapters today. By the time you're done, you should have your book topic locked in.</span>
+
+Let me know how it lands.
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+
+  <div class="msg-card email">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 2</span>
+        <span class="msg-subject">There's something about holding a real book...</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">There's something about holding a real book...</span>
+        <span class="em-label">Preview</span><span class="em-value">The paperback hits different.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+PDFs live on your phone. Audiobooks live in your ears.
+
+But a physical book? That lives on your shelf. On your desk. It becomes part of your space. People see it. Ask about it. It becomes a conversation starter about your mission.
+
+I have the paperback version available for $27. Shipped to your door.
+
+<span class="highlight">It's also the best gift in the ladder — for a friend, a family member, someone in your church who has a story to tell.</span>
+
+[GRAB THE PAPERBACK — $27 →]
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+
+  <div class="msg-card sms">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">SMS</span>
+        <span class="msg-timing">Day 3</span>
+        <span class="msg-subject">Paperback nudge</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="sms-bubble">{{contact.first_name}} — enjoying the audiobook? 🎧
+
+Quick one — I also have a physical paperback for $27. Ships anywhere. Makes a great gift too if you know someone who needs to hear this message. Link: [LINK]</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy SMS</button>
+    </div>
+  </div>
+
+  <div class="msg-card email">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 5</span>
+        <span class="msg-subject">Final call — paperback + a question for you</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">Final call — paperback + a question for you</span>
+        <span class="em-label">Preview</span><span class="em-value">One more thing before I move on.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+Two things real quick.
+
+One — last chance on the paperback at $27: [LINK]
+
+Two — genuine question: have you started writing yet?
+
+Even an outline? Even a title? Even just a paragraph that came to you at 2am?
+
+Reply and tell me. I want to know. Because the whole point of everything I put out is to get people like you actually writing — not just thinking about it.
+
+What's stopping you?
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PANEL 3 — $27 PAPERBACK SEQUENCE
+════════════════════════════════════════════ -->
+<div class="panel" id="panel-3">
+  <div class="seq-header">
+    <div class="seq-stage">Stage 04 · Upsell Two</div>
+    <h2 class="seq-title">$27 Paperback <span>Buyer</span> Sequence</h2>
+    <p class="seq-desc">Triggered on $27 purchase. Confirm order, keep excitement high, bridge to the $67 Online Course Bundle.</p>
+    <div class="seq-meta">
+      <span class="meta-pill gold">Trigger: $27 Purchase</span>
+      <span class="meta-pill">Tag: buyer-paperback27</span>
+      <span class="meta-pill">Duration: 8 Days</span>
+      <span class="meta-pill">4 Messages</span>
+    </div>
+  </div>
+
+  <div class="msg-card email open">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 0 · Immediate</span>
+        <span class="msg-subject">Your book is on the way 📦</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">Your book is on the way 📦</span>
+        <span class="em-label">Preview</span><span class="em-value">Physical proof that you showed up for yourself.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+Your paperback is confirmed and on its way.
+
+When it arrives, I want you to do something. Put it somewhere you'll see it every single day. Your desk. Your nightstand. Your bathroom counter.
+
+Let it be a daily reminder that you chose to invest in your voice.
+
+<span class="highlight">Because most people just think about writing a book. You bought the blueprint. That's different.</span>
+
+While you wait for it to ship, keep reading the digital version. By the time the physical copy arrives, you should have your outline done.
+
+More from me soon.
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+
+  <div class="msg-card email">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 3</span>
+        <span class="msg-subject">Ready to go deeper?</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">Ready to go deeper?</span>
+        <span class="em-label">Preview</span><span class="em-value">The course takes the book to a whole new level.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+The eBook gives you the roadmap. The audiobook lets you take it anywhere. The paperback makes it real.
+
+But what if you want someone walking you through it, step by step, on video?
+
+That's what the Online Course Bundle is.
+
+Same content — but expanded into full video modules, templates you can download, and bonus training that's not in the book.
+
+<span class="highlight">It's $67. And it's the bridge from "I'm reading about this" to "I'm actually doing this."</span>
+
+[CHECK OUT THE COURSE BUNDLE →]
+
+Let me know if you have questions.
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+
+  <div class="msg-card sms">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">SMS</span>
+        <span class="msg-timing">Day 6</span>
+        <span class="msg-subject">Book arrival check + course nudge</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="sms-bubble">{{contact.first_name}} — your paperback should've arrived by now! 📦 How does it feel to hold it?
+
+If you're ready to go even deeper, the video course bundle is $67 and walks you through every step on camera. Link: [LINK]</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy SMS</button>
+    </div>
+  </div>
+
+  <div class="msg-card email">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 8</span>
+        <span class="msg-subject">The difference between reading and doing</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">The difference between reading and doing</span>
+        <span class="em-label">Preview</span><span class="em-value">The course is for people who are serious.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+I'm going to say something real.
+
+Most people who buy books never finish them. And most people who buy courses never complete them either. I'm not going to pretend otherwise.
+
+But the ones who do? They get results.
+
+The $67 course bundle isn't for everyone. It's for the person who is serious about finishing their book this year. Who wants video walkthroughs, templates, and accountability — not just pages to read.
+
+<span class="highlight">If that's you, the link is below. If it's not the right time, no pressure. The book is enough to get you started.</span>
+
+[GET THE COURSE BUNDLE — $67 →]
+
+Either way — go write something today.
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PANEL 4 — $67 COURSE SEQUENCE
+════════════════════════════════════════════ -->
+<div class="panel" id="panel-4">
+  <div class="seq-header">
+    <div class="seq-stage">Stage 05 · Course Bundle</div>
+    <h2 class="seq-title">$67 Course <span>Buyer</span> Sequence</h2>
+    <p class="seq-desc">Triggered on $67 purchase. Deliver access, guide through the course, and move toward the Skool Monthly membership trial.</p>
+    <div class="seq-meta">
+      <span class="meta-pill gold">Trigger: $67 Purchase</span>
+      <span class="meta-pill">Tag: buyer-course67</span>
+      <span class="meta-pill">Duration: 10 Days</span>
+      <span class="meta-pill">5 Messages</span>
+    </div>
+  </div>
+
+  <div class="msg-card email open">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 0 · Immediate</span>
+        <span class="msg-subject">Welcome to the course. Let's get to work. 🔥</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">Welcome to the course. Let's get to work. 🔥</span>
+        <span class="em-label">Preview</span><span class="em-value">Module 1 is unlocked. Start here.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+Let's go. You're in the course.
+
+[ACCESS YOUR COURSE →]
+
+Start with Module 1. Don't skip around. The modules build on each other and I designed them to go in order for a reason.
+
+Your goal for this week: finish the first 3 modules and have your book topic, one-sentence pitch, and 12-chapter outline done.
+
+That's it. Three modules. One outline. This week.
+
+<span class="highlight">If you get stuck anywhere, reply to this email and I'll help you personally.</span>
+
+Welcome to the work.
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+
+  <div class="msg-card sms">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">SMS</span>
+        <span class="msg-timing">Day 3</span>
+        <span class="msg-subject">Progress check</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="sms-bubble">{{contact.first_name}} — Terrance here. Checking in on the course. How far are you in?
+
+If you're stuck on anything reply here and I'll help you get unstuck. Don't let it sit.</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy SMS</button>
+    </div>
+  </div>
+
+  <div class="msg-card email">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 5</span>
+        <span class="msg-subject">You shouldn't be doing this alone</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">You shouldn't be doing this alone</span>
+        <span class="em-label">Preview</span><span class="em-value">The community makes all the difference.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+Here's something I've noticed about people who finish their books and people who don't.
+
+It's not talent. It's not time. It's not even discipline.
+
+It's community.
+
+The people who finish are around other people who are also finishing. They share progress. They get feedback. They hold each other accountable.
+
+That's why I built the Skool community.
+
+It's a monthly membership — $47/month — with live Q&As, accountability check-ins, new content drops every month, and a community of Kingdom-minded writers who are actually doing the work.
+
+<span class="highlight">There's a 7-day free trial. Try it. If it's not for you, cancel before day 7 and you pay nothing.</span>
+
+[START YOUR FREE 7-DAY TRIAL →]
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+
+  <div class="msg-card email">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 7</span>
+        <span class="msg-subject">Save $317 — here's the annual plan</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">Save $317 — here's the annual plan</span>
+        <span class="em-label">Preview</span><span class="em-value">$247/year vs $564/year. Your call.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+Quick math for you.
+
+Monthly membership: $47 × 12 = $564/year
+Annual membership: $247/year
+
+<span class="highlight">Annual saves you $317. That's 56% off.</span>
+
+If you already know you're committed to the mission — the annual plan is the move. One payment, full year, everything included.
+
+[GET THE ANNUAL PLAN — $247 →]
+
+Or start with the monthly trial if you want to test the waters first: [MONTHLY TRIAL LINK]
+
+Your call. Both options are solid.
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+
+  <div class="msg-card sms">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">SMS</span>
+        <span class="msg-timing">Day 10</span>
+        <span class="msg-subject">Skool final push SMS</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="sms-bubble">{{contact.first_name}} — last nudge on this. The Skool community trial is 7 days free. Nothing to lose to try it.
+
+Monthly: $47/mo → [LINK]
+Annual (save $317): $247/yr → [LINK]
+
+Kingdom builders don't grind alone. 🙏</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy SMS</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PANEL 5 — SKOOL RETENTION
+════════════════════════════════════════════ -->
+<div class="panel" id="panel-5">
+  <div class="seq-header">
+    <div class="seq-stage">Stage 06 · Monthly Membership</div>
+    <h2 class="seq-title">Skool <span>Retention</span> Sequence</h2>
+    <p class="seq-desc">Trial start, conversion, retention, re-engagement, and winback. This is your recurring revenue engine — protect it.</p>
+    <div class="seq-meta">
+      <span class="meta-pill gold">Trigger: Trial Start</span>
+      <span class="meta-pill">Tag: trial-skool</span>
+      <span class="meta-pill">Ongoing</span>
+      <span class="meta-pill">6 Messages</span>
+    </div>
+  </div>
+
+  <div class="msg-card sms open">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">SMS</span>
+        <span class="msg-timing">Trial Day 3</span>
+        <span class="msg-subject">Trial check-in</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="sms-bubble">{{contact.first_name}} — you're 3 days into your Skool trial. Have you jumped into the community yet?
+
+The accountability thread drops value every week. Don't miss it. You've got 4 days left on the trial — make them count.</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy SMS</button>
+    </div>
+  </div>
+
+  <div class="msg-card email">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Trial Day 5</span>
+        <span class="msg-subject">Your trial ends in 2 days — here's what you'd be keeping</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">Your trial ends in 2 days — here's what you'd be keeping</span>
+        <span class="em-label">Preview</span><span class="em-value">$47/month. Less than your streaming subscriptions.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+Your 7-day free trial ends in 2 days.
+
+Here's what $47/month gets you after that:
+
+→ Monthly live Q&A sessions with Terrance
+→ Weekly accountability threads with other Kingdom builders
+→ New content modules dropped every month
+→ Community of writers, entrepreneurs, and faith-led hustlers actually doing the work
+→ Access to everything — past sessions, resources, templates
+
+<span class="highlight">$47/month is $1.57/day. Less than most people spend on coffee.</span>
+
+If you've gotten value from the trial, staying in is a no-brainer.
+
+[STAY IN THE COMMUNITY →]
+
+If you want to cancel, just do it before the trial ends and you won't be charged.
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+
+  <div class="msg-card email">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Month 2</span>
+        <span class="msg-subject">You still in here? (re-engagement check)</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">You still in here? (re-engagement check)</span>
+        <span class="em-label">Preview</span><span class="em-value">I see you. Come back.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+I noticed you haven't been active in the community lately.
+
+That's okay — life happens. But I don't want you paying for something you're not using, AND I don't want you to miss what's been dropping in there.
+
+This month we covered: [INSERT RECENT WIN/CONTENT]
+
+<span class="highlight">Come back and post one update this week. Even one sentence. "I wrote 200 words today." That counts.</span>
+
+Progress over perfection. Always.
+
+See you in there.
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+
+  <div class="msg-card email">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Winback — After Cancel</span>
+        <span class="msg-subject">I'm not going to chase you — but I do want to say this</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">I'm not going to chase you — but I do want to say this</span>
+        <span class="em-label">Preview</span><span class="em-value">The door is open when you're ready.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+I saw you cancelled your membership.
+
+No hard feelings. Genuinely. Life has seasons and I respect that.
+
+I just want to say one thing before you go:
+
+<span class="highlight">Your story still matters. Your book still needs to be written. And when the time is right — we're here.</span>
+
+If things change and you want to come back, the community will be waiting.
+
+[REJOIN WHEN YOU'RE READY →]
+
+Until then — go write something. Even if it's just a paragraph. Even if nobody reads it yet.
+
+Be blessed.
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PANEL 6 — ANNUAL UPGRADE
+════════════════════════════════════════════ -->
+<div class="panel" id="panel-6">
+  <div class="seq-header">
+    <div class="seq-stage">Stage 07 · Annual Plan</div>
+    <h2 class="seq-title">Annual <span>Member</span> Sequence</h2>
+    <p class="seq-desc">For monthly members who upgrade to annual, plus the renewal → Lifetime pitch at month 11.</p>
+    <div class="seq-meta">
+      <span class="meta-pill gold">Trigger: Annual Purchase</span>
+      <span class="meta-pill">Tag: member-annual</span>
+      <span class="meta-pill">3 Messages</span>
+    </div>
+  </div>
+
+  <div class="msg-card email open">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 0 · Immediate</span>
+        <span class="msg-subject">Welcome to the annual plan. You're locked in. 🔒</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">Welcome to the annual plan. You're locked in. 🔒</span>
+        <span class="em-label">Preview</span><span class="em-value">365 days of community, content, and Kingdom work.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+You just saved $317 and committed to a full year.
+
+That's not a small thing. That's a declaration.
+
+You're telling yourself — and God — that you're serious about this for the next 12 months. That the book is getting written. That the mission is getting built.
+
+<span class="highlight">I take that seriously. And I'm going to make sure this year delivers for you.</span>
+
+Everything is unlocked. Get in the community and introduce yourself this week if you haven't already.
+
+[GO TO YOUR COMMUNITY →]
+
+Let's build something this year.
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+
+  <div class="msg-card email">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Month 6</span>
+        <span class="msg-subject">Halfway through your year — how's it going?</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">Halfway through your year — how's it going?</span>
+        <span class="em-label">Preview</span><span class="em-value">6 months in. 6 months to go. What's the report?</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+Six months ago you went annual. How's it going?
+
+I'm asking for real — not a form. Hit reply and give me one sentence: where are you with your book?
+
+Are you ahead of schedule? Behind? Did life get in the way?
+
+<span class="highlight">No judgment. Just want to know so I can serve you better for the second half of your year.</span>
+
+Also — your annual plan renews in 6 months. I'll be in touch with a special offer before then.
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+
+  <div class="msg-card email">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Month 11</span>
+        <span class="msg-subject">Your renewal is coming — but there's a better option</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">Your renewal is coming — but there's a better option</span>
+        <span class="em-label">Preview</span><span class="em-value">Pay once. Never pay again. $497 lifetime.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+Your annual plan renews next month at $247.
+
+Before that happens — I want to give you a better option.
+
+Lifetime access is $497. One payment. You never pay again. Everything included. All future content. Forever.
+
+The math: you'd break even in just over 2 years. After that — every month is free.
+
+<span class="highlight">You've already been here a year. If you're planning to stick around — and I hope you are — the Lifetime plan saves you money long-term.</span>
+
+[UPGRADE TO LIFETIME — $497 →]
+
+Or let your annual renew at $247 — that's fine too.
+
+Just wanted to give you the choice.
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PANEL 7 — LIFETIME
+════════════════════════════════════════════ -->
+<div class="panel" id="panel-7">
+  <div class="seq-header">
+    <div class="seq-stage">Stage 08 · Lifetime Access</div>
+    <h2 class="seq-title">Lifetime <span>Member</span> Sequence</h2>
+    <p class="seq-desc">The highest tier. Welcome them like royalty, ask for a testimonial, activate referrals.</p>
+    <div class="seq-meta">
+      <span class="meta-pill gold">Trigger: $497 Purchase</span>
+      <span class="meta-pill">Tag: member-lifetime</span>
+      <span class="meta-pill">3 Messages</span>
+    </div>
+  </div>
+
+  <div class="msg-card email open">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 0 · Immediate</span>
+        <span class="msg-subject">You're in. For life. 👑</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">You're in. For life. 👑</span>
+        <span class="em-label">Preview</span><span class="em-value">This is what commitment looks like.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+$497. One time. For life.
+
+You didn't just buy a membership. You made a statement.
+
+You said: I'm not testing this. I'm not dipping my toe in. I'm ALL IN on my story, my mission, and my legacy.
+
+<span class="highlight">That's Kingdom energy. And I honor that.</span>
+
+Everything is unlocked — every course, every module, every future drop. It's yours. Forever.
+
+[ACCESS YOUR COMMUNITY →]
+
+One request: in 30 days, I'm going to reach out and ask you for a testimonial. Not because I need the clout — but because your story joining this community could be the thing that convinces someone else to finally start.
+
+Your journey is someone else's permission slip.
+
+Welcome to the family — for life.
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+
+  <div class="msg-card sms">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">SMS</span>
+        <span class="msg-timing">Day 0 · Same Day</span>
+        <span class="msg-subject">Personal thank you from Terrance</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="sms-bubble">{{contact.first_name}} — this is Terrance personally. I saw you just grabbed the Lifetime membership and I just want to say thank you. For real. That means a lot. Welcome to the family for life 🙏👑</div>
+      <div class="sms-note">Send this manually or as a personalized automated SMS. High touch = high loyalty.</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy SMS</button>
+    </div>
+  </div>
+
+  <div class="msg-card email">
+    <div class="msg-header" onclick="toggleCard(this)">
+      <div class="msg-header-left">
+        <span class="msg-type">Email</span>
+        <span class="msg-timing">Day 30</span>
+        <span class="msg-subject">Can I ask you for something?</span>
+      </div>
+      <span class="msg-toggle">▼</span>
+    </div>
+    <div class="msg-body">
+      <div class="email-meta">
+        <span class="em-label">Subject</span><span class="em-value subj">Can I ask you for something?</span>
+        <span class="em-label">Preview</span><span class="em-value">Your story could unlock someone else's.</span>
+      </div>
+      <div class="email-copy">{{contact.first_name}} —
+
+You've been in the Lifetime community for 30 days now.
+
+I want to ask for two things — and I only ask people I trust.
+
+1. A short testimonial. One paragraph or a 60-second video. What made you go Lifetime? What's changed for you? I'll feature it on the sales page (with your permission).
+
+2. A referral. Is there someone in your life — church, family, circle — who has a story they've been sitting on? Send them this link: [REFERRAL LINK]
+
+<span class="highlight">You joining this community was an act of faith. Help me bring one more person in.</span>
+
+Reply here with your testimonial or questions. I read every single one.
+
+— Terrance</div>
+      <button class="copy-btn" onclick="copyText(this)">Copy Email</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- end content -->
+
+<footer>© 2025 Terrance Gee · Soul Prosperity · GHL Automation Sequences · All copy written for GoHighLevel workflows</footer>
+
+<script>
+function showPanel(index) {
+  document.querySelectorAll('.panel').forEach((p, i) => {
+    p.classList.toggle('active', i === index);
+  });
+  document.querySelectorAll('.nav-tab').forEach((t, i) => {
+    t.classList.toggle('active', i === index);
+  });
+}
+
+function toggleCard(header) {
+  const card = header.closest('.msg-card');
+  card.classList.toggle('open');
+}
+
+function copyText(btn) {
+  const body = btn.closest('.msg-body');
+  let text = '';
+
+  const emailMeta = body.querySelector('.email-meta');
+  const emailCopy = body.querySelector('.email-copy');
+  const smsBubble = body.querySelector('.sms-bubble');
+
+  if (emailMeta) {
+    const labels = emailMeta.querySelectorAll('.em-label');
+    const values = emailMeta.querySelectorAll('.em-value');
+    labels.forEach((l, i) => {
+      text += l.textContent.trim() + ': ' + values[i].textContent.trim() + '\n';
+    });
+    text += '\n';
+  }
+  if (emailCopy) text += emailCopy.innerText.trim();
+  if (smsBubble) text += smsBubble.innerText.trim();
+
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = btn.classList.contains('copied') ? (btn.closest('.sms') ? 'Copy SMS' : 'Copy Email') : 'Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(() => {
+    btn.textContent = 'Select manually';
+  });
+}
+</script>
+</body>
+</html>

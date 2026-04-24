@@ -1,0 +1,13 @@
+{
+  "name": "soul-prosperity-command-center",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Soul Prosperity Funnel Command Center dashboard for the $7 eBook offer ladder.",
+  "scripts": {
+    "dev": "serve . -l 3000 --no-clipboard --single",
+    "start": "serve . -l 3000 --no-clipboard --single"
+  },
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soul Prosperity — 30-Day Launch Checklist</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background-color:#0D0D0D; color:#FFFFFF; font-family:'Barlow Condensed',Arial,sans-serif; overflow-x:hidden; }
+.header { padding:48px 32px 36px; border-bottom:1px solid #222; position:relative; }
+.header::after { content:''; position:absolute; bottom:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,#FFD600,transparent); }
+.h-eyebrow { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.25em; text-transform:uppercase; color:#FFD600; margin-bottom:10px; }
+.h-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(40px,8vw,84px); line-height:0.9; color:#FFFFFF; }
+.h-title span { color:#FFD600; }
+.h-sub { font-size:16px; color:#AAAAAA; margin-top:10px; letter-spacing:0.04em; }
+.progress-wrap { background:#111; border-bottom:1px solid #222; padding:20px 32px; }
+.progress-label { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:#FFD600; margin-bottom:10px; }
+.progress-bar { height:6px; background:#222; overflow:hidden; }
+.progress-fill { height:100%; background:linear-gradient(90deg,#C9921A,#FFD600); width:0%; transition:width 0.5s ease; }
+.progress-stats { display:flex; gap:32px; margin-top:12px; flex-wrap:wrap; }
+.p-stat { font-family:'JetBrains Mono',monospace; font-size:11px; color:#666; letter-spacing:0.08em; }
+.p-stat span { color:#FFD600; font-weight:700; }
+.canvas { max-width:960px; margin:0 auto; padding:40px 32px 80px; }
+.week-block { margin-bottom:48px; }
+.week-header { display:flex; align-items:center; gap:20px; padding:20px 24px; margin-bottom:4px; cursor:pointer; user-select:none; border-left:4px solid #FFD600; background:#141414; transition:background 0.2s; }
+.week-header:hover { background:#191919; }
+.week-num { font-family:'Bebas Neue',sans-serif; font-size:52px; line-height:1; color:#333; flex-shrink:0; width:56px; }
+.week-info { flex:1; }
+.week-title { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:0.04em; color:#FFFFFF; line-height:1; }
+.week-title span { color:#FFD600; }
+.week-subtitle { font-size:13px; color:#AAAAAA; letter-spacing:0.06em; text-transform:uppercase; margin-top:4px; }
+.week-count { font-family:'JetBrains Mono',monospace; font-size:11px; color:#666; text-align:right; flex-shrink:0; }
+.week-count .done-num { color:#4CAF50; font-weight:700; }
+.week-toggle { font-size:14px; color:#444; transition:transform 0.3s; flex-shrink:0; }
+.week-block.open .week-toggle { transform:rotate(180deg); color:#FFD600; }
+.task-list { display:none; flex-direction:column; gap:2px; }
+.week-block.open .task-list { display:flex; }
+.task { display:flex; align-items:flex-start; gap:14px; padding:14px 18px 14px 24px; background:#161616; border-left:3px solid transparent; cursor:pointer; transition:background 0.15s,border-color 0.15s; border-bottom:1px solid #1A1A1A; }
+.task:hover { background:#1C1C1C; }
+.task.done { background:#101A10; border-left-color:#4CAF50; }
+.task.done .task-text { color:#555; text-decoration:line-through; text-decoration-color:#444; }
+.task.done .task-title { color:#555; }
+.checkbox { width:20px; height:20px; border:2px solid #333; flex-shrink:0; display:flex; align-items:center; justify-content:center; margin-top:2px; transition:border-color 0.2s,background 0.2s; }
+.task.done .checkbox { border-color:#4CAF50; background:#4CAF50; }
+.check-mark { font-size:12px; color:#FFFFFF; display:none; }
+.task.done .check-mark { display:block; }
+.task-body { flex:1; }
+.task-title { font-size:16px; font-weight:700; letter-spacing:0.03em; color:#FFFFFF; margin-bottom:3px; line-height:1.3; }
+.task-text { font-size:13px; color:#888888; line-height:1.5; letter-spacing:0.02em; }
+.task-tags { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+.ttag { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; padding:2px 7px; border:1px solid; }
+.ttag-ghl { border-color:#FF9800; color:#FF9800; }
+.ttag-design { border-color:#E91E63; color:#E91E63; }
+.ttag-copy { border-color:#2196F3; color:#2196F3; }
+.ttag-social { border-color:#9C27B0; color:#CE93D8; }
+.ttag-tech { border-color:#00BCD4; color:#00BCD4; }
+.ttag-money { border-color:#4CAF50; color:#4CAF50; }
+.ttag-fire { border-color:#FFD600; color:#FFD600; }
+.day-label { padding:8px 24px; background:#0D0D0D; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#444; border-bottom:1px solid #1A1A1A; }
+.milestone { background:rgba(255,214,0,0.05); border:1px solid rgba(255,214,0,0.2); border-left:4px solid #FFD600; padding:16px 20px; margin:16px 0 4px; display:flex; align-items:center; gap:14px; }
+.ms-icon { font-size:24px; flex-shrink:0; }
+.ms-text { font-size:16px; font-weight:700; letter-spacing:0.04em; color:#FFD600; }
+.ms-sub { font-size:13px; color:#888; margin-top:3px; }
+.rev-tracker { background:#111; border:1px solid #222; border-top:3px solid #FFD600; padding:32px 28px; margin-top:48px; }
+.rt-title { font-family:'Bebas Neue',sans-serif; font-size:32px; color:#FFFFFF; margin-bottom:24px; }
+.rt-title span { color:#FFD600; }
+.rt-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:3px; margin-bottom:24px; }
+.rt-cell { background:#161616; padding:16px 18px; }
+.rt-label { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#555; margin-bottom:6px; }
+.rt-input { background:transparent; border:none; border-bottom:1px solid #333; color:#FFD600; font-family:'Bebas Neue',sans-serif; font-size:28px; width:100%; outline:none; padding:2px 0; transition:border-color 0.2s; }
+.rt-input:focus { border-bottom-color:#FFD600; }
+.rt-input::placeholder { color:#333; }
+.rt-total { background:#1A1600; padding:16px 18px; }
+.rt-total-label { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#FFD600; margin-bottom:4px; }
+.rt-total-val { font-family:'Bebas Neue',sans-serif; font-size:36px; color:#FFD600; }
+.reset-btn { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; background:transparent; border:1px solid #333; color:#555; padding:8px 16px; cursor:pointer; transition:border-color 0.2s,color 0.2s; margin-top:16px; }
+.reset-btn:hover { border-color:#F44336; color:#F44336; }
+footer { background:#0A0A0A; padding:28px 32px; border-top:1px solid #1E1E1E; font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#444; text-align:center; }
+@media(max-width:600px){ .canvas{padding:24px 16px 60px;} .header{padding:36px 16px 24px;} .week-num{font-size:36px;width:42px;} }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="h-eyebrow">Soul Prosperity · 30-Day Launch Plan</div>
+  <h1 class="h-title">THE <span>LAUNCH</span><br>CHECKLIST</h1>
+  <p class="h-sub">Every task. Every day. Week by week. Click each item to mark it done.</p>
+</div>
+<div class="progress-wrap">
+  <div class="progress-label">Overall Launch Progress</div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-stats">
+    <div class="p-stat">Completed: <span id="doneCount">0</span></div>
+    <div class="p-stat">Remaining: <span id="leftCount">0</span></div>
+    <div class="p-stat">Total Tasks: <span id="totalCount">0</span></div>
+    <div class="p-stat">Progress: <span id="pctCount">0%</span></div>
+  </div>
+</div>
+<div class="canvas">
+
+<!-- PRE-LAUNCH -->
+<div class="week-block open" id="week-pre">
+  <div class="week-header" onclick="toggleWeek('week-pre')">
+    <div class="week-num">00</div>
+    <div class="week-info"><div class="week-title">Pre-Launch <span>Setup</span></div><div class="week-subtitle">Foundation — Do this before anything goes public</div></div>
+    <div class="week-count" id="wc-pre">0/12 done</div>
+    <div class="week-toggle">▼</div>
+  </div>
+  <div class="task-list">
+    <div class="day-label">Technical Setup</div>
+    <div class="task" onclick="toggleTask(this,`pre`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Upload $7 eBook PDF to GHL Products</div><div class="task-text">Create product → set price $7 → attach PDF delivery → test full purchase flow end to end</div><div class="task-tags"><span class="ttag ttag-ghl">GHL</span><span class="ttag ttag-money">Revenue</span><span class="ttag ttag-fire">Priority</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`pre`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Set up $17, $27, $67 products in GHL</div><div class="task-text">Audiobook · Paperback · Course Bundle — all priced, all with delivery configured</div><div class="task-tags"><span class="ttag ttag-ghl">GHL</span><span class="ttag ttag-money">Revenue</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`pre`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Connect Stripe to GHL and test transaction</div><div class="task-text">Verify Stripe → connect to GHL gateway → run $1 test → confirm webhook fires correctly</div><div class="task-tags"><span class="ttag ttag-tech">Tech</span><span class="ttag ttag-money">Revenue</span><span class="ttag ttag-fire">Priority</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`pre`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Build freebie opt-in page in GHL</div><div class="task-text">Name + email form → confirm download → tag "freebie-download" → trigger automation workflow</div><div class="task-tags"><span class="ttag ttag-ghl">GHL</span><span class="ttag ttag-design">Design</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`pre`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Host sales page and connect buy button to GHL checkout</div><div class="task-text">Upload sales-page-7-ebook.html → host on GHL funnel or custom domain → test the full buy flow</div><div class="task-tags"><span class="ttag ttag-tech">Tech</span><span class="ttag ttag-fire">Priority</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`pre`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Build all 8 GHL automation workflows</div><div class="task-text">Use the GHL Automation Sequences doc → build each workflow → test triggers → verify email and SMS delivery</div><div class="task-tags"><span class="ttag ttag-ghl">GHL</span><span class="ttag ttag-fire">Priority</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`pre`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Set up Skool community (free trial + pricing)</div><div class="task-text">Create workspace → configure 7-day trial → set $47/mo and $247/yr pricing → add welcome post → test join flow</div><div class="task-tags"><span class="ttag ttag-tech">Tech</span><span class="ttag ttag-money">Revenue</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`pre`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Upload eBook to Amazon KDP</div><div class="task-text">Create KDP account → upload PDF + cover → write description → set $7 price → submit (takes 24-72hrs to go live)</div><div class="task-tags"><span class="ttag ttag-tech">Tech</span><span class="ttag ttag-money">Revenue</span></div></div></div>
+    <div class="day-label">Content Prep</div>
+    <div class="task" onclick="toggleTask(this,`pre`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Create all 8 quote graphic images in Canva</div><div class="task-text">Black background #0D0D0D · White Lora Italic · Gold #FFD600 Bebas Neue · Export 1080x1080 feed + 1080x1920 story sizes</div><div class="task-tags"><span class="ttag ttag-design">Design</span><span class="ttag ttag-social">Social</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`pre`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Film Reel Script 1 (McChicken story) and save to drafts</div><div class="task-text">Talking head · good lighting · caption it · DO NOT post yet — save to drafts for launch day</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-fire">Priority</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`pre`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Film Reel Script 2 (Paul from prison) and save to drafts</div><div class="task-text">Have 2 reels ready before launch day so you're not scrambling in Week 1</div><div class="task-tags"><span class="ttag ttag-social">Social</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`pre`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Update all social bios with book link</div><div class="task-text">Instagram · TikTok · Facebook · X → bio: "New eBook $7 → [LINK]" or Linktree pointing to sales page</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-copy">Copy</span></div></div></div>
+  </div>
+</div>
+
+<div class="milestone"><div class="ms-icon">🚀</div><div><div class="ms-text">LAUNCH DAY — Week 1 Begins</div><div class="ms-sub">Everything goes live. First sales. First list. First momentum.</div></div></div>
+
+<!-- WEEK 1 -->
+<div class="week-block" id="week-1">
+  <div class="week-header" onclick="toggleWeek('week-1')">
+    <div class="week-num">01</div>
+    <div class="week-info"><div class="week-title">Week 1 — <span>Go Live</span></div><div class="week-subtitle">Launch · First Sales · Build Momentum</div></div>
+    <div class="week-count" id="wc-1">0/10 done</div>
+    <div class="week-toggle">▼</div>
+  </div>
+  <div class="task-list">
+    <div class="day-label">Day 1 — Launch</div>
+    <div class="task" onclick="toggleTask(this,`1`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Post Reel 1 (McChicken) on TikTok + IG + YouTube Shorts</div><div class="task-text">Simultaneously on all platforms · caption from social pack · link in bio pointing to sales page</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-fire">Launch Day</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`1`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Post X Thread 1 (How to write eBook this weekend)</div><div class="task-text">Use Thread 1 from social content pack → post all tweets in sequence → pin to your profile</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-copy">Copy</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`1`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Post Caption 1 (McChicken story) on IG feed</div><div class="task-text">Pair with book cover · use Caption 1 · include hashtag pack · post 6-9pm for best reach</div><div class="task-tags"><span class="ttag ttag-social">Social</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`1`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Send launch broadcast to existing GHL contacts</div><div class="task-text">If you have any existing list → broadcast: "My $7 eBook just dropped" → use Day 3 freebie email as template adapted for warm contacts</div><div class="task-tags"><span class="ttag ttag-ghl">GHL</span><span class="ttag ttag-fire">Launch Day</span></div></div></div>
+    <div class="day-label">Days 2-7</div>
+    <div class="task" onclick="toggleTask(this,`1`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Post Quote Graphic 1 (Faith is WiFi) as IG story + feed</div><div class="task-text">Story first with link sticker → then feed post → track which drives more click-throughs to sales page</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-design">Design</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`1`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Post Reel 2 (Paul from prison) on all platforms</div><div class="task-text">Day 2 or 3 · reply to EVERY comment on Reel 1 before posting Reel 2 to boost algorithm signals</div><div class="task-tags"><span class="ttag ttag-social">Social</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`1`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Post Caption 2 (You don't need a publisher) on Facebook</div><div class="task-text">Post on your page + share to 3 Christian entrepreneur or writer Facebook groups</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-copy">Copy</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`1`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Post Quote Graphic 2 (Your scars are receipts)</div><div class="task-text">Highest engagement potential quote · post to IG feed + Pinterest · use as TikTok text overlay background</div><div class="task-tags"><span class="ttag ttag-social">Social</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`1`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Verify all GHL automations firing correctly</div><div class="task-text">Do a test opt-in → confirm freebie email arrives → confirm Day 1 SMS fires → check tags in contacts tab</div><div class="task-tags"><span class="ttag ttag-ghl">GHL</span><span class="ttag ttag-tech">Tech</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`1`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Week 1 revenue check — log first sales</div><div class="task-text">GHL + Stripe → record $7 sales count → note which platform drove them → adjust content focus for Week 2</div><div class="task-tags"><span class="ttag ttag-money">Revenue</span><span class="ttag ttag-fire">Review</span></div></div></div>
+  </div>
+</div>
+
+<div class="milestone"><div class="ms-icon">📈</div><div><div class="ms-text">WEEK 2 — Build Audience and Drive Upsells</div><div class="ms-sub">Consistent content. First $17 and $27 buyers. Skool trial signups begin.</div></div></div>
+
+<!-- WEEK 2 -->
+<div class="week-block" id="week-2">
+  <div class="week-header" onclick="toggleWeek('week-2')">
+    <div class="week-num">02</div>
+    <div class="week-info"><div class="week-title">Week 2 — <span>Build and Upsell</span></div><div class="week-subtitle">Content Consistency · Upsells · Community Growth</div></div>
+    <div class="week-count" id="wc-2">0/10 done</div>
+    <div class="week-toggle">▼</div>
+  </div>
+  <div class="task-list">
+    <div class="task" onclick="toggleTask(this,`2`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Film and post Reel 3 (Unpopular Opinion)</div><div class="task-text">Controversy drives comments · reply to every single comment to boost algorithm · goal is 50+ comments</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-fire">Priority</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`2`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Post X Thread 2 (Paul the original content creator)</div><div class="task-text">Best thread for faith + culture crossover · ask followers to RT if they know someone with a story to tell</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-copy">Copy</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`2`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Post Caption 3 (The night I almost quit) on Facebook</div><div class="task-text">Long-form storytelling performs best on Facebook · post on page + share to 3 relevant groups</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-copy">Copy</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`2`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Post 3 quote graphics (Wed / Fri / Sun)</div><div class="task-text">Wed: "Write the vision" · Fri: "Don't be polished, be available" · Sun: "40 pages into eternity" — Sunday gets highest saves</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-design">Design</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`2`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Film Reel 4 (3 things I wish I knew) and post</div><div class="task-text">Tutorial format · use text overlays for each point · high saves and shares = algorithm fuel</div><div class="task-tags"><span class="ttag ttag-social">Social</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`2`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">GHL broadcast to $7 buyers — push $17 audiobook</div><div class="task-text">Tag: buyer-ebook7 minus buyer-audio17 → use Day 2 email from $7 sequence as template → send mid-week</div><div class="task-tags"><span class="ttag ttag-ghl">GHL</span><span class="ttag ttag-money">Revenue</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`2`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Post Caption 5 (POV TikTok comment bait)</div><div class="task-text">Ask people to drop a pen emoji if writing a book · reply to every response · these become warm leads for the freebie opt-in</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-copy">Copy</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`2`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">DM 5 people personally — share the book</div><div class="task-text">Personal message not copy-paste · "I wrote something I think you'd get value from" · these convert higher than any ad</div><div class="task-tags"><span class="ttag ttag-fire">Priority</span><span class="ttag ttag-money">Revenue</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`2`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Go live on IG or Facebook for 15 min about the book</div><div class="task-text">No script needed · open the book · read one section · explain why you wrote it · mention $7 price at least 3 times · pin comment with link</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-fire">Priority</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`2`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Week 2 revenue review — track upsell conversion rates</div><div class="task-text">How many $7 buyers converted to $17? If below 30% → tweak Day 2 email subject line and resend to non-openers</div><div class="task-tags"><span class="ttag ttag-money">Revenue</span><span class="ttag ttag-fire">Review</span></div></div></div>
+  </div>
+</div>
+
+<div class="milestone"><div class="ms-icon">🔥</div><div><div class="ms-text">WEEK 3 — Scale What's Working</div><div class="ms-sub">Double down on best-performing content. Push the $67 course. Fill Skool.</div></div></div>
+
+<!-- WEEK 3 -->
+<div class="week-block" id="week-3">
+  <div class="week-header" onclick="toggleWeek('week-3')">
+    <div class="week-num">03</div>
+    <div class="week-info"><div class="week-title">Week 3 — <span>Scale It</span></div><div class="week-subtitle">Double Down · Course Launch · Fill the Community</div></div>
+    <div class="week-count" id="wc-3">0/10 done</div>
+    <div class="week-toggle">▼</div>
+  </div>
+  <div class="task-list">
+    <div class="task" onclick="toggleTask(this,`3`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Film and post Reel 5 (God didn't give you that story)</div><div class="task-text">Faith audience reel · best posted Sunday · gets saved and shared more than views — that's the goal</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-fire">Priority</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`3`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Repost best-performing Week 1 reel on TikTok</div><div class="task-text">Whichever reel got most views in Week 1 → repost on TikTok with slightly different caption · TikTok rewards re-posting</div><div class="task-tags"><span class="ttag ttag-social">Social</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`3`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Post X Thread 3 (7 reasons your book isn't written)</div><div class="task-text">Most shareable thread in the pack · add a poll: "Which reason resonates most?" · drives engagement and profile visits</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-copy">Copy</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`3`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">GHL broadcast — dedicated $67 course email to all buyers</div><div class="task-text">Tags: buyer-ebook7 + buyer-audio17 + buyer-paperback27 who haven't purchased course · use Day 8 email from $27 sequence</div><div class="task-tags"><span class="ttag ttag-ghl">GHL</span><span class="ttag ttag-money">Revenue</span><span class="ttag ttag-fire">Priority</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`3`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">GHL broadcast — Skool trial offer to all buyers</div><div class="task-text">"Ready to join the community?" → link to 7-day free trial → this is your recurring revenue activation push</div><div class="task-tags"><span class="ttag ttag-ghl">GHL</span><span class="ttag ttag-money">Revenue</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`3`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Post Caption 6 (Tag someone with a story) on IG + Facebook</div><div class="task-text">Referral mechanic built in · every tag = new eyeball on your offer · respond to every tag with a personal welcome</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-copy">Copy</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`3`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Ask first buyers for testimonials via DM or email</div><div class="task-text">"What's been the most valuable part so far?" → collect 3-5 real responses → use to update sales page testimonials</div><div class="task-tags"><span class="ttag ttag-copy">Copy</span><span class="ttag ttag-fire">Priority</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`3`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Update sales page testimonials with real quotes</div><div class="task-text">Replace placeholders in HTML with real buyer quotes → republish → real testimonials increase conversion 15-30%</div><div class="task-tags"><span class="ttag ttag-design">Design</span><span class="ttag ttag-fire">Priority</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`3`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Film Reel 6 (How to write it this weekend — tutorial)</div><div class="task-text">Tutorial format · show actual steps · screen record + talking head combo · tutorials get the most saves</div><div class="task-tags"><span class="ttag ttag-social">Social</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`3`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Week 3 full revenue audit</div><div class="task-text">Total by product · best automation open rates · which platform drives most opt-ins · double what's working, cut what's not</div><div class="task-tags"><span class="ttag ttag-money">Revenue</span><span class="ttag ttag-fire">Review</span></div></div></div>
+  </div>
+</div>
+
+<div class="milestone"><div class="ms-icon">👑</div><div><div class="ms-text">WEEK 4 — Recurring Revenue and Long Game</div><div class="ms-sub">Lock in members. Close first Lifetime buyers. Build the system that runs without you.</div></div></div>
+
+<!-- WEEK 4 -->
+<div class="week-block" id="week-4">
+  <div class="week-header" onclick="toggleWeek('week-4')">
+    <div class="week-num">04</div>
+    <div class="week-info"><div class="week-title">Week 4 — <span>Lock It In</span></div><div class="week-subtitle">Recurring Revenue · Lifetime Closes · System Automation</div></div>
+    <div class="week-count" id="wc-4">0/10 done</div>
+    <div class="week-toggle">▼</div>
+  </div>
+  <div class="task-list">
+    <div class="task" onclick="toggleTask(this,`4`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Post X Thread 4 (I just published my first eBook)</div><div class="task-text">Personal story format · highest trust-build of the 4 threads · best for converting lurkers to buyers · post Monday</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-copy">Copy</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`4`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">GHL broadcast — Lifetime $497 offer to most engaged buyers</div><div class="task-text">Filter: buyer-course67 OR member-monthly → send $497 Lifetime offer with 7-day window · biggest single-ticket revenue event of the 30 days</div><div class="task-tags"><span class="ttag ttag-ghl">GHL</span><span class="ttag ttag-money">Revenue</span><span class="ttag ttag-fire">Priority</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`4`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Host free 30-min live training on writing your first eBook</div><div class="task-text">IG Live or Zoom · free value · pitch $7 eBook at end · pitch Skool · record it and repurpose as a YouTube video</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-fire">Priority</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`4`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Post remaining quote graphics (Mon + Wed + Fri)</div><div class="task-text">Quotes 5-8 · "The mess is the message" · "Paul was viral before WiFi" · "Your story is assigned" · "40 pages into eternity"</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-design">Design</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`4`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Post Caption 4 ($7 changes everything) on Instagram</div><div class="task-text">Clean product mockup · post at 7pm local · use as ad creative if boosting with paid spend</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-copy">Copy</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`4`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Run Amazon KDP free promo days (2 days)</div><div class="task-text">Announce on social: "Free on Amazon this weekend" → drives organic discovery and reviews → reviews fuel long-term sales</div><div class="task-tags"><span class="ttag ttag-money">Revenue</span><span class="ttag ttag-tech">Tech</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`4`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Reach out to 3 churches or ministries about bulk orders</div><div class="task-text">DM 3 youth pastors or ministry leaders · "This book could equip your congregation to share their testimonies" · offer 10-copy discount</div><div class="task-tags"><span class="ttag ttag-money">Revenue</span><span class="ttag ttag-fire">Priority</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`4`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Review and optimize low-performing GHL email subject lines</div><div class="task-text">Check open rates → any below 25% → A/B test new subject line → resend to non-openers with new subject</div><div class="task-tags"><span class="ttag ttag-ghl">GHL</span><span class="ttag ttag-fire">Optimize</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`4`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">Plan Month 2 content calendar</div><div class="task-text">Create new reel hooks from the Hook Formulas tab · rotate quote graphics · plan 4 new reels · schedule 3 X threads · content never stops</div><div class="task-tags"><span class="ttag ttag-social">Social</span><span class="ttag ttag-copy">Copy</span></div></div></div>
+    <div class="task" onclick="toggleTask(this,`4`)"><div class="checkbox"><span class="check-mark">✓</span></div><div class="task-body"><div class="task-title">30-Day Final Revenue Report</div><div class="task-text">Total revenue by offer · list size · Skool member count · best content · worst content · what to double, what to cut, what to build next</div><div class="task-tags"><span class="ttag ttag-money">Revenue</span><span class="ttag ttag-fire">Review</span></div></div></div>
+  </div>
+</div>
+
+<!-- REVENUE TRACKER -->
+<div class="rev-tracker">
+  <div class="rt-title">30-Day Revenue <span>Tracker</span></div>
+  <div class="rt-grid">
+    <div class="rt-cell"><div class="rt-label">$7 eBook Sales (#)</div><input class="rt-input" type="number" placeholder="0" id="r1" oninput="calcTotal()"></div>
+    <div class="rt-cell"><div class="rt-label">$17 Audio Sales (#)</div><input class="rt-input" type="number" placeholder="0" id="r2" oninput="calcTotal()"></div>
+    <div class="rt-cell"><div class="rt-label">$27 Paperback Sales (#)</div><input class="rt-input" type="number" placeholder="0" id="r3" oninput="calcTotal()"></div>
+    <div class="rt-cell"><div class="rt-label">$67 Course Sales (#)</div><input class="rt-input" type="number" placeholder="0" id="r4" oninput="calcTotal()"></div>
+    <div class="rt-cell"><div class="rt-label">Skool Members (#)</div><input class="rt-input" type="number" placeholder="0" id="r5" oninput="calcTotal()"></div>
+    <div class="rt-cell"><div class="rt-label">$247 Annual (#)</div><input class="rt-input" type="number" placeholder="0" id="r6" oninput="calcTotal()"></div>
+    <div class="rt-cell"><div class="rt-label">$497 Lifetime (#)</div><input class="rt-input" type="number" placeholder="0" id="r7" oninput="calcTotal()"></div>
+    <div class="rt-total"><div class="rt-total-label">Total 30-Day Revenue</div><div class="rt-total-val" id="totalRev">$0</div></div>
+  </div>
+  <button class="reset-btn" onclick="resetTracker()">Reset Tracker</button>
+</div>
+
+</div>
+<footer>© 2025 Terrance Gee · Soul Prosperity · 30-Day Launch Checklist · Kingdom Systems</footer>
+<script>
+const WEEK_TOTALS = {pre:12, 1:10, 2:10, 3:10, 4:10};
+let launchState = [];
+let revenueState = [];
+
+function toggleTask(task, week) {
+  task.classList.toggle('done');
+  saveState();
+  updateProgress();
+  updateWeekCount(week);
+}
+
+function toggleWeek(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+function updateWeekCount(week) {
+  const block = document.getElementById('week-' + week);
+  if (!block) return;
+  const total = block.querySelectorAll('.task').length;
+  const done = block.querySelectorAll('.task.done').length;
+  const el = document.getElementById('wc-' + week);
+  if (el) el.innerHTML = `<span class="done-num">${done}</span>/${total} done`;
+}
+
+function updateProgress() {
+  const all = document.querySelectorAll('.task');
+  const done = document.querySelectorAll('.task.done');
+  const total = all.length;
+  const doneNum = done.length;
+  const pct = total > 0 ? Math.round((doneNum / total) * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('doneCount').textContent = doneNum;
+  document.getElementById('leftCount').textContent = total - doneNum;
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('pctCount').textContent = pct + '%';
+  ['pre','1','2','3','4'].forEach(w => updateWeekCount(w));
+}
+
+function saveState() {
+  launchState = Array.from(document.querySelectorAll('.task')).map(t => t.classList.contains('done'));
+}
+
+function loadState() {
+  document.querySelectorAll('.task').forEach((t, i) => { if (launchState[i]) t.classList.add('done'); });
+}
+
+function calcTotal() {
+  const prices = [7, 17, 27, 67, 47, 247, 497];
+  let total = 0;
+  for (let i = 1; i <= 7; i++) {
+    total += (parseFloat(document.getElementById('r'+i).value) || 0) * prices[i-1];
+  }
+  document.getElementById('totalRev').textContent = '$' + total.toLocaleString();
+  revenueState = [1,2,3,4,5,6,7].map(i=>document.getElementById('r'+i).value);
+}
+
+function resetTracker() {
+  if (!confirm('Reset all revenue numbers?')) return;
+  for (let i=1; i<=7; i++) document.getElementById('r'+i).value='';
+  document.getElementById('totalRev').textContent='$0';
+  revenueState = [];
+}
+
+function loadRevenue() {
+  revenueState.forEach((v,i) => { if(v && document.getElementById('r'+(i+1))) document.getElementById('r'+(i+1)).value=v; });
+  calcTotal();
+}
+
+window.addEventListener('DOMContentLoaded', () => { loadState(); loadRevenue(); updateProgress(); });
+</script>
+</body>
+</html>

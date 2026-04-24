@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soul Prosperity — Social Content Pack</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@600;700;800&family=JetBrains+Mono:wght@400;700&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  background-color: #0D0D0D;
+  color: #FFFFFF;
+  font-family: 'Lora', Georgia, serif;
+  overflow-x: hidden;
+}
+
+.header {
+  padding: 48px 32px 36px;
+  border-bottom: 1px solid #222;
+  position: relative;
+  background-color: #0D0D0D;
+}
+.header::after {
+  content: '';
+  position: absolute; bottom:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, #FFD600, transparent);
+}
+.h-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: #FFD600; margin-bottom: 10px; }
+.h-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(40px, 8vw, 84px); line-height: 0.9; color: #FFFFFF; }
+.h-title span { color: #FFD600; }
+.h-sub { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; color: #AAAAAA; margin-top: 10px; letter-spacing: 0.04em; }
+
+/* NAV */
+.nav { background-color: #111111; border-bottom: 1px solid #222; padding: 0 32px; display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; }
+.nav::-webkit-scrollbar { display: none; }
+.nav-tab { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: #555555; padding: 16px 20px; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; transition: color 0.2s, border-color 0.2s; user-select: none; }
+.nav-tab:hover { color: #CCCCCC; }
+.nav-tab.active { color: #FFD600; border-bottom-color: #FFD600; }
+
+/* CONTENT */
+.content { max-width: 900px; margin: 0 auto; padding: 48px 32px 80px; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* SECTION HEADER */
+.sec-header { margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid #222; }
+.sec-stage { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #FFD600; margin-bottom: 8px; }
+.sec-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(32px, 6vw, 58px); line-height: 0.9; color: #FFFFFF; margin-bottom: 10px; }
+.sec-title span { color: #FFD600; }
+.sec-desc { font-size: 15px; color: #AAAAAA; line-height: 1.6; max-width: 680px; }
+.sec-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+.meta-pill { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 10px; border: 1px solid #333; color: #AAAAAA; }
+.meta-pill.gold { border-color: rgba(255,214,0,0.4); color: #FFD600; }
+
+/* CONTENT CARD */
+.content-card {
+  background-color: #141414;
+  border: 1px solid #242424;
+  border-left: 4px solid #FFD600;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.content-card.reel { border-left-color: #E91E63; }
+.content-card.caption { border-left-color: #2196F3; }
+.content-card.quote { border-left-color: #FF9800; }
+.content-card.hook { border-left-color: #9C27B0; }
+.content-card.thread { border-left-color: #00BCD4; }
+
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px;
+  background-color: #191919;
+  border-bottom: 1px solid #222;
+  cursor: pointer; user-select: none; gap: 12px;
+}
+.card-header-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+.card-type { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; padding: 3px 8px; border: 1px solid; flex-shrink: 0; }
+.reel .card-type   { border-color: #E91E63; color: #E91E63; background: rgba(233,30,99,0.08); }
+.caption .card-type{ border-color: #2196F3; color: #2196F3; background: rgba(33,150,243,0.08); }
+.quote .card-type  { border-color: #FF9800; color: #FF9800; background: rgba(255,152,0,0.08); }
+.hook .card-type   { border-color: #9C27B0; color: #CE93D8; background: rgba(156,39,176,0.08); }
+.thread .card-type { border-color: #00BCD4; color: #00BCD4; background: rgba(0,188,212,0.08); }
+
+.card-platform { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #666; flex-shrink: 0; }
+.card-title-text { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 0.03em; color: #FFFFFF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-toggle { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #555; flex-shrink: 0; transition: transform 0.3s; }
+.content-card.open .card-toggle { transform: rotate(180deg); color: #FFD600; }
+
+.card-body { display: none; padding: 24px 22px; }
+.content-card.open .card-body { display: block; }
+
+/* REEL SCRIPT */
+.reel-script { }
+.scene { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #1E1E1E; }
+.scene:last-of-type { border-bottom: none; }
+.scene-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #E91E63; margin-bottom: 8px; }
+.scene-time { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; letter-spacing: 0.1em; float: right; }
+.scene-text { font-size: 16px; line-height: 1.75; color: #CCCCCC; }
+.scene-text .spoken { color: #FFFFFF; font-weight: normal; }
+.scene-text .direction { color: #666; font-style: italic; font-size: 13px; }
+.scene-text .hook-word { color: #FFD600; font-style: italic; }
+
+/* CAPTION */
+.caption-text { font-size: 15px; line-height: 1.85; color: #CCCCCC; white-space: pre-wrap; margin-bottom: 16px; }
+.caption-text .line-bold { color: #FFFFFF; }
+.caption-text .line-gold { color: #FFD600; font-style: italic; }
+.hashtags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.hashtag { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #2196F3; letter-spacing: 0.05em; }
+
+/* QUOTE GRAPHIC */
+.quote-visual {
+  background-color: #0D0D0D;
+  border: 1px solid #222;
+  padding: 32px 28px;
+  margin-bottom: 16px;
+  text-align: center;
+  position: relative;
+}
+.quote-visual::before { content: '"'; position: absolute; top: -10px; left: 20px; font-family: 'Bebas Neue', sans-serif; font-size: 80px; color: #FFD600; line-height: 1; }
+.quote-main { font-family: 'Lora', serif; font-size: clamp(18px, 3vw, 26px); font-style: italic; color: #FFFFFF; line-height: 1.5; margin-bottom: 16px; }
+.quote-attr { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; color: #FFD600; }
+.quote-note { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #555; margin-top: 10px; line-height: 1.5; letter-spacing: 0.05em; }
+
+/* HOOK LIST */
+.hook-list { list-style: none; }
+.hook-list li { padding: 12px 0 12px 20px; position: relative; border-bottom: 1px solid #1E1E1E; font-size: 15px; color: #CCCCCC; line-height: 1.5; }
+.hook-list li:last-child { border-bottom: none; }
+.hook-list li::before { content: '→'; position: absolute; left: 0; color: #FFD600; font-family: 'JetBrains Mono', monospace; font-size: 12px; top: 14px; }
+.hook-list li strong { color: #FFFFFF; }
+
+/* THREAD */
+.tweet { background-color: #0D0D0D; border: 1px solid #222; border-radius: 0; padding: 16px 18px; margin-bottom: 3px; position: relative; }
+.tweet-num { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #444; letter-spacing: 0.1em; margin-bottom: 8px; }
+.tweet-text { font-size: 15px; line-height: 1.7; color: #CCCCCC; white-space: pre-wrap; }
+.tweet-text .t-gold { color: #FFD600; }
+.tweet-connector { width: 2px; height: 16px; background: #333; margin-left: 18px; }
+
+/* COPY BTN */
+.copy-btn { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; background: transparent; border: 1px solid #333; color: #666; padding: 6px 14px; cursor: pointer; transition: border-color 0.2s, color 0.2s; margin-top: 16px; display: inline-block; }
+.copy-btn:hover { border-color: #FFD600; color: #FFD600; }
+.copy-btn.copied { border-color: #4CAF50; color: #4CAF50; }
+
+/* USAGE NOTE */
+.usage-note { background-color: #0D0D0D; border: 1px solid #1E1E1E; border-left: 3px solid #FFD600; padding: 14px 16px; margin-bottom: 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #AAAAAA; line-height: 1.6; letter-spacing: 0.03em; }
+.usage-note strong { color: #FFD600; }
+
+/* FOOTER */
+footer { background-color: #0A0A0A; padding: 28px 32px; border-top: 1px solid #1E1E1E; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #444; text-align: center; }
+
+@media(max-width:600px){
+  .content { padding: 32px 16px 60px; }
+  .header { padding: 36px 16px 24px; }
+  .nav { padding: 0 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="h-eyebrow">Soul Prosperity · Social Content Pack</div>
+  <h1 class="h-title">30 PIECES OF <span>CONTENT</span><br>ONE MISSION</h1>
+  <p class="h-sub">Reel scripts · Captions · Quote graphics · Hook formulas · Twitter/X threads — all built from the eBook</p>
+</div>
+
+<nav class="nav">
+  <div class="nav-tab active" onclick="showPanel(0)">🎬 Reel Scripts</div>
+  <div class="nav-tab" onclick="showPanel(1)">📝 Captions</div>
+  <div class="nav-tab" onclick="showPanel(2)">💬 Quote Graphics</div>
+  <div class="nav-tab" onclick="showPanel(3)">🪝 Hook Formulas</div>
+  <div class="nav-tab" onclick="showPanel(4)">🧵 X Threads</div>
+</nav>
+
+<div class="content">
+
+<!-- ════════════════════════════
+     PANEL 0 — REEL SCRIPTS
+════════════════════════════ -->
+<div class="panel active" id="panel-0">
+  <div class="sec-header">
+    <div class="sec-stage">Format 01 · Short-Form Video</div>
+    <h2 class="sec-title">Reel <span>Scripts</span></h2>
+    <p class="sec-desc">6 scripts optimized for TikTok, Instagram Reels, and YouTube Shorts. Each under 60 seconds. Hook in the first 3 words. CTA at the end. Terrance's voice throughout.</p>
+    <div class="sec-meta">
+      <span class="meta-pill gold">TikTok · IG Reels · YouTube Shorts</span>
+      <span class="meta-pill">Under 60 Seconds Each</span>
+      <span class="meta-pill">6 Scripts</span>
+    </div>
+  </div>
+
+  <div class="usage-note"><strong>HOW TO USE:</strong> Film these talking-head style. No fancy setup needed. Phone camera, good lighting, your face. The words do the work. End every video with: "Link in bio to grab the $7 eBook."</div>
+
+  <!-- REEL 1 -->
+  <div class="content-card reel open">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left">
+        <span class="card-type">Reel Script</span>
+        <span class="card-platform">TikTok / IG / YT Shorts</span>
+        <span class="card-title-text">The $1 McChicken That Changed My Life</span>
+      </div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="reel-script">
+        <div class="scene">
+          <div class="scene-label">HOOK <span class="scene-time">0:00 – 0:03</span></div>
+          <div class="scene-text"><span class="spoken">"My debit card got declined on a <span class="hook-word">$1 McChicken.</span>"</span><br><span class="direction">[straight to camera, deadpan delivery, slight pause after]</span></div>
+        </div>
+        <div class="scene">
+          <div class="scene-label">STORY <span class="scene-time">0:03 – 0:25</span></div>
+          <div class="scene-text"><span class="spoken">"That cashier looked at me like I asked for a loan. And in that moment — standing in a McDonald's drive-through with $0.47 in my account — I made a decision.</span><br><br><span class="spoken">I was going to write down everything I had been through. Every struggle. Every prayer at 2am. Every time I almost quit.</span><br><br><span class="spoken">Because I figured — if I went through it, somebody else is going through it right now. And they need to know they're not alone."</span></div>
+        </div>
+        <div class="scene">
+          <div class="scene-label">VALUE <span class="scene-time">0:25 – 0:48</span></div>
+          <div class="scene-text"><span class="spoken">"So I wrote a 40-page eBook. No publishing deal. No English degree. Just WiFi and the courage to hit save as PDF.</span><br><br><span class="spoken">And that $7 book has done more for my purpose than anything I've ever built.</span><br><br><span class="spoken">If you've got a story you've been sitting on — Habakkuk 2:2 says write the vision and make it plain. Not when you're ready. <span class="hook-word">Now.</span>"</span></div>
+        </div>
+        <div class="scene">
+          <div class="scene-label">CTA <span class="scene-time">0:48 – 0:58</span></div>
+          <div class="scene-text"><span class="spoken">"I wrote a whole book on how to do exactly that. It's $7. Link in bio."</span><br><span class="direction">[point to bio / use text overlay with link]</span></div>
+        </div>
+      </div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Script</button>
+    </div>
+  </div>
+
+  <!-- REEL 2 -->
+  <div class="content-card reel">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left">
+        <span class="card-type">Reel Script</span>
+        <span class="card-platform">TikTok / IG Reels</span>
+        <span class="card-title-text">Paul Wrote From Prison. What's Your Excuse?</span>
+      </div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="reel-script">
+        <div class="scene">
+          <div class="scene-label">HOOK <span class="scene-time">0:00 – 0:04</span></div>
+          <div class="scene-text"><span class="spoken">"Paul the Apostle wrote letters from <span class="hook-word">a jail cell.</span> No laptop. No WiFi. No Canva."</span></div>
+        </div>
+        <div class="scene">
+          <div class="scene-label">BUILD <span class="scene-time">0:04 – 0:28</span></div>
+          <div class="scene-text"><span class="spoken">"Those letters became scripture. They're still being read 2,000 years later. That's the most viral content in human history — and the man wrote it in chains.</span><br><br><span class="spoken">Meanwhile you've got a story God assigned to you. You've got WiFi. You've got a phone. You've got ten fingers.</span><br><br><span class="spoken">And you still haven't written it."</span><br><span class="direction">[pause — let it land]</span></div>
+        </div>
+        <div class="scene">
+          <div class="scene-label">TURN <span class="scene-time">0:28 – 0:50</span></div>
+          <div class="scene-text"><span class="spoken">"I'm not saying this to shame you. I'm saying it because I was you. I had the message, I just didn't have the map.</span><br><br><span class="spoken">So I built the map. It's a 40-page eBook that takes you from zero to published — even if you've never written anything longer than a text message."</span></div>
+        </div>
+        <div class="scene">
+          <div class="scene-label">CTA <span class="scene-time">0:50 – 0:60</span></div>
+          <div class="scene-text"><span class="spoken">"Seven dollars. Link in bio. Write the vision."</span></div>
+        </div>
+      </div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Script</button>
+    </div>
+  </div>
+
+  <!-- REEL 3 -->
+  <div class="content-card reel">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left">
+        <span class="card-type">Reel Script</span>
+        <span class="card-platform">TikTok · High Controversy Format</span>
+        <span class="card-title-text">Unpopular Opinion: Your Story Is Worth More Than Your Degree</span>
+      </div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="reel-script">
+        <div class="scene">
+          <div class="scene-label">HOOK <span class="scene-time">0:00 – 0:05</span></div>
+          <div class="scene-text"><span class="spoken">"Unpopular opinion: <span class="hook-word">your story is worth more than your degree.</span>"</span><br><span class="direction">[confident, direct, slight smirk]</span></div>
+        </div>
+        <div class="scene">
+          <div class="scene-label">ARGUMENT <span class="scene-time">0:05 – 0:35</span></div>
+          <div class="scene-text"><span class="spoken">"Your degree tells people what you studied. Your story tells people who you are.</span><br><br><span class="spoken">The nights you didn't sleep. The jobs that didn't call you back. The faith you held onto when the math wasn't mathing.</span><br><br><span class="spoken">That's what people connect to. That's what changes lives. Not your GPA.</span><br><br><span class="spoken">DJ Khaled made millions shouting 'Another One.' Kanye released a 27-track album with no tracklist. Peter denied Jesus three times and still got chosen to preach.</span><br><br><span class="spoken">You don't have to be polished. You just have to be <span class="hook-word">available.</span>"</span></div>
+        </div>
+        <div class="scene">
+          <div class="scene-label">CTA <span class="scene-time">0:35 – 0:55</span></div>
+          <div class="scene-text"><span class="spoken">"I wrote a book on how to take everything you've lived through and turn it into a 40-page eBook — even if you've never written anything before. It's seven dollars. Link in bio. Go get it."</span></div>
+        </div>
+      </div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Script</button>
+    </div>
+  </div>
+
+  <!-- REEL 4 -->
+  <div class="content-card reel">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left">
+        <span class="card-type">Reel Script</span>
+        <span class="card-platform">IG Reels · Storytelling Format</span>
+        <span class="card-title-text">3 Things I Wish I Knew Before I Wrote My First Book</span>
+      </div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="reel-script">
+        <div class="scene">
+          <div class="scene-label">HOOK <span class="scene-time">0:00 – 0:04</span></div>
+          <div class="scene-text"><span class="spoken">"Three things I wish someone told me before I wrote my first book."</span><br><span class="direction">[use text overlay: "3 things I wish I knew" — B-roll or talking head]</span></div>
+        </div>
+        <div class="scene">
+          <div class="scene-label">POINT 1 <span class="scene-time">0:04 – 0:20</span></div>
+          <div class="scene-text"><span class="spoken">"Number one — <span class="hook-word">your first draft is supposed to be ugly.</span> Stop waiting to feel ready. Write ugly. Edit later. Done beats perfect every single time."</span></div>
+        </div>
+        <div class="scene">
+          <div class="scene-label">POINT 2 <span class="scene-time">0:20 – 0:36</span></div>
+          <div class="scene-text"><span class="spoken">"Number two — <span class="hook-word">40 pages is enough.</span> You don't need 300 pages. You need 12 chapters, 3-4 pages each, one clear message. That's it. The mixtape model."</span></div>
+        </div>
+        <div class="scene">
+          <div class="scene-label">POINT 3 <span class="scene-time">0:36 – 0:50</span></div>
+          <div class="scene-text"><span class="spoken">"Number three — <span class="hook-word">you can publish for free.</span> Amazon KDP. PDF. Gumroad. Zero dollars to get your book into the world. The only thing stopping you is you."</span></div>
+        </div>
+        <div class="scene">
+          <div class="scene-label">CTA <span class="scene-time">0:50 – 0:60</span></div>
+          <div class="scene-text"><span class="spoken">"I break down all of this in my $7 eBook. Link in bio. Start today."</span></div>
+        </div>
+      </div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Script</button>
+    </div>
+  </div>
+
+  <!-- REEL 5 -->
+  <div class="content-card reel">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left">
+        <span class="card-type">Reel Script</span>
+        <span class="card-platform">TikTok · Faith Audience</span>
+        <span class="card-title-text">God Didn't Give You That Story to Keep It</span>
+      </div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="reel-script">
+        <div class="scene">
+          <div class="scene-label">HOOK <span class="scene-time">0:00 – 0:05</span></div>
+          <div class="scene-text"><span class="spoken">"God didn't give you that story to <span class="hook-word">keep it to yourself.</span>"</span></div>
+        </div>
+        <div class="scene">
+          <div class="scene-label">BODY <span class="scene-time">0:05 – 0:42</span></div>
+          <div class="scene-text"><span class="spoken">"Think about it. Everything you've been through — the breakdowns, the breakthroughs, the seasons that nearly broke you — none of that was wasted.</span><br><br><span class="spoken">Revelation 12:11 says we overcome by the word of our testimony. Your testimony is a weapon. Not just for you — for someone watching this right now who needs to hear that they can make it too.</span><br><br><span class="spoken">But here's the thing — if you never write it down, if you never publish it, if you keep it locked in your head and your journal and your Notes app — nobody benefits from it but you.</span><br><br><span class="spoken">Habakkuk said write the vision and make it PLAIN. Not vague. Not someday. Plain. Now."</span></div>
+        </div>
+        <div class="scene">
+          <div class="scene-label">CTA <span class="scene-time">0:42 – 0:58</span></div>
+          <div class="scene-text"><span class="spoken">"I wrote a $7 book that shows you exactly how to turn your testimony into a published eBook. 40 pages. One weekend. Link in bio."</span></div>
+        </div>
+      </div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Script</button>
+    </div>
+  </div>
+
+  <!-- REEL 6 -->
+  <div class="content-card reel">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left">
+        <span class="card-type">Reel Script</span>
+        <span class="card-platform">YouTube Shorts · Tutorial Format</span>
+        <span class="card-title-text">How to Write a 40-Page eBook This Weekend</span>
+      </div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="reel-script">
+        <div class="scene">
+          <div class="scene-label">HOOK <span class="scene-time">0:00 – 0:04</span></div>
+          <div class="scene-text"><span class="spoken">"You can write a 40-page eBook <span class="hook-word">this weekend.</span> Here's exactly how."</span></div>
+        </div>
+        <div class="scene">
+          <div class="scene-label">STEPS <span class="scene-time">0:04 – 0:48</span></div>
+          <div class="scene-text"><span class="spoken">"Saturday morning: Pick your message. One sentence. What do you want people to feel or know after reading your book?</span><br><br><span class="spoken">Saturday afternoon: Write your 12 chapter titles. Don't write anything yet — just titles. Think of it like a mixtape tracklist.</span><br><br><span class="spoken">Saturday night: Write chapters 1 through 4. That's 12-16 pages. Each chapter is 3-4 pages. One page is about 300 words. You can do that in an hour per chapter.</span><br><br><span class="spoken">Sunday: Finish chapters 5 through 12. Edit on Monday. Upload to Amazon KDP for free. Done.</span>"</span></div>
+        </div>
+        <div class="scene">
+          <div class="scene-label">CTA <span class="scene-time">0:48 – 0:58</span></div>
+          <div class="scene-text"><span class="spoken">"I break down every single step in my $7 eBook. Link in bio. This weekend. Let's go."</span></div>
+        </div>
+      </div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Script</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════
+     PANEL 1 — CAPTIONS
+════════════════════════════ -->
+<div class="panel" id="panel-1">
+  <div class="sec-header">
+    <div class="sec-stage">Format 02 · Post Captions</div>
+    <h2 class="sec-title">Caption <span>Templates</span></h2>
+    <p class="sec-desc">6 ready-to-post captions for Instagram, Facebook, and TikTok. Each designed to stop the scroll, tell a story, and drive to the $7 eBook.</p>
+    <div class="sec-meta">
+      <span class="meta-pill gold">Instagram · Facebook · TikTok</span>
+      <span class="meta-pill">6 Captions</span>
+    </div>
+  </div>
+
+  <div class="usage-note"><strong>HOW TO USE:</strong> Pair with a strong image — your book cover, a quote graphic, or a phone screenshot of your writing. Post 3–5x per week consistently. Rotate these over 2 weeks then repeat.</div>
+
+  <div class="content-card caption open">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left">
+        <span class="card-type">Caption</span>
+        <span class="card-platform">Instagram · Story-Driven</span>
+        <span class="card-title-text">The Broke McChicken Story</span>
+      </div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="caption-text">My debit card got declined on a $1 McChicken. 🍗
+
+That cashier's face is burned into my memory. It's the moment I decided I was done being broke — not just financially, but spiritually broke. Broke in my identity. Broke in my confidence. Broke in my willingness to share what God had put in me.
+
+So I started writing.
+
+Not because I was qualified. Not because I had a deal or a platform or a following. But because <span class="line-gold">Habakkuk 2:2 said "write the vision and make it plain" — and I figured that included me.</span>
+
+That writing became a 40-page eBook. That eBook became the foundation of everything I've built.
+
+If you've got a story you've been sitting on — this is your sign.
+
+I wrote a book on how to write YOUR book. $7. Link in bio. No excuses.
+
+<span class="line-bold">What's the story you've been afraid to tell? Drop it in the comments. 👇</span></div>
+      <div class="hashtags">
+        <span class="hashtag">#WriteTheVision</span><span class="hashtag">#SoulProsperity</span><span class="hashtag">#ChristianEntrepreneur</span><span class="hashtag">#eBookLife</span><span class="hashtag">#FaithAndHustle</span><span class="hashtag">#KingdomBusiness</span><span class="hashtag">#SelfPublishing</span><span class="hashtag">#YoungAndFaithful</span>
+      </div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Caption</button>
+    </div>
+  </div>
+
+  <div class="content-card caption">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left">
+        <span class="card-type">Caption</span>
+        <span class="card-platform">Instagram · List Format</span>
+        <span class="card-title-text">You Don't Need a Publisher</span>
+      </div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="caption-text">You don't need a publisher to write a book.
+You don't need Barnes & Noble.
+You don't need a degree.
+You don't even need money to print copies.
+
+All you need:
+→ WiFi
+→ Your story
+→ The courage to hit save as PDF
+
+<span class="line-gold">An eBook is the street mixtape of the publishing world.</span> You can drop it tonight. You can sell it tomorrow. You can build a whole income stream from the thing you've already lived through.
+
+I wrote a 40-page guide that walks you through every step — from finding your message to publishing on Amazon KDP for free.
+
+It's $7. That's it.
+
+Link in bio. 👆 Go get it before you talk yourself out of it.
+
+<span class="line-bold">Share this with someone who has a book in them. You know who they are. 🙏</span></div>
+      <div class="hashtags">
+        <span class="hashtag">#SelfPublish</span><span class="hashtag">#eBook</span><span class="hashtag">#ChristianWriter</span><span class="hashtag">#KingdomSystems</span><span class="hashtag">#SoulProsperity</span><span class="hashtag">#PassiveIncome</span><span class="hashtag">#WriteYourBook</span>
+      </div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Caption</button>
+    </div>
+  </div>
+
+  <div class="content-card caption">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left">
+        <span class="card-type">Caption</span>
+        <span class="card-platform">Facebook · Long-Form Storytelling</span>
+        <span class="card-title-text">The Night I Almost Didn't Write It</span>
+      </div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="caption-text">There was a night I almost deleted everything.
+
+I had been working on the outline for two weeks. I had my 12 chapters. I had my opening story. I had the faith to believe this thing could actually help someone.
+
+And then I read it back to myself and thought — who am I to write a book?
+
+I closed the laptop. I didn't open it again for three days.
+
+On day four I was reading about Paul. And I was reminded that this man wrote letters that changed the world — from a prison cell. Not from a penthouse. Not from a seminary. From chains.
+
+<span class="line-gold">God doesn't call the qualified. He qualifies the called.</span>
+
+I reopened the laptop. I finished the book. I published it.
+
+And now I'm sharing it with you because I know there's someone reading this who has a story — a real one, a powerful one, an assigned one — and you're one self-doubt moment away from deleting it.
+
+Don't delete it.
+
+Write it. Publish it. Let it reach the person it was made for.
+
+My $7 eBook shows you exactly how. Link in bio. 🔗
+
+<span class="line-bold">Have you ever almost quit on something God told you to do? Tell me below. 👇</span></div>
+      <div class="hashtags">
+        <span class="hashtag">#FaithOverFear</span><span class="hashtag">#WriteTheVision</span><span class="hashtag">#SoulProsperity</span><span class="hashtag">#ChristianAuthor</span><span class="hashtag">#KingdomBusiness</span><span class="hashtag">#Testimony</span>
+      </div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Caption</button>
+    </div>
+  </div>
+
+  <div class="content-card caption">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left">
+        <span class="card-type">Caption</span>
+        <span class="card-platform">Instagram · Quick Hit</span>
+        <span class="card-title-text">$7 Changes Everything</span>
+      </div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="caption-text">$7.
+
+Less than a combo meal.
+Less than a venti Starbucks order.
+Less than most people spend on apps they don't use.
+
+For $7 you get a complete roadmap to write, design, and publish your first 40-page eBook — even if you've never written anything before.
+
+<span class="line-gold">12 chapters. One weekend. Zero publisher required.</span>
+
+The only thing between you and a published book is a decision.
+
+Link in bio. 👆</div>
+      <div class="hashtags">
+        <span class="hashtag">#eBook</span><span class="hashtag">#SoulProsperity</span><span class="hashtag">#WriteYourBook</span><span class="hashtag">#7Dollars</span><span class="hashtag">#KingdomHustle</span>
+      </div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Caption</button>
+    </div>
+  </div>
+
+  <div class="content-card caption">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left">
+        <span class="card-type">Caption</span>
+        <span class="card-platform">TikTok · Comment Bait</span>
+        <span class="card-title-text">What Chapter Are You On?</span>
+      </div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="caption-text">POV: You just found out you don't need a degree, a publishing deal, or a platform to write a book that changes lives.
+
+Just your story. Just your faith. Just 40 pages.
+
+<span class="line-gold">Habakkuk 2:2 didn't say "write the vision when you're ready." It just said write.</span>
+
+Drop a ✍️ in the comments if you've been thinking about writing a book. I want to know what it's about.
+
+$7 eBook in bio. Let's go. 🔥</div>
+      <div class="hashtags">
+        <span class="hashtag">#WriteYourBook</span><span class="hashtag">#BookTok</span><span class="hashtag">#ChristianTikTok</span><span class="hashtag">#FaithAndHustle</span><span class="hashtag">#SoulProsperity</span><span class="hashtag">#eBookAuthor</span>
+      </div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Caption</button>
+    </div>
+  </div>
+
+  <div class="content-card caption">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left">
+        <span class="card-type">Caption</span>
+        <span class="card-platform">Instagram · Social Proof</span>
+        <span class="card-title-text">Real People. Real Books. Real Legacy.</span>
+      </div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="caption-text">People always ask me: "Terrance, does this actually work?"
+
+Here's what I know:
+
+→ You don't need to be a writer to write a book
+→ You don't need money to publish one
+→ You don't need a following to sell one
+→ You DO need to stop waiting for permission
+
+<span class="line-gold">Your scars are receipts — proof that God already paid the bill.</span>
+
+And now it's time to turn those receipts into pages.
+
+My $7 eBook walks you through all 12 chapters, the faith factor, the design, the publishing, and the marketing. Everything.
+
+30-day money-back guarantee. No risk. Link in bio. 🔗
+
+<span class="line-bold">Tag someone who has a story the world needs to hear. 👇🙏</span></div>
+      <div class="hashtags">
+        <span class="hashtag">#SoulProsperity</span><span class="hashtag">#KingdomSystems</span><span class="hashtag">#WriteTheVision</span><span class="hashtag">#ChristianEntrepreneur</span><span class="hashtag">#eBook</span><span class="hashtag">#Legacy</span><span class="hashtag">#SelfPublishing</span>
+      </div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Caption</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════
+     PANEL 2 — QUOTE GRAPHICS
+════════════════════════════ -->
+<div class="panel" id="panel-2">
+  <div class="sec-header">
+    <div class="sec-stage">Format 03 · Quote Graphics</div>
+    <h2 class="sec-title">Quote <span>Graphics</span></h2>
+    <p class="sec-desc">8 pull quotes from the eBook — formatted for IG story graphics, carousels, and Pinterest. Copy the text, drop into Canva with a black background and gold text.</p>
+    <div class="sec-meta">
+      <span class="meta-pill gold">IG Stories · Carousels · Pinterest</span>
+      <span class="meta-pill">Black + Gold Design</span>
+      <span class="meta-pill">8 Quotes</span>
+    </div>
+  </div>
+
+  <div class="usage-note"><strong>CANVA INSTRUCTIONS:</strong> Black background (#0D0D0D) · Quote in white Lora Italic · Author name in gold (#FFD600) Bebas Neue · Add Soul Prosperity logo or @handle bottom right. Size: 1080×1080 for feed, 1080×1920 for stories.</div>
+
+  <div class="content-card quote open">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left"><span class="card-type">Quote</span><span class="card-platform">Feed + Story</span><span class="card-title-text">Faith is WiFi</span></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="quote-visual">
+        <div class="quote-main">"Faith is WiFi — you can't see it, but you need it to stay connected."</div>
+        <div class="quote-attr">— Terrance Gee · Soul Prosperity</div>
+      </div>
+      <div class="quote-note">SOURCE: Chapter 5 · High shareable · Works for any faith audience · Pair with a blurred city lights background</div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Quote</button>
+    </div>
+  </div>
+
+  <div class="content-card quote">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left"><span class="card-type">Quote</span><span class="card-platform">Feed + Story</span><span class="card-title-text">Your Scars Are Receipts</span></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="quote-visual">
+        <div class="quote-main">"Your scars are receipts — proof that God already paid the bill."</div>
+        <div class="quote-attr">— Terrance Gee · Soul Prosperity</div>
+      </div>
+      <div class="quote-note">SOURCE: Chapter 5 · Highest engagement potential · Speaks directly to trauma survivors and faith community · Use gold texture background</div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Quote</button>
+    </div>
+  </div>
+
+  <div class="content-card quote">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left"><span class="card-type">Quote</span><span class="card-platform">Feed + Carousel</span><span class="card-title-text">Write The Vision</span></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="quote-visual">
+        <div class="quote-main">"Habakkuk 2:2 didn't say write the vision when you're ready. It just said write."</div>
+        <div class="quote-attr">— Terrance Gee · Soul Prosperity</div>
+      </div>
+      <div class="quote-note">SOURCE: Chapter 1 · Scripture-based · High resonance for church audiences · Use parchment or scroll imagery</div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Quote</button>
+    </div>
+  </div>
+
+  <div class="content-card quote">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left"><span class="card-type">Quote</span><span class="card-platform">Story · Swipe Up</span><span class="card-title-text">Don't Polished. Be Available.</span></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="quote-visual">
+        <div class="quote-main">"You don't have to be polished. You just have to be available."</div>
+        <div class="quote-attr">— Terrance Gee · How to Write a 40-Page eBook</div>
+      </div>
+      <div class="quote-note">SOURCE: Chapter 1 · Removes the biggest objection (not being "good enough") · Use with a microphone or open notebook image</div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Quote</button>
+    </div>
+  </div>
+
+  <div class="content-card quote">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left"><span class="card-type">Quote</span><span class="card-platform">Feed + Pinterest</span><span class="card-title-text">The Mess Is The Message</span></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="quote-visual">
+        <div class="quote-main">"Stop waiting for your story to be perfect. The mess IS the message."</div>
+        <div class="quote-attr">— Terrance Gee · Soul Prosperity</div>
+      </div>
+      <div class="quote-note">SOURCE: Chapter 6 · Storytelling chapter · Hits writers, speakers, and coaches who feel "not ready" · Very shareable in writing communities</div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Quote</button>
+    </div>
+  </div>
+
+  <div class="content-card quote">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left"><span class="card-type">Quote</span><span class="card-platform">Feed · Controversy Bait</span><span class="card-title-text">Paul Was Viral Before WiFi</span></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="quote-visual">
+        <div class="quote-main">"Paul the Apostle was viral before WiFi. His letters are still being shared 2,000 years later. That's legacy."</div>
+        <div class="quote-attr">— Terrance Gee · How to Write a 40-Page eBook</div>
+      </div>
+      <div class="quote-note">SOURCE: Chapter 3 · Cultural + faith crossover · Great for comment debates · Use ancient manuscript + modern phone split image</div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Quote</button>
+    </div>
+  </div>
+
+  <div class="content-card quote">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left"><span class="card-type">Quote</span><span class="card-platform">Story · Daily Devotional Vibe</span><span class="card-title-text">Your Story Is Assigned</span></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="quote-visual">
+        <div class="quote-main">"Your message isn't random. It's assigned. God gave Noah a blueprint for an ark — not a scooter. Your story has a purpose too."</div>
+        <div class="quote-attr">— Terrance Gee · Soul Prosperity</div>
+      </div>
+      <div class="quote-note">SOURCE: Chapter 2 · Speaks to people doubting their purpose · Morning devotional energy · Pair with sunrise or water imagery</div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Quote</button>
+    </div>
+  </div>
+
+  <div class="content-card quote">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left"><span class="card-type">Quote</span><span class="card-platform">Feed · Legacy Angle</span><span class="card-title-text">40 Pages Into Eternity</span></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="quote-visual">
+        <div class="quote-main">"The same God who multiplied five loaves and two fish can multiply your 40 pages into a legacy that outlives you."</div>
+        <div class="quote-attr">— Terrance Gee · How to Write a 40-Page eBook</div>
+      </div>
+      <div class="quote-note">SOURCE: Chapter 1 · Closing line energy · High emotional impact · Best for Sunday posts and legacy/purpose content days</div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Quote</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════
+     PANEL 3 — HOOK FORMULAS
+════════════════════════════ -->
+<div class="panel" id="panel-3">
+  <div class="sec-header">
+    <div class="sec-stage">Format 04 · Hook Formulas</div>
+    <h2 class="sec-title">Hook <span>Formulas</span></h2>
+    <p class="sec-desc">30 proven scroll-stopping hooks — organized by formula type. Use these as the first line of any reel, caption, or post. Plug in your own specifics.</p>
+    <div class="sec-meta">
+      <span class="meta-pill gold">All Platforms</span>
+      <span class="meta-pill">5 Formula Types</span>
+      <span class="meta-pill">30 Hooks</span>
+    </div>
+  </div>
+
+  <div class="usage-note"><strong>HOW TO USE:</strong> The hook is the first 3 seconds of a video or the first line of a caption. If the hook doesn't stop the scroll, nothing else matters. Use these as-is or swap in your own specifics.</div>
+
+  <div class="content-card hook open">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left"><span class="card-type">Hook Type</span><span class="card-platform">All Platforms</span><span class="card-title-text">The "Confession" Hook — Most Vulnerable</span></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <ul class="hook-list">
+        <li><strong>My debit card got declined on a $1 McChicken.</strong> That's the day I decided to write my book.</li>
+        <li><strong>I stared at a blank screen for two weeks</strong> before I figured out the one thing that unlocked everything.</li>
+        <li><strong>I almost deleted my entire book</strong> the night before I published it. Here's what stopped me.</li>
+        <li><strong>Nobody told me I could write a book.</strong> So I told myself — and then I did it anyway.</li>
+        <li><strong>I failed English in high school.</strong> I still published a book. Here's how.</li>
+        <li><strong>For years I had a story I was too scared to tell.</strong> Then I read Habakkuk 2:2 and everything changed.</li>
+      </ul>
+      <button class="copy-btn" onclick="copyCard(this)">Copy All Hooks</button>
+    </div>
+  </div>
+
+  <div class="content-card hook">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left"><span class="card-type">Hook Type</span><span class="card-platform">TikTok / IG Reels</span><span class="card-title-text">The "Unpopular Opinion" Hook — High Controversy</span></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <ul class="hook-list">
+        <li><strong>Unpopular opinion:</strong> You don't need a publisher to write a book that changes lives.</li>
+        <li><strong>Unpopular opinion:</strong> Your story is worth more than your degree.</li>
+        <li><strong>Hot take:</strong> Most people who "want to write a book" are just scared of being seen.</li>
+        <li><strong>Nobody wants to hear this:</strong> Writer's block is really just "haven't prayed" block.</li>
+        <li><strong>Controversial but true:</strong> 40 pages of your real story beats 300 pages of someone else's theory.</li>
+        <li><strong>I said what I said:</strong> The reason your book isn't written yet has nothing to do with time.</li>
+      </ul>
+      <button class="copy-btn" onclick="copyCard(this)">Copy All Hooks</button>
+    </div>
+  </div>
+
+  <div class="content-card hook">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left"><span class="card-type">Hook Type</span><span class="card-platform">All Platforms</span><span class="card-title-text">The "Fast Fact" Hook — Tutorial Energy</span></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <ul class="hook-list">
+        <li><strong>You can publish a book on Amazon for $0.</strong> Here's exactly how.</li>
+        <li><strong>A 40-page eBook can be written in one weekend.</strong> This is the formula.</li>
+        <li><strong>12 chapters. 3-4 pages each. That's all a 40-page eBook is.</strong> Stop overthinking it.</li>
+        <li><strong>Your book topic is already inside you.</strong> It's hiding in what you've survived, learned, and care about.</li>
+        <li><strong>Amazon KDP lets you publish for free</strong> and earn up to 70% royalties. No gatekeepers.</li>
+        <li><strong>The difference between a reader and a listener</strong> could be the difference between finishing your book or not.</li>
+      </ul>
+      <button class="copy-btn" onclick="copyCard(this)">Copy All Hooks</button>
+    </div>
+  </div>
+
+  <div class="content-card hook">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left"><span class="card-type">Hook Type</span><span class="card-platform">Faith Audience</span><span class="card-title-text">The "Scripture Drop" Hook — Kingdom Energy</span></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <ul class="hook-list">
+        <li><strong>Habakkuk 2:2 says "write the vision and make it plain."</strong> That includes you.</li>
+        <li><strong>Revelation 12:11 says we overcome by the word of our testimony.</strong> When's the last time you shared yours?</li>
+        <li><strong>Paul wrote his most powerful letters from prison.</strong> What's your excuse?</li>
+        <li><strong>God isn't asking you to be perfect.</strong> He's asking you to be willing.</li>
+        <li><strong>Matthew 5:14 says you are the light of the world.</strong> Your eBook? That's just one more way to shine.</li>
+        <li><strong>The same God who multiplied five loaves and two fish</strong> can multiply your 40 pages into a legacy.</li>
+      </ul>
+      <button class="copy-btn" onclick="copyCard(this)">Copy All Hooks</button>
+    </div>
+  </div>
+
+  <div class="content-card hook">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left"><span class="card-type">Hook Type</span><span class="card-platform">All Platforms</span><span class="card-title-text">The "Direct Challenge" Hook — Action Drivers</span></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <ul class="hook-list">
+        <li><strong>If you've been saying "I should write a book" for more than 6 months,</strong> this is for you.</li>
+        <li><strong>The book you're meant to write is sitting in your drafts, your notes app, your head.</strong> Go get it out.</li>
+        <li><strong>Stop letting your story die with you.</strong> Someone needs it right now.</li>
+        <li><strong>You have exactly enough experience, faith, and story to write a book this weekend.</strong> Here's proof.</li>
+        <li><strong>Your testimony isn't for you.</strong> It's for the person who's one chapter away from giving up.</li>
+        <li><strong>Write the book. Publish the book. Let God handle the rest.</strong> That's the whole strategy.</li>
+      </ul>
+      <button class="copy-btn" onclick="copyCard(this)">Copy All Hooks</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════
+     PANEL 4 — X THREADS
+════════════════════════════ -->
+<div class="panel" id="panel-4">
+  <div class="sec-header">
+    <div class="sec-stage">Format 05 · Twitter/X Threads</div>
+    <h2 class="sec-title">X <span>Threads</span></h2>
+    <p class="sec-desc">4 complete threads built for Twitter/X. Each one teaches, tells a story, and ends with a CTA to the $7 eBook. Post one per week.</p>
+    <div class="sec-meta">
+      <span class="meta-pill gold">Twitter / X</span>
+      <span class="meta-pill">4 Threads</span>
+      <span class="meta-pill">Post 1x Per Week</span>
+    </div>
+  </div>
+
+  <div class="content-card thread open">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left"><span class="card-type">X Thread</span><span class="card-platform">Twitter / X</span><span class="card-title-text">Thread: How to Write a 40-Page eBook This Weekend</span></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="tweet"><div class="tweet-num">1/8</div><div class="tweet-text">How to write a 40-page eBook this weekend — even if you've never written anything before.
+
+A thread. 🧵</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">2/8</div><div class="tweet-text">First: forget everything you think a "book" has to be.
+
+You don't need 300 pages. You don't need a publisher. You don't need an English degree.
+
+You need 12 chapters × 3-4 pages each = 40 pages. That's the whole formula.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">3/8</div><div class="tweet-text">Saturday morning → Pick your message.
+
+One sentence. "My book helps _____ do _____ so they can _____."
+
+If you can't say it in one sentence it's too complicated. TikTok generation. Attention spans are short. Keep it simple.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">4/8</div><div class="tweet-text">Saturday afternoon → Write your 12 chapter titles.
+
+Think of it like a mixtape tracklist. You're not writing the songs yet — just naming them.
+
+Each title should be a promise to the reader. "How I went from broke to building." "The prayer that changed everything."</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">5/8</div><div class="tweet-text">Saturday night → Write chapters 1-4.
+
+Each chapter = 1 page intro + 1-2 pages of content + 1 page close/action step.
+
+That's roughly 300 words per page. One hour per chapter. 4 chapters = 4 hours.
+
+You can do that.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">6/8</div><div class="tweet-text">Sunday → Finish chapters 5-12.
+
+Edit Monday. 
+
+Design your cover in Canva (free). Export as PDF. Upload to Amazon KDP (also free).
+
+You can be a published author by next week. No joke.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">7/8</div><div class="tweet-text"><span class="t-gold">The real secret?</span>
+
+Write how you talk. Not how you think a "book" sounds.
+
+If you talk like "cap" and "frfr" — keep it. That's your voice. People connect to authenticity more than perfection.
+
+Paul wrote letters, not textbooks. You can too.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">8/8</div><div class="tweet-text">I wrote a full 40-page guide on every step of this.
+
+From finding your message → to publishing on Amazon → to marketing it like Drake dropping an album.
+
+It's $7. 
+
+Link → [YOUR LINK HERE]
+
+Write the vision. Make it plain. Go. 🙏</div></div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Thread</button>
+    </div>
+  </div>
+
+  <div class="content-card thread">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left"><span class="card-type">X Thread</span><span class="card-platform">Twitter / X</span><span class="card-title-text">Thread: Paul the Apostle Was the Original Content Creator</span></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="tweet"><div class="tweet-num">1/7</div><div class="tweet-text">Paul the Apostle was the original content creator.
+
+And he has a lot to teach us about writing, publishing, and going viral.
+
+Thread. 🧵</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">2/7</div><div class="tweet-text">Paul wrote letters from prison.
+
+No laptop. No WiFi. No Canva. No Amazon KDP.
+
+Just a message so urgent that chains couldn't stop it from getting out.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">3/7</div><div class="tweet-text">Those letters spread across the Roman Empire — city by city, person by person.
+
+They were read aloud in churches. Copied by hand. Shared with strangers.
+
+That's viral before WiFi. That's a content distribution strategy that lasted 2,000 years.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">4/7</div><div class="tweet-text">What made Paul's content work?
+
+→ He was authentic (his failures were in his letters)
+→ He was specific (wrote to specific people with specific problems)
+→ He was consistent (he kept writing even when it was hard)
+→ He pointed to something bigger than himself</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">5/7</div><div class="tweet-text">You have all of those tools available to you right now.
+
+You have your story. You have your faith. You have WiFi and a phone and literally free publishing platforms.
+
+Paul would have killed for Amazon KDP.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">6/7</div><div class="tweet-text"><span class="t-gold">The question isn't whether you can write a book.</span>
+
+The question is whether you'll be obedient enough to write the one you were assigned.
+
+Habakkuk 2:2. Look it up.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">7/7</div><div class="tweet-text">I wrote a $7 eBook that breaks down the whole process — from finding your message to publishing it worldwide.
+
+Faith + strategy + 40 pages = your legacy.
+
+→ [YOUR LINK HERE]
+
+RT if you know someone who has a story the world needs to hear. 🙏</div></div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Thread</button>
+    </div>
+  </div>
+
+  <div class="content-card thread">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left"><span class="card-type">X Thread</span><span class="card-platform">Twitter / X</span><span class="card-title-text">Thread: 7 Reasons Your Book Isn't Written Yet</span></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="tweet"><div class="tweet-num">1/9</div><div class="tweet-text">7 real reasons your book isn't written yet.
+
+(And what to do about each one.)
+
+🧵</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">2/9</div><div class="tweet-text">1. You're waiting to feel ready.
+
+You won't. Nobody does. Readiness is a myth.
+
+The people who finish books are the ones who write ugly first and edit later. Done beats perfect. Always.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">3/9</div><div class="tweet-text">2. You think your story isn't interesting enough.
+
+It is. If you survived it — it's interesting. If you learned from it — it's valuable. If you care about it — it's yours to write.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">4/9</div><div class="tweet-text">3. You're trying to write 300 pages.
+
+Stop. 40 pages is enough. 12 chapters. 3-4 pages each. That's it. You can write that this weekend if you stop overthinking the scope.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">5/9</div><div class="tweet-text">4. You don't know how to structure it.
+
+Think mixtape not textbook. Each chapter is a track. The book is the album. Hook → struggle → lesson → faith principle → action step. Repeat 12 times.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">6/9</div><div class="tweet-text">5. You're scared of what people will think.
+
+Vulnerability is powerful. The mess is the message. The people who need your story most are waiting for you to stop caring about the people who don't.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">7/9</div><div class="tweet-text">6. You don't know how to publish it.
+
+Amazon KDP. Free. Worldwide distribution. Up to 70% royalties. You upload a PDF and a cover. It's live in 24 hours. There are literally no gatekeepers anymore.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">8/9</div><div class="tweet-text">7. <span class="t-gold">You're doing this alone.</span>
+
+Community matters. The people who finish have people around them who are also finishing. Accountability changes everything.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">9/9</div><div class="tweet-text">I wrote a $7 eBook that solves all 7 of these.
+
+12 chapters. One weekend. Your story published.
+
+→ [YOUR LINK HERE]
+
+Save this thread. Share it with someone who needs it. 🙏</div></div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Thread</button>
+    </div>
+  </div>
+
+  <div class="content-card thread">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-header-left"><span class="card-type">X Thread</span><span class="card-platform">Twitter / X · Launch Week</span><span class="card-title-text">Thread: I Just Published My First eBook (Here's Everything I Learned)</span></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="tweet"><div class="tweet-num">1/8</div><div class="tweet-text">I just published my first eBook.
+
+Here's everything I learned — so you can do it faster, better, and without the mistakes I made.
+
+🧵</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">2/8</div><div class="tweet-text">Mistake 1: I tried to write in order.
+
+Don't. Write whatever chapter feels alive right now. Chapter 7 might come before Chapter 2. That's fine. You can reorder later.
+
+Momentum > sequence.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">3/8</div><div class="tweet-text">Mistake 2: I tried to edit while writing.
+
+This killed my flow for two weeks. Now I write first — no edits, no corrections, no second-guessing. Then I edit everything at the end.
+
+Write ugly. Edit clean.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">4/8</div><div class="tweet-text">Mistake 3: I didn't pray before I wrote.
+
+Sounds simple. Changed everything.
+
+When I started each session asking God to use me as His pen — the words came differently. The message got clearer. The purpose got stronger.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">5/8</div><div class="tweet-text">What actually worked:
+
+→ Voice recording my ideas first, then transcribing
+→ Writing in 15-min sprints, not 3-hour blocks
+→ Setting one small daily goal ("finish intro of Chapter 4")
+→ Having someone to send pages to who would actually read them</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">6/8</div><div class="tweet-text">The marketing truth nobody tells you:
+
+Your launch matters more than your book.
+
+Build hype before you publish. Post quotes. Show your cover. Do a countdown. Make it an event.
+
+Drake doesn't just drop — he builds anticipation. Do the same.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">7/8</div><div class="tweet-text">The number that surprised me most:
+
+<span class="t-gold">$7 converts better than free.</span>
+
+Free attracts people who collect things. $7 attracts people who intend to use them. Know your audience. Price accordingly.</div></div>
+      <div class="tweet-connector"></div>
+      <div class="tweet"><div class="tweet-num">8/8</div><div class="tweet-text">I put everything — every lesson, every step, every mistake — into a 40-page guide.
+
+It's $7. It can be your roadmap.
+
+→ [YOUR LINK HERE]
+
+If this thread helped you, RT the first tweet. Somebody in your timeline needs to write their book. 🙏</div></div>
+      <button class="copy-btn" onclick="copyCard(this)">Copy Thread</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- end content -->
+
+<footer>© 2025 Terrance Gee · Soul Prosperity · Social Content Pack · 30 pieces of content built from the eBook</footer>
+
+<script>
+function showPanel(index) {
+  document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', i===index));
+  document.querySelectorAll('.nav-tab').forEach((t,i) => t.classList.toggle('active', i===index));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleCard(header) {
+  header.closest('.content-card').classList.toggle('open');
+}
+
+function copyCard(btn) {
+  const body = btn.closest('.card-body');
+  let text = '';
+
+  // Reel scripts
+  body.querySelectorAll('.scene').forEach(s => {
+    const label = s.querySelector('.scene-label');
+    const content = s.querySelector('.scene-text');
+    if (label) text += '[' + label.textContent.replace(/\s+/g,' ').trim() + ']\n';
+    if (content) text += content.innerText.trim() + '\n\n';
+  });
+
+  // Captions
+  const cap = body.querySelector('.caption-text');
+  if (cap) { text += cap.innerText.trim() + '\n\n'; }
+  body.querySelectorAll('.hashtag').forEach(h => { text += h.textContent + ' '; });
+
+  // Quotes
+  const qMain = body.querySelector('.quote-main');
+  const qAttr = body.querySelector('.quote-attr');
+  if (qMain) text += qMain.innerText.trim() + '\n';
+  if (qAttr) text += '— ' + qAttr.innerText.trim() + '\n';
+
+  // Hooks
+  body.querySelectorAll('.hook-list li').forEach(li => {
+    text += '→ ' + li.innerText.trim() + '\n';
+  });
+
+  // Threads
+  body.querySelectorAll('.tweet').forEach(t => {
+    const num = t.querySelector('.tweet-num');
+    const content = t.querySelector('.tweet-text');
+    if (num) text += num.textContent.trim() + '\n';
+    if (content) text += content.innerText.trim() + '\n\n';
+  });
+
+  text = text.trim();
+
+  if (!text) {
+    btn.textContent = 'Nothing to copy';
+    return;
+  }
+
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => { btn.textContent = 'Select manually'; });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soul Prosperity — Kingdom Wealth Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dim: #7A5C1E;
+    --black: #0A0A0A;
+    --border: #2A2A2A;
+    --text: #E8E0D0;
+    --muted: #888070;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--black); color: var(--text); font-family: 'Crimson Pro', serif; min-height: 100vh; }
+
+  header { padding: 50px 40px 36px; border-bottom: 1px solid var(--border); position: relative; }
+  header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase; margin-bottom: 14px; }
+  h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(42px, 7vw, 84px); line-height: 0.9; color: var(--text); margin-bottom: 10px; }
+  h1 span { color: var(--gold); }
+  .subtitle { font-size: 17px; color: var(--muted); font-style: italic; max-width: 560px; margin-top: 10px; }
+
+  .progress-bar { height: 2px; background: var(--border); }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dim), var(--gold)); transition: width 1s ease; width: 0%; }
+
+  #loadingState { padding: 70px 40px; text-align: center; }
+  .spinner { width: 40px; height: 40px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.9s linear infinite; margin: 0 auto 20px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-label { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 6px; }
+  .loading-sub { font-size: 14px; color: var(--muted); font-style: italic; }
+
+  .prompt-section { padding: 48px 40px; border-bottom: 1px solid var(--border); max-width: 860px; margin: 0 auto; opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .prompt-section.show { opacity: 1; transform: translateY(0); }
+  .prompt-header { display: flex; align-items: flex-start; gap: 18px; margin-bottom: 28px; }
+  .num { font-family: 'Bebas Neue', sans-serif; font-size: 64px; line-height: 1; color: var(--gold-dim); flex-shrink: 0; }
+  .meta { flex: 1; padding-top: 6px; }
+  .ptitle { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 0.04em; color: var(--text); margin-bottom: 6px; }
+  .ptag { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.15em; color: var(--gold); background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.25); padding: 3px 9px; text-transform: uppercase; display: inline-block; }
+
+  .body { font-size: 16.5px; line-height: 1.8; color: var(--text); }
+  .body h3 { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.08em; color: var(--gold-light); margin: 22px 0 8px; }
+  .body p { margin-bottom: 12px; }
+  .body ul { list-style: none; margin: 10px 0 16px; }
+  .body ul li { padding: 7px 0 7px 22px; position: relative; border-bottom: 1px solid rgba(42,42,42,0.6); font-size: 15.5px; }
+  .body ul li::before { content: '→'; position: absolute; left: 0; color: var(--gold); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  .body strong { color: var(--gold-light); font-weight: 600; }
+
+  .err { padding: 20px 40px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #e74c3c; border-left: 3px solid #e74c3c; margin: 20px 40px; background: rgba(231,76,60,0.05); }
+
+  footer { padding: 36px 40px; text-align: center; border-top: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.1em; position: relative; }
+  footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-dim), transparent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Soul Prosperity · Kingdom Wealth Intelligence</div>
+  <h1>YOUR <span>WEALTH</span><br>BLUEPRINT</h1>
+  <p class="subtitle">5 millionaire frameworks — personalized to Soul Prosperity, OpenClaw, and the arborist niche.</p>
+</header>
+
+<div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+
+<div id="loadingState">
+  <div class="spinner"></div>
+  <div class="loading-label" id="loadingLabel">Initializing Kingdom Systems Analysis...</div>
+  <div class="loading-sub" id="loadingSub">Running prompt 0 of 5</div>
+</div>
+
+<div id="results"></div>
+<footer>SOUL PROSPERITY · AI AUTOMATION MASTERY · KINGDOM SYSTEMS FOR BLUE-COLLAR CHRISTIAN BUSINESS OWNERS</footer>
+
+<script>
+const SYSTEM = `You are a personalized wealth and business strategist for Terrance, CEO and founder of Soul Prosperity. Key facts:
+
+BUSINESS MODEL:
+- Solo technical operator managing both architecture and product strategy
+- Builds AI automation systems for blue-collar B2B clients (arborist/tree care niche)
+- Active client: Heavenly Arbor Care Services (Ricardo Camacho, San Antonio TX) — delivered Remotion Lambda video estimate system (AI video → n8n → GHL SMS)
+- Phase 2 portal proposal: Next.js + Supabase + Stripe, priced at $7,500
+- Tech stack: GoHighLevel (GHL), n8n, Remotion Lambda, AWS S3, React/Vite, Railway
+
+PRODUCTS & REVENUE:
+1. Client automation builds (project-based, $5K-$15K each)
+2. AI Automation Mastery Course — 3 tiers: Core / Launch System / Membership
+3. OpenClaw — autonomous AI platform (SaaS in development, hosted on Railway)
+4. Maintenance/retainer packages for automation clients
+
+POSITIONING: "Kingdom Systems for blue-collar Christian business owners" — faith-based, targets Christian contractors, arborists, tree care, blue-collar service businesses.
+
+CONSTRAINTS: Solo operator, no team. Juggling client delivery + course building + platform simultaneously. Goal: $10K-$20K/month recurring.
+
+Give direct, tactical, numbered action steps specific to Terrance's real business. No generic wealth tips.`;
+
+const prompts = [
+  { num: "01", title: "Wealth Architect", tag: "Net Worth Strategy",
+    msg: "Act as a wealth-building strategist for Terrance. He runs Soul Prosperity targeting blue-collar Christian businesses. He wants $100K-$300K net worth in 3 years as a solo AI founder. Give him: (1) exact income milestones for the first 90 days, (2) which Soul Prosperity revenue stream to prioritize first and why, (3) how to allocate income between reinvestment vs personal wealth, (4) the single most important financial move he should make this week. Be specific and numbered." },
+  { num: "02", title: "Millionaire Thinking Decoder", tag: "Mindset & Money Habits",
+    msg: "As a behavioral economist, give Terrance 6 specific mental shifts to stop being trapped in client delivery and start building scalable wealth through Soul Prosperity's course and OpenClaw platform. Then give a concrete 90-day habit plan — specific daily and weekly actions — to rewire him from service provider to systems owner. He's a solo operator in AI automation with a faith-based mission." },
+  { num: "03", title: "Passive Income Engine", tag: "Automated Revenue",
+    msg: "Design 4 automated revenue streams for Soul Prosperity using tools Terrance already has: GHL, n8n, OpenClaw, Remotion Lambda. For each stream: exact product, how to automate using his stack, realistic monthly revenue, time to first dollar, how it reinforces the others. One stream must leverage his Heavenly Arbor video estimate case study directly." },
+  { num: "04", title: "Asset Acquisition Strategy", tag: "Portfolio & Investment",
+    msg: "Build Terrance a 5-year asset acquisition plan as a solo AI founder. Include: (1) how to allocate money at $3K/mo, $7K/mo, $15K/mo revenue stages, (2) asset classes that make sense at his stage, (3) how to treat OpenClaw as a sellable asset, (4) one unconventional asset play that fits his niche, (5) rebalancing trigger points. No generic financial advisor advice — founder-specific only." },
+  { num: "05", title: "Wealth Accelerator", tag: "Leverage & Scale",
+    msg: "Show Terrance how to 10x Soul Prosperity without hiring a full team. Specifically: (1) how to turn the Heavenly Arbor case study into a lead gen machine for other arborists, (2) how to fund OpenClaw development using OPM or partnerships, (3) how to use n8n + GHL to replace 20+ hours/week of manual work, (4) one distribution play to 5x course sales, (5) a risk management plan for a solo operator with no safety net. Concrete tactics only." }
+];
+
+function toHTML(text) {
+  const lines = text.split('\n');
+  let html = '';
+  let inList = false;
+  for (let raw of lines) {
+    const line = raw.trim();
+    if (!line) { if (inList) { html += '</ul>'; inList = false; } continue; }
+    if (/^#{1,3}\s/.test(line)) {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += `<h3>${line.replace(/^#{1,3}\s+/, '')}</h3>`;
+    } else if (/^[-•*]\s/.test(line) || /^\d+[.)]\s/.test(line)) {
+      if (!inList) { html += '<ul>'; inList = true; }
+      const c = line.replace(/^[-•*]\s/, '').replace(/^\d+[.)]\s/, '');
+      html += `<li>${bold(c)}</li>`;
+    } else {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += `<p>${bold(line)}</p>`;
+    }
+  }
+  if (inList) html += '</ul>';
+  return html;
+}
+
+function bold(t) { return t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); }
+
+async function callClaude(userMsg) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: SYSTEM,
+      messages: [{ role: 'user', content: userMsg }]
+    })
+  });
+
+  const json = await res.json();
+
+  if (!res.ok) {
+    throw new Error(json?.error?.message || `HTTP ${res.status}`);
+  }
+  if (json.content && Array.isArray(json.content)) {
+    for (const block of json.content) {
+      if (block.type === 'text' && block.text) return block.text;
+    }
+  }
+  throw new Error('No text in response: ' + JSON.stringify(json).slice(0, 150));
+}
+
+function addSection(p, text) {
+  const div = document.createElement('div');
+  div.className = 'prompt-section';
+  div.innerHTML = `
+    <div class="prompt-header">
+      <div class="num">${p.num}</div>
+      <div class="meta">
+        <div class="ptitle">${p.title}</div>
+        <div class="ptag">${p.tag}</div>
+      </div>
+    </div>
+    <div class="body">${toHTML(text)}</div>`;
+  document.getElementById('results').appendChild(div);
+  requestAnimationFrame(() => setTimeout(() => div.classList.add('show'), 30));
+}
+
+async function run() {
+  const label = document.getElementById('loadingLabel');
+  const sub = document.getElementById('loadingSub');
+  const prog = document.getElementById('prog');
+  const loading = document.getElementById('loadingState');
+
+  for (let i = 0; i < prompts.length; i++) {
+    const p = prompts[i];
+    label.textContent = `Analyzing: ${p.title}...`;
+    sub.textContent = `Processing prompt ${i + 1} of ${prompts.length}`;
+    prog.style.width = `${(i / prompts.length) * 100}%`;
+
+    try {
+      const text = await callClaude(p.msg);
+      if (i === 0) loading.style.display = 'none';
+      addSection(p, text);
+    } catch (e) {
+      if (i === 0) loading.style.display = 'none';
+      const err = document.createElement('div');
+      err.className = 'err';
+      err.textContent = `[${p.title}] Error: ${e.message}`;
+      document.getElementById('results').appendChild(err);
+    }
+
+    prog.style.width = `${((i + 1) / prompts.length) * 100}%`;
+  }
+  loading.style.display = 'none';
+}
+
+run();
+</script>
+</body>
+</html>
