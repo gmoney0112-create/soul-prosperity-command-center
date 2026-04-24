@@ -95,9 +95,37 @@ Run the same checks locally before pushing:
 npm run check
 ```
 
+## Deploying to Vercel
+
+This repo is configured for zero-config Vercel deployment as a pure static site. The root `vercel.json` declares no build step and lets Vercel serve `index.html` at `/` and every other file (including `source-assets/*.html`) at its literal path. There is intentionally no SPA catch-all rewrite — a catch-all would shadow the standalone HTML assets in `source-assets/`.
+
+### Import the repo
+
+1. Go to [vercel.com/new](https://vercel.com/new) and import the GitHub repo `gmoney0112-create/soul-prosperity-command-center`.
+2. On the **Configure Project** screen:
+   - **Framework Preset:** `Other` (static HTML).
+   - **Root Directory:** leave as the repo root.
+   - **Build Command:** leave empty (or set to an empty string / `None`). No build is required.
+   - **Output Directory:** leave empty — Vercel serves the repo root directly.
+   - **Install Command:** leave empty. `npm install` is not needed for serving; it is only used by CI and local dev.
+3. Click **Deploy**. Vercel will publish the repo files as-is and honor the settings in `vercel.json`.
+
+### What Vercel serves
+
+- `/` → `index.html`
+- `/styles.css`, `/app.js`, `/config.js` → served verbatim
+- `/source-assets/funnel-map.html`, etc. → served verbatim, direct-linkable
+- `cleanUrls: true` means `/source-assets/funnel-map` also resolves to the same page
+
+### Editing the link config after deploy
+
+All external destinations live in `config.js` at the repo root. To update a funnel link in production, edit `config.js` on `main`, commit, and push — Vercel will redeploy automatically. No build or environment variables are involved. See the **Editing the link config** section above for the keys and placeholder rules.
+
 ## Deploying to GitHub Pages
 
-Pushes to `main` trigger `.github/workflows/pages.yml`, which validates the site and publishes it to GitHub Pages via the official `actions/deploy-pages` flow. No build step is used — the repo files are published as-is, minus CI-only paths (`.github/`, `scripts/`, `node_modules/`, `package.json`, `package-lock.json`, `source-assets.zip`).
+Pushes to `main` also trigger `.github/workflows/pages.yml`, which validates the site and publishes it to GitHub Pages via the official `actions/deploy-pages` flow. No build step is used — the repo files are published as-is, minus CI-only paths (`.github/`, `scripts/`, `node_modules/`, `package.json`, `package-lock.json`, `source-assets.zip`).
+
+> **Note on private repos:** GitHub Pages publishing from a private repo requires GitHub Pro / Team / Enterprise. On the free plan, the `Deploy to GitHub Pages` workflow will fail with a permissions error when the repo is private. Use Vercel (above) as the primary host in that case; the Pages workflow can be ignored or disabled without affecting the site.
 
 ### One-time setup (if Pages is not yet enabled)
 
