@@ -210,28 +210,54 @@ AppUninstall
 location-scoped token bundle; on uninstall you must revoke local
 state.
 
-### 4.4 Signature verification (sketch)
+### 4.4 Signature verification (public-key)
+
+HighLevel signs webhook deliveries with **public-key cryptography** —
+there is no shared HMAC secret. Two schemes are in production:
+
+- **Current — Ed25519.** Header `X-GHL-Signature`, base64 of the
+  Ed25519 signature over the raw request body. The public key is:
+
+  ```text
+  -----BEGIN PUBLIC KEY-----
+  MCowBQYDK2VwAyEAi2HR1srL4o18O8BRa7gVJY7G7bupbN3H9AwJrHCDiOg=
+  -----END PUBLIC KEY-----
+  ```
+
+- **Legacy — RSA-SHA256.** Header `X-WH-Signature`, base64 of the
+  RSA-SHA256 signature over the raw request body. The 4096-bit RSA
+  public key is published in the HighLevel docs and embedded in
+  `api/_lib/ghl.js`.
+
+Verification sketch using Node's `crypto` module:
 
 ```js
 const crypto = require("crypto");
 
-function verifyHighLevelSignature(rawBody, signatureHeader, secret) {
-  const expected = crypto
-    .createHmac("sha256", secret)
-    .update(rawBody)
-    .digest("hex");
-  // Use timing-safe compare; reject on length mismatch.
-  if (signatureHeader.length !== expected.length) return false;
-  return crypto.timingSafeEqual(
-    Buffer.from(signatureHeader),
-    Buffer.from(expected)
-  );
+const ED25519_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
+MCowBQYDK2VwAyEAi2HR1srL4o18O8BRa7gVJY7G7bupbN3H9AwJrHCDiOg=
+-----END PUBLIC KEY-----`;
+
+function verifyEd25519(rawBody, signatureHeader) {
+  const sig = Buffer.from(signatureHeader, "base64");
+  const key = crypto.createPublicKey(ED25519_PUBLIC_KEY);
+  return crypto.verify(null, rawBody, key, sig);
+}
+
+function verifyRsaSha256(rawBody, signatureHeader, rsaPublicKeyPem) {
+  const sig = Buffer.from(signatureHeader, "base64");
+  const key = crypto.createPublicKey(rsaPublicKeyPem);
+  return crypto.verify("RSA-SHA256", rawBody, key, sig);
 }
 ```
 
-The exact signing secret + header name are issued by HighLevel when
-you save the webhook; keep them in your backend secret store, never
-in `config.js`.
+Critically, you must verify against the **exact raw request bytes**.
+If your framework pre-parses JSON, capture the raw body before parsing.
+
+Because the keys are public, **no env-var secret is required** — and
+intentionally none is configured in this repo. Anyone setting up the
+serverless layer should not look for a `GHL_WEBHOOK_SIGNING_SECRET`;
+it is not used.
 
 A sample inbound webhook payload is at
 `samples/ghl-webhook-payload.json`.
@@ -288,7 +314,7 @@ live under `/api/ghl/`:
 | --- | --- | --- |
 | `/api/ghl/health` | `GET` | Returns JSON about which env vars are configured. Booleans only — never values. Safe to expose. |
 | `/api/ghl/oauth/callback` | `GET` | Receives `?code=` from HighLevel and exchanges it server-side at `services.leadconnectorhq.com/oauth/token`. Forwards the token bundle to `GHL_TOKEN_STORAGE_URL` and never returns tokens to the browser. |
-| `/api/ghl/webhook` | `POST` | Verifies `x-wh-signature` (when `GHL_WEBHOOK_SIGNING_SECRET` is set), de-duplicates by `x-wh-id` best-effort in memory, validates event type against `GHL_ALLOWED_WEBHOOK_EVENTS`, and forwards to `GHL_WEBHOOK_FORWARD_URL` if set. |
+| `/api/ghl/webhook` | `POST` | Verifies HighLevel's webhook signature (`X-GHL-Signature` Ed25519, with `X-WH-Signature` RSA-SHA256 fallback) against the public keys baked into `api/_lib/ghl.js`. No env secret required. De-duplicates by `x-wh-id` / `x-ghl-webhook-id` best-effort in memory, validates event type against `GHL_ALLOWED_WEBHOOK_EVENTS`, and forwards to `GHL_WEBHOOK_FORWARD_URL` if set. |
 
 ### Environment variables
 
@@ -304,9 +330,13 @@ deployments to be exercised). For local serverless testing, copy
 | `GHL_OAUTH_REDIRECT_URI` | Must equal `https://<your-domain>/api/ghl/oauth/callback` | No |
 | `GHL_USER_TYPE` | `Location` (default) or `Company` | No |
 | `GHL_TOKEN_STORAGE_URL` | Server-side sink that stores the token bundle | **Yes** (URL may be sensitive) |
-| `GHL_WEBHOOK_SIGNING_SECRET` | HMAC-SHA256 key for webhook verification | **Yes** |
 | `GHL_WEBHOOK_FORWARD_URL` | Optional sink for accepted webhook payloads | Optional |
 | `GHL_ALLOWED_WEBHOOK_EVENTS` | Comma-separated allowlist (defaults to the recommended list in §4.3) | No |
+
+> Webhook signature verification does **not** use an env-var secret.
+> HighLevel signs deliveries with public-key crypto (Ed25519 / RSA);
+> the public keys are embedded in `api/_lib/ghl.js`. There is
+> intentionally no `GHL_WEBHOOK_SIGNING_SECRET` — do not add one.
 
 ### Mapping back to `config.js`
 
@@ -370,15 +400,22 @@ npm run check
 # Readiness
 curl -s https://<your-domain>/api/ghl/health | jq
 
-# Webhook (signed)
-SECRET="$GHL_WEBHOOK_SIGNING_SECRET"
-BODY='{"type":"ContactCreate","webhookId":"wh_test_001","contact":{"email":"x@y.z"}}'
-SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $2}')
+# Webhook — note the live endpoint will reject any request you sign
+# yourself, because only HighLevel's private key produces valid
+# signatures. To exercise the rejection path:
+BODY='{"type":"ContactCreate","webhookId":"wh_test_001"}'
 curl -s -X POST https://<your-domain>/api/ghl/webhook \
   -H "Content-Type: application/json" \
-  -H "x-wh-signature: $SIG" \
+  -H "x-ghl-signature: not-a-real-signature" \
   -H "x-wh-id: wh_test_001" \
   --data "$BODY"
+# Expect: 401 invalid_signature
+
+# To exercise the accept path end-to-end, trigger an actual delivery
+# from the GHL Marketplace app's Webhooks tab (Settings → Advanced
+# Settings → Webhooks → "Send test event") and watch the function
+# logs. The repo's smoke tests cover the verification path locally
+# using a generated key pair (see scripts/smoke-serverless.js).
 
 # OAuth callback (HighLevel calls this; you don't normally curl it)
 # To test the missing-env path:

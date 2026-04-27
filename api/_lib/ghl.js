@@ -24,6 +24,40 @@ const DEFAULT_ALLOWED_EVENTS = [
 
 const TOKEN_URL = "https://services.leadconnectorhq.com/oauth/token";
 
+// Official HighLevel webhook signing public keys.
+//
+// HighLevel publishes these in their developer docs. They are PUBLIC
+// keys — safe to embed in the repo. Each delivery is signed by
+// HighLevel's private key; we verify the signature against the
+// matching public key and the EXACT raw request bytes.
+//
+// Current scheme: Ed25519. Header: `X-GHL-Signature` (base64).
+// Legacy scheme:  RSA-SHA256. Header: `X-WH-Signature` (base64).
+//
+// Both keys come from
+// https://highlevel.stoplight.io/docs/integrations/ (Webhooks →
+// Verifying Webhook Signature).
+const GHL_ED25519_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
+MCowBQYDK2VwAyEAi2HR1srL4o18O8BRa7gVJY7G7bupbN3H9AwJrHCDiOg=
+-----END PUBLIC KEY-----`;
+
+// HighLevel's published RSA public key for the legacy `X-WH-Signature`
+// scheme. Verbatim from the HighLevel docs.
+const GHL_RSA_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAokvo/r9tVgcfZ5DysOSC
+Frm602qYV0MaAiNnX9O8KxMbiyRKWeL9JpCpVpt4XHIcBOK4u3cLSqJGOLaPuXw6
+dO0t6Q/ZVdAV5Phz+ZtzPL16iCGeK9po6D6JHBpbi989mmzMryUnQJezlYJ3DVfB
+csedpinheNnyYeFXolrJvcsjDtfAeRx5ByHQmTnSdFUzuAnC9/GepgLT9SM4nCpv
+uxmZMxrJt5Rw+VUaQ9B8JSvbMPpez4peKaJPZHBbU3OdeCVx5klVXXZQGNHOs8gF
+3kvoV5rTnXV0IknLBXlcKKAQLZcY/Q9rG6Ifi9c+5vqlvHPCUJFT5XUGG5RKgOKU
+J062fRtN+rLYZUV+BjafxQauvC8wSWeYja63VSUruvmNj8xkx2zE/Juc+yjLjTXp
+IocmaiFeAO6fUtNjDeFVkhf5LNb59vECyrHD2SQIrhgXpO4Q3dVNA5rw576PwTzN
+h/AMfHKIjE4xQA1SZuYJmNnmVZLIZBlQAF9Ntd03rfadZ+yDiOXCCs9FkHibELhC
+HULgCsnuDJHcrGNd5/Ddm5hxGQ0ASitgHeMZ0kcIOwKDOzOU53lDza6/Y09T7sYJ
+PQe7z0cvj7aE4B+Ax1ZoZGPzpJlZtGXCsu9aTEGEnKzmsFqwcSsnw3JB31IGKAyk
+T1hhTiaCeIY/OwwwNUY2yvcCAwEAAQ==
+-----END PUBLIC KEY-----`;
+
 // Best-effort in-memory webhook id cache for dev. Vercel serverless
 // instances are short-lived and not shared across invocations, so this
 // is NOT a durable de-dup. Production must back this with Redis / KV.
@@ -118,32 +152,97 @@ function getOAuthConfig() {
 
 function getWebhookConfig() {
   return {
-    signingSecret: readEnv("GHL_WEBHOOK_SIGNING_SECRET"),
     forwardUrl: readEnv("GHL_WEBHOOK_FORWARD_URL"),
     allowedEvents: getAllowedEvents(),
   };
 }
 
-// Timing-safe HMAC-SHA256 hex compare. Returns false if the secret is
-// empty (signature verification disabled), so callers must check that
-// case explicitly before treating the result as "verified".
-function verifySignature(rawBody, signatureHeader, secret) {
-  if (!secret) return false;
-  if (!signatureHeader) return false;
-  const sig = String(signatureHeader).trim();
-  if (!sig) return false;
-  const expected = crypto
-    .createHmac("sha256", secret)
-    .update(rawBody)
-    .digest("hex");
-  const a = Buffer.from(sig, "utf8");
-  const b = Buffer.from(expected, "utf8");
-  if (a.length !== b.length) return false;
+function decodeSignature(sigHeader) {
+  if (!sigHeader) return null;
+  const trimmed = String(sigHeader).trim();
+  if (!trimmed) return null;
+  // HighLevel publishes signatures as base64. Be lenient: accept hex
+  // too in case a tester signs with openssl dgst -hex.
   try {
-    return crypto.timingSafeEqual(a, b);
+    const b64 = Buffer.from(trimmed, "base64");
+    if (b64.length > 0 && b64.toString("base64").replace(/=+$/, "") ===
+        trimmed.replace(/=+$/, "")) {
+      return b64;
+    }
+  } catch (_err) {
+    // fall through
+  }
+  if (/^[0-9a-fA-F]+$/.test(trimmed) && trimmed.length % 2 === 0) {
+    try {
+      return Buffer.from(trimmed, "hex");
+    } catch (_err) {
+      return null;
+    }
+  }
+  // Final fallback — try base64 even if it does not roundtrip cleanly.
+  try {
+    return Buffer.from(trimmed, "base64");
+  } catch (_err) {
+    return null;
+  }
+}
+
+// Verify HighLevel's current Ed25519 webhook signature.
+// Header: `X-GHL-Signature` (base64 of the Ed25519 signature).
+// Public key: GHL_ED25519_PUBLIC_KEY (PEM).
+function verifyEd25519(rawBody, signatureHeader) {
+  if (!signatureHeader) return false;
+  const sig = decodeSignature(signatureHeader);
+  if (!sig || sig.length === 0) return false;
+  try {
+    const keyObj = crypto.createPublicKey(GHL_ED25519_PUBLIC_KEY);
+    return crypto.verify(null, rawBody, keyObj, sig);
   } catch (_err) {
     return false;
   }
+}
+
+// Verify HighLevel's legacy RSA-SHA256 webhook signature.
+// Header: `X-WH-Signature` (base64 of the RSA-SHA256 signature).
+// Public key: GHL_RSA_PUBLIC_KEY (PEM).
+function verifyRsaSha256(rawBody, signatureHeader) {
+  if (!signatureHeader) return false;
+  const sig = decodeSignature(signatureHeader);
+  if (!sig || sig.length === 0) return false;
+  try {
+    const keyObj = crypto.createPublicKey(GHL_RSA_PUBLIC_KEY);
+    return crypto.verify("RSA-SHA256", rawBody, keyObj, sig);
+  } catch (_err) {
+    return false;
+  }
+}
+
+// Top-level webhook verification entrypoint. Tries Ed25519 first
+// (current scheme), falls back to RSA (legacy scheme). Returns:
+//   { verified: true,  scheme: "ed25519" | "rsa-sha256" }
+//   { verified: false, scheme: null, reason: "no_signature_header" | "invalid" }
+function verifyWebhookSignature(rawBody, headers) {
+  function pickHeader(name) {
+    if (!headers) return "";
+    const lower = name.toLowerCase();
+    const v = headers[lower];
+    if (Array.isArray(v)) return v[0] || "";
+    return v ? String(v) : "";
+  }
+  const ed25519Sig =
+    pickHeader("x-ghl-signature") || pickHeader("x-hl-signature");
+  const rsaSig = pickHeader("x-wh-signature");
+
+  if (!ed25519Sig && !rsaSig) {
+    return { verified: false, scheme: null, reason: "no_signature_header" };
+  }
+  if (ed25519Sig && verifyEd25519(rawBody, ed25519Sig)) {
+    return { verified: true, scheme: "ed25519" };
+  }
+  if (rsaSig && verifyRsaSha256(rawBody, rsaSig)) {
+    return { verified: true, scheme: "rsa-sha256" };
+  }
+  return { verified: false, scheme: null, reason: "invalid" };
 }
 
 // Best-effort, in-memory de-dup. Returns true if this is the first
@@ -271,6 +370,10 @@ async function postForm(url, params) {
 // Operator-readiness summary used by /api/ghl/health. Mirrors the
 // production-required keys in scripts/validate.js, but scoped to the
 // SERVER side: only env-var presence is reported, never values.
+//
+// Webhook signature verification is ALWAYS available because the
+// public keys are hardcoded from the HighLevel docs — we report that
+// as a static `true` rather than a configurable boolean.
 function readinessSummary() {
   const oauth = getOAuthConfig();
   const wh = getWebhookConfig();
@@ -283,7 +386,8 @@ function readinessSummary() {
       tokenStorageConfigured: !isPlaceholder(oauth.tokenStorageUrl),
     },
     webhook: {
-      signatureVerification: !isPlaceholder(wh.signingSecret),
+      signatureVerification: true,
+      signatureSchemes: ["ed25519", "rsa-sha256"],
       forwardConfigured: !isPlaceholder(wh.forwardUrl),
       allowedEvents: wh.allowedEvents,
     },
@@ -293,6 +397,8 @@ function readinessSummary() {
 module.exports = {
   TOKEN_URL,
   DEFAULT_ALLOWED_EVENTS,
+  GHL_ED25519_PUBLIC_KEY,
+  GHL_RSA_PUBLIC_KEY,
   jsonResponse,
   methodNotAllowed,
   readRawBody,
@@ -302,7 +408,9 @@ module.exports = {
   getAllowedEvents,
   getOAuthConfig,
   getWebhookConfig,
-  verifySignature,
+  verifyEd25519,
+  verifyRsaSha256,
+  verifyWebhookSignature,
   recordWebhookId,
   sanitizeForLog,
   logSafe,

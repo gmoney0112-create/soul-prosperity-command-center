@@ -237,12 +237,15 @@ const SERVERLESS_ROUTES = [
   },
 ];
 
+// NOTE: GHL_WEBHOOK_SIGNING_SECRET is intentionally absent. HighLevel
+// webhook signature verification uses public-key crypto (Ed25519
+// current, RSA-SHA256 legacy). The public keys are baked into
+// api/_lib/ghl.js and require no env secret to function.
 const SERVER_ENV_LAUNCH = [
   "GHL_CLIENT_ID",
   "GHL_CLIENT_SECRET",
   "GHL_OAUTH_REDIRECT_URI",
   "GHL_TOKEN_STORAGE_URL",
-  "GHL_WEBHOOK_SIGNING_SECRET",
 ];
 
 function checkServerlessRoutes() {

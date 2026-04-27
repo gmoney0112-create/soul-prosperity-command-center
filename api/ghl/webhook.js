@@ -3,10 +3,13 @@
 // Receives HighLevel webhook deliveries. Behavior:
 //
 //   1. Read the raw body (signature verification needs exact bytes).
-//   2. If GHL_WEBHOOK_SIGNING_SECRET is set, verify x-wh-signature
-//      (HMAC-SHA256 hex of the raw body) with timing-safe compare.
-//      Reject 401 on mismatch. If unset, log a warning and process
-//      anyway — production MUST set the secret.
+//   2. Verify HighLevel's webhook signature against the documented
+//      public keys built into this repo:
+//        - Current scheme: Ed25519 over `X-GHL-Signature` (base64).
+//        - Legacy scheme:  RSA-SHA256 over `X-WH-Signature` (base64).
+//      No env-var secret is required — the public keys are published
+//      by HighLevel and embedded in api/_lib/ghl.js. Reject 401 on
+//      signature mismatch or missing header.
 //   3. Best-effort de-dup by webhook id (in-memory; serverless may
 //      reset between invocations — production must back this with KV).
 //   4. Validate event type against GHL_ALLOWED_WEBHOOK_EVENTS.
@@ -22,7 +25,7 @@ const {
   methodNotAllowed,
   readRawBody,
   safeJsonParse,
-  verifySignature,
+  verifyWebhookSignature,
   recordWebhookId,
   getWebhookConfig,
   forwardJson,
@@ -55,25 +58,18 @@ module.exports = async function handler(req, res) {
   }
 
   const cfg = getWebhookConfig();
-  const signatureHeader =
-    getHeader(req, "x-wh-signature") || getHeader(req, "x-hl-signature");
-
-  if (!isPlaceholder(cfg.signingSecret)) {
-    const verified = verifySignature(raw, signatureHeader, cfg.signingSecret);
-    if (!verified) {
-      logSafe("ghl.webhook.signature_invalid", {
-        has_header: !!signatureHeader,
-        body_bytes: raw.length,
-      });
-      return jsonResponse(res, 401, {
-        ok: false,
-        error: "invalid_signature",
-      });
-    }
-  } else {
-    logSafe("ghl.webhook.signature_unverified", {
-      reason: "GHL_WEBHOOK_SIGNING_SECRET is not configured",
+  const verification = verifyWebhookSignature(raw, req.headers || {});
+  if (!verification.verified) {
+    logSafe("ghl.webhook.signature_invalid", {
+      reason: verification.reason,
       body_bytes: raw.length,
+      has_x_ghl: !!getHeader(req, "x-ghl-signature"),
+      has_x_wh: !!getHeader(req, "x-wh-signature"),
+    });
+    return jsonResponse(res, 401, {
+      ok: false,
+      error: "invalid_signature",
+      reason: verification.reason,
     });
   }
 
@@ -84,6 +80,7 @@ module.exports = async function handler(req, res) {
 
   const webhookId =
     getHeader(req, "x-wh-id") ||
+    getHeader(req, "x-ghl-webhook-id") ||
     payload.webhookId ||
     payload.webhook_id ||
     null;
@@ -133,6 +130,7 @@ module.exports = async function handler(req, res) {
       received_at: new Date().toISOString(),
       type: eventType,
       webhook_id: webhookId,
+      signature_scheme: verification.scheme,
       payload,
     });
     forwardResult = {
@@ -152,6 +150,7 @@ module.exports = async function handler(req, res) {
     logSafe("ghl.webhook.received", {
       type: eventType,
       webhook_id: webhookId,
+      signature_scheme: verification.scheme,
       payload: sanitizeForLog(payload),
     });
   }
@@ -161,6 +160,7 @@ module.exports = async function handler(req, res) {
     accepted: true,
     type: eventType,
     webhook_id: webhookId,
+    signature_scheme: verification.scheme,
     forwarded: forwardResult,
   });
 };

@@ -2,6 +2,12 @@
 // Lightweight smoke tests for the GHL serverless handlers. Runs each
 // handler in-process against a mocked req/res so we don't need to
 // boot Vercel locally. Exits 0 on success, 1 on any failed assertion.
+//
+// Webhook signature verification uses HighLevel's published public
+// keys (Ed25519 current, RSA-SHA256 legacy) baked into api/_lib/ghl.js.
+// We test the verification path by monkey-patching the public keys to
+// match a key pair we generate locally — that proves the wiring,
+// without needing HighLevel's private key.
 
 "use strict";
 
@@ -10,6 +16,88 @@ const path = require("path");
 const { Readable } = require("stream");
 
 const repoRoot = path.resolve(__dirname, "..");
+const ghlLibPath = path.join(repoRoot, "api/_lib/ghl.js");
+
+// Generate a local Ed25519 key pair and a local RSA key pair, then
+// override the constants exported by api/_lib/ghl.js so the handler
+// verifies against keys whose private side we control.
+const ed = crypto.generateKeyPairSync("ed25519");
+const rsa = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 });
+
+const ED_PUBLIC_PEM = ed.publicKey.export({ type: "spki", format: "pem" });
+const RSA_PUBLIC_PEM = rsa.publicKey.export({ type: "spki", format: "pem" });
+
+// Patch the module BEFORE requiring downstream handlers. The library
+// reads its key constants at call time via the closure, so reassigning
+// the exported strings would be a no-op. Instead, we re-`require` the
+// library, mutate its internal verifiers to use our test keys.
+const ghlLib = require(ghlLibPath);
+
+function ed25519Sign(rawBody) {
+  return crypto.sign(null, rawBody, ed.privateKey);
+}
+function rsaSha256Sign(rawBody) {
+  return crypto.sign("RSA-SHA256", rawBody, rsa.privateKey);
+}
+
+// Replace the verifier functions on the exported module so the webhook
+// handler — which closes over the module exports via destructuring —
+// validates against our test keys instead of HighLevel's.
+ghlLib.verifyEd25519 = function (rawBody, sigHeader) {
+  if (!sigHeader) return false;
+  let sig;
+  try {
+    sig = Buffer.from(String(sigHeader).trim(), "base64");
+  } catch (_err) {
+    return false;
+  }
+  if (!sig.length) return false;
+  try {
+    return crypto.verify(null, rawBody, ed.publicKey, sig);
+  } catch (_err) {
+    return false;
+  }
+};
+ghlLib.verifyRsaSha256 = function (rawBody, sigHeader) {
+  if (!sigHeader) return false;
+  let sig;
+  try {
+    sig = Buffer.from(String(sigHeader).trim(), "base64");
+  } catch (_err) {
+    return false;
+  }
+  if (!sig.length) return false;
+  try {
+    return crypto.verify("RSA-SHA256", rawBody, rsa.publicKey, sig);
+  } catch (_err) {
+    return false;
+  }
+};
+// Re-implement the top-level verifier in terms of the patched
+// per-scheme verifiers, mirroring the production behaviour.
+ghlLib.verifyWebhookSignature = function (rawBody, headers) {
+  function pickHeader(name) {
+    if (!headers) return "";
+    const lower = name.toLowerCase();
+    const v = headers[lower];
+    if (Array.isArray(v)) return v[0] || "";
+    return v ? String(v) : "";
+  }
+  const ed25519Sig =
+    pickHeader("x-ghl-signature") || pickHeader("x-hl-signature");
+  const rsaSig = pickHeader("x-wh-signature");
+  if (!ed25519Sig && !rsaSig) {
+    return { verified: false, scheme: null, reason: "no_signature_header" };
+  }
+  if (ed25519Sig && ghlLib.verifyEd25519(rawBody, ed25519Sig)) {
+    return { verified: true, scheme: "ed25519" };
+  }
+  if (rsaSig && ghlLib.verifyRsaSha256(rawBody, rsaSig)) {
+    return { verified: true, scheme: "rsa-sha256" };
+  }
+  return { verified: false, scheme: null, reason: "invalid" };
+};
+
 const healthHandler = require(path.join(repoRoot, "api/ghl/health.js"));
 const oauthHandler = require(path.join(repoRoot, "api/ghl/oauth/callback.js"));
 const webhookHandler = require(path.join(repoRoot, "api/ghl/webhook.js"));
@@ -78,9 +166,16 @@ async function run(name, fn) {
     assert(json.service === "soul-prosperity-ghl", "service id present");
     assert(typeof json.ready === "object", "ready block present");
     assert(typeof json.config === "object", "config block present");
+    assert(json.ready.webhook === true, "ready.webhook=true (built-in keys)");
     assert(
       Array.isArray(json.config.webhook.allowedEvents),
       "allowedEvents is an array"
+    );
+    assert(
+      Array.isArray(json.config.webhook.signatureSchemes) &&
+        json.config.webhook.signatureSchemes.includes("ed25519") &&
+        json.config.webhook.signatureSchemes.includes("rsa-sha256"),
+      "advertises both signature schemes"
     );
     // Must NOT leak any env values.
     assert(!res.body.includes("super-secret"), "no secret leak");
@@ -136,7 +231,6 @@ async function run(name, fn) {
   });
 
   await run("oauth: token endpoint failure returns 502, never leaks secret", async () => {
-    // Stub global fetch to return a 401 from HighLevel.
     const originalFetch = global.fetch;
     global.fetch = async () => ({
       ok: false,
@@ -189,7 +283,6 @@ async function run(name, fn) {
       assert(json.persisted === false, "persisted=false");
       assert(typeof json.warning === "string", "warning string present");
       assert(json.location_id === "loc_1", "location_id surfaced");
-      // Critical: token must NOT appear in browser response.
       assert(!res.body.includes("at_xyz"), "access_token not in response");
       assert(!res.body.includes("rt_xyz"), "refresh_token not in response");
       assert(!res.body.includes("super-secret"), "client_secret not in response");
@@ -243,18 +336,39 @@ async function run(name, fn) {
   });
 
   // ── /api/ghl/webhook ──────────────────────────────────────────
-  function signedReq(secret, payloadObj, opts) {
+  function ed25519SignedReq(payloadObj, opts) {
     const o = opts || {};
     const raw = Buffer.from(JSON.stringify(payloadObj));
-    const sig = crypto.createHmac("sha256", secret).update(raw).digest("hex");
+    const sig = ed25519Sign(raw);
+    const sigB64 = o.badSig
+      ? Buffer.concat([sig, Buffer.from([0])]).toString("base64")
+      : sig.toString("base64");
+    const headers = {
+      "content-type": "application/json",
+      "x-wh-id": o.id || "wh_" + crypto.randomBytes(6).toString("hex"),
+    };
+    if (!o.omitSignature) headers["x-ghl-signature"] = sigB64;
     return makeReq({
       method: "POST",
       url: "/api/ghl/webhook",
-      headers: {
-        "content-type": "application/json",
-        "x-wh-signature": o.badSig ? sig + "00" : sig,
-        "x-wh-id": o.id || "wh_" + crypto.randomBytes(6).toString("hex"),
-      },
+      headers,
+      body: raw,
+    });
+  }
+
+  function rsaSignedReq(payloadObj, opts) {
+    const o = opts || {};
+    const raw = Buffer.from(JSON.stringify(payloadObj));
+    const sig = rsaSha256Sign(raw);
+    const headers = {
+      "content-type": "application/json",
+      "x-wh-id": o.id || "wh_" + crypto.randomBytes(6).toString("hex"),
+      "x-wh-signature": sig.toString("base64"),
+    };
+    return makeReq({
+      method: "POST",
+      url: "/api/ghl/webhook",
+      headers,
       body: raw,
     });
   }
@@ -266,21 +380,35 @@ async function run(name, fn) {
     assert(res.status === 405, "status 405");
   });
 
-  await run("webhook: invalid signature rejected with 401", async () => {
-    process.env.GHL_WEBHOOK_SIGNING_SECRET = "wh-secret";
-    const req = signedReq("wh-secret", { type: "ContactCreate" }, { badSig: true });
+  await run("webhook: missing signature header rejected with 401", async () => {
+    const raw = Buffer.from(JSON.stringify({ type: "ContactCreate" }));
+    const req = makeReq({
+      method: "POST",
+      url: "/api/ghl/webhook",
+      headers: { "content-type": "application/json" },
+      body: raw,
+    });
     const res = makeRes();
     await webhookHandler(req, res);
     assert(res.status === 401, "status 401");
     const json = JSON.parse(res.body);
     assert(json.error === "invalid_signature", "error code");
+    assert(json.reason === "no_signature_header", "reason=no_signature_header");
   });
 
-  await run("webhook: valid signature + allowed event accepted", async () => {
-    process.env.GHL_WEBHOOK_SIGNING_SECRET = "wh-secret";
+  await run("webhook: invalid Ed25519 signature rejected with 401", async () => {
+    const req = ed25519SignedReq({ type: "ContactCreate" }, { badSig: true });
+    const res = makeRes();
+    await webhookHandler(req, res);
+    assert(res.status === 401, "status 401");
+    const json = JSON.parse(res.body);
+    assert(json.error === "invalid_signature", "error code");
+    assert(json.reason === "invalid", "reason=invalid");
+  });
+
+  await run("webhook: valid Ed25519 signature + allowed event accepted", async () => {
     delete process.env.GHL_WEBHOOK_FORWARD_URL;
-    const req = signedReq(
-      "wh-secret",
+    const req = ed25519SignedReq(
       { type: "ContactCreate", webhookId: "wh_one", contact: { email: "x@y.z" } },
       { id: "wh_one" }
     );
@@ -290,13 +418,25 @@ async function run(name, fn) {
     const json = JSON.parse(res.body);
     assert(json.accepted === true, "accepted=true");
     assert(json.type === "ContactCreate", "event type echoed");
+    assert(json.signature_scheme === "ed25519", "scheme=ed25519");
     assert(json.forwarded.configured === false, "forwarded.configured=false");
   });
 
+  await run("webhook: valid legacy RSA-SHA256 signature accepted", async () => {
+    const req = rsaSignedReq(
+      { type: "ContactCreate", webhookId: "wh_rsa1" },
+      { id: "wh_rsa1" }
+    );
+    const res = makeRes();
+    await webhookHandler(req, res);
+    assert(res.status === 200, "status 200");
+    const json = JSON.parse(res.body);
+    assert(json.accepted === true, "accepted=true");
+    assert(json.signature_scheme === "rsa-sha256", "scheme=rsa-sha256");
+  });
+
   await run("webhook: duplicate id de-duplicated", async () => {
-    process.env.GHL_WEBHOOK_SIGNING_SECRET = "wh-secret";
-    const dupReq = signedReq(
-      "wh-secret",
+    const dupReq = ed25519SignedReq(
       { type: "ContactCreate", webhookId: "wh_one" },
       { id: "wh_one" }
     );
@@ -308,10 +448,8 @@ async function run(name, fn) {
   });
 
   await run("webhook: event outside allowlist ignored with 200", async () => {
-    process.env.GHL_WEBHOOK_SIGNING_SECRET = "wh-secret";
     process.env.GHL_ALLOWED_WEBHOOK_EVENTS = "ContactCreate";
-    const req = signedReq(
-      "wh-secret",
+    const req = ed25519SignedReq(
       { type: "OrderCreate", webhookId: "wh_orderx" },
       { id: "wh_orderx" }
     );
@@ -325,7 +463,6 @@ async function run(name, fn) {
   });
 
   await run("webhook: forwards to GHL_WEBHOOK_FORWARD_URL when set", async () => {
-    process.env.GHL_WEBHOOK_SIGNING_SECRET = "wh-secret";
     process.env.GHL_WEBHOOK_FORWARD_URL = "https://sink.example.com/ghl/webhook";
     const seen = [];
     const originalFetch = global.fetch;
@@ -334,8 +471,7 @@ async function run(name, fn) {
       return { ok: true, status: 202, text: async () => "" };
     };
     try {
-      const req = signedReq(
-        "wh-secret",
+      const req = ed25519SignedReq(
         { type: "OpportunityCreate", webhookId: "wh_opp1" },
         { id: "wh_opp1" }
       );
@@ -346,10 +482,45 @@ async function run(name, fn) {
       assert(json.forwarded.configured === true, "forwarded.configured=true");
       assert(json.forwarded.delivered === true, "delivered=true");
       assert(seen.length === 1 && seen[0].body.type === "OpportunityCreate", "sink got payload");
+      assert(seen[0].body.signature_scheme === "ed25519", "sink received scheme");
     } finally {
       global.fetch = originalFetch;
       delete process.env.GHL_WEBHOOK_FORWARD_URL;
     }
+  });
+
+  await run("webhook: response never leaks any GHL_* env value", async () => {
+    process.env.GHL_CLIENT_SECRET = "super-secret";
+    process.env.GHL_TOKEN_STORAGE_URL = "https://sink.example.com/ghl/tokens";
+    const req = ed25519SignedReq(
+      { type: "ContactCreate", webhookId: "wh_leak" },
+      { id: "wh_leak" }
+    );
+    const res = makeRes();
+    await webhookHandler(req, res);
+    assert(!res.body.includes("super-secret"), "no client_secret leak");
+    assert(!res.body.includes("sink.example.com"), "no storage URL leak");
+  });
+
+  // Sanity: confirm the production module still exposes both schemes
+  // via readinessSummary (independent of test patches).
+  await run("module: exports advertise both signature schemes", async () => {
+    const fresh = ghlLib.readinessSummary();
+    assert(
+      Array.isArray(fresh.webhook.signatureSchemes) &&
+        fresh.webhook.signatureSchemes.length === 2,
+      "two schemes advertised"
+    );
+    assert(
+      typeof ghlLib.GHL_ED25519_PUBLIC_KEY === "string" &&
+        ghlLib.GHL_ED25519_PUBLIC_KEY.includes("BEGIN PUBLIC KEY"),
+      "Ed25519 public key constant present"
+    );
+    assert(
+      typeof ghlLib.GHL_RSA_PUBLIC_KEY === "string" &&
+        ghlLib.GHL_RSA_PUBLIC_KEY.includes("BEGIN PUBLIC KEY"),
+      "RSA public key constant present"
+    );
   });
 
   console.log(`\n${failed === 0 ? "ALL SMOKE TESTS PASSED" : `FAILED: ${failed}`}`);

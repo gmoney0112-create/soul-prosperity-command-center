@@ -21,7 +21,10 @@ module.exports = async function handler(req, res) {
     summary.oauth.clientId &&
     summary.oauth.clientSecret &&
     summary.oauth.redirectUri;
-  const webhookReady = summary.webhook.signatureVerification;
+  // Webhook signature verification uses HighLevel's published public
+  // keys baked into the repo — no env secret is required for it. The
+  // route is "ready" as long as the function can run.
+  const webhookReady = summary.webhook.signatureVerification === true;
 
   return jsonResponse(res, 200, {
     ok: true,

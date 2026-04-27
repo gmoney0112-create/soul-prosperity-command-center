@@ -96,13 +96,15 @@ This repo also ships a minimal Vercel-compatible serverless layer that implement
 | --- | --- |
 | `GET /api/ghl/health` | Returns JSON about which server env vars are configured. Booleans only — never values. |
 | `GET /api/ghl/oauth/callback` | Exchanges `?code=` server-side at `services.leadconnectorhq.com/oauth/token` and forwards the token bundle to `GHL_TOKEN_STORAGE_URL`. Tokens never reach the browser. |
-| `POST /api/ghl/webhook` | Verifies `x-wh-signature` HMAC, de-duplicates by `x-wh-id` (best-effort in-memory), allowlists event types, and forwards to `GHL_WEBHOOK_FORWARD_URL` if set. |
+| `POST /api/ghl/webhook` | Verifies HighLevel's webhook signature (current `X-GHL-Signature` Ed25519, legacy `X-WH-Signature` RSA-SHA256) against the public keys baked into `api/_lib/ghl.js`. No env secret required. De-duplicates by webhook id (best-effort in-memory), allowlists event types, and forwards to `GHL_WEBHOOK_FORWARD_URL` if set. |
 
 Configure these env vars in the Vercel project (see `.env.example` and [`docs/GHL_SETUP.md`](./docs/GHL_SETUP.md) §5b for full details):
 
 - `GHL_CLIENT_ID`, `GHL_CLIENT_SECRET`, `GHL_OAUTH_REDIRECT_URI`, `GHL_USER_TYPE`
 - `GHL_TOKEN_STORAGE_URL` — server-to-server sink for the exchanged token bundle. Required for tokens to actually persist; if unset, the callback returns `persisted: false` with an explicit operator warning rather than silently dropping the tokens.
-- `GHL_WEBHOOK_SIGNING_SECRET`, `GHL_WEBHOOK_FORWARD_URL`, `GHL_ALLOWED_WEBHOOK_EVENTS`
+- `GHL_WEBHOOK_FORWARD_URL`, `GHL_ALLOWED_WEBHOOK_EVENTS`
+
+> Webhook signing is **public-key**, not HMAC. There is intentionally no `GHL_WEBHOOK_SIGNING_SECRET` env var — HighLevel signs each delivery with its private key, and this repo verifies against HighLevel's published public keys (Ed25519 + RSA). See [`docs/GHL_SETUP.md`](./docs/GHL_SETUP.md) §4.4.
 
 `GHL_OAUTH_REDIRECT_URI` must exactly match `SP_CONFIG.ghl.oauth.redirectUri`; the canonical value is `https://<your-domain>/api/ghl/oauth/callback`. Likewise, `SP_CONFIG.ghl.webhook.targetUrl` should be `https://<your-domain>/api/ghl/webhook`.
 
@@ -113,6 +115,14 @@ npm run smoke:serverless
 ```
 
 `npm run check` runs the same smoke tests in addition to static validation.
+
+For the end-to-end production handoff (current live URLs, remaining
+operator-owned tasks, step-by-step execution checklist, verification
+commands, rollback plan, troubleshooting, security boundaries) see
+[`docs/PRODUCTION_HANDOFF.md`](./docs/PRODUCTION_HANDOFF.md). To hand
+the rest of the launch off to another AI assistant (Claude Code,
+Manus, browser-automation agent), use the ready-to-paste prompts in
+[`docs/AGENT_HANDOFF_PROMPT.md`](./docs/AGENT_HANDOFF_PROMPT.md).
 
 See [`docs/GHL_SETUP.md`](./docs/GHL_SETUP.md) for the full operator setup guide:
 
