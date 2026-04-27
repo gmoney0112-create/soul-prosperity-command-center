@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soul Prosperity — Tracking &amp; Analytics Spec</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:#0d0d0d; color:#fff; font-family:'Barlow Condensed',Arial,sans-serif; line-height:1.55; }
+a { color:#FFD600; text-decoration:none; } a:hover { text-decoration:underline; }
+.wrap { max-width:1080px; margin:0 auto; padding:48px 32px 96px; }
+.eyebrow { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.25em; text-transform:uppercase; color:#FFD600; }
+h1 { font-family:'Bebas Neue',sans-serif; font-size:clamp(40px,7vw,72px); line-height:0.95; letter-spacing:0.02em; margin:8px 0 14px; }
+h1 span { color:#FFD600; }
+h2 { font-family:'Bebas Neue',sans-serif; font-size:clamp(26px,3vw,36px); letter-spacing:0.04em; margin:48px 0 12px; color:#fff; border-left:4px solid #FFD600; padding-left:14px; }
+h3 { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:0.05em; margin:24px 0 10px; color:#FFD600; }
+p { color:#cfcfcf; margin:0 0 12px; }
+.lede { font-size:18px; color:#cfcfcf; max-width:760px; }
+.callout { padding:18px 22px; border:1px solid #2a2a2a; background:#141414; margin:18px 0 24px; border-left:4px solid #FFD600; }
+.callout strong { color:#FFD600; }
+ul, ol { margin:0 0 16px 22px; color:#cfcfcf; }
+li { margin-bottom:6px; }
+table { width:100%; border-collapse:collapse; margin:12px 0 24px; font-size:14px; }
+th, td { padding:10px 14px; text-align:left; vertical-align:top; border-bottom:1px solid #2a2a2a; color:#cfcfcf; }
+thead th { background:#191919; color:#FFD600; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; }
+code { font-family:'JetBrains Mono',monospace; font-size:12px; color:#FFD600; background:rgba(255,214,0,0.08); padding:2px 6px; border-radius:3px; }
+pre.snippet { white-space:pre; overflow:auto; padding:16px 18px; background:#141414; border:1px solid #2a2a2a; color:#cfcfcf; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.6; margin:12px 0 24px; border-left:4px solid #FFD600; }
+.toc { background:#141414; border:1px solid #2a2a2a; padding:18px 22px; margin-bottom:36px; }
+.toc ul { list-style:none; margin:0; columns:2; column-gap:24px; }
+.toc li { margin:4px 0; color:#cfcfcf; }
+.toc a { color:#cfcfcf; }
+.toc a:hover { color:#FFD600; }
+.back { display:inline-block; margin-bottom:24px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:#8a8a8a; }
+.back:hover { color:#FFD600; }
+hr { border:0; border-top:1px solid #2a2a2a; margin:32px 0; }
+footer { color:#666; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; text-align:center; padding:32px 0 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<a class="back" href="../index.html#blueprint">← Command Center</a>
+
+<p class="eyebrow">Launch Blueprint · Tracking</p>
+<h1>One naming system across <span>ads, pixel, GHL</span>.</h1>
+<p class="lede">A single source of truth for every event name, UTM, pixel parameter, and GHL custom field used to track performance from the first ad click to the lifetime renewal. If a name appears here, it must match exactly in every system. If it does not appear here, do not invent a new one — extend the spec first.</p>
+
+<div class="toc" aria-label="Table of contents">
+  <strong>Table of contents</strong>
+  <ul>
+    <li><a href="#utm">1. UTM convention</a></li>
+    <li><a href="#events">2. Conversion events</a></li>
+    <li><a href="#pixel">3. Pixel/event params</a></li>
+    <li><a href="#tytags">4. Thank-you-page firing</a></li>
+    <li><a href="#ghl">5. GHL custom fields &amp; tags</a></li>
+    <li><a href="#dashboard">6. Dashboard fields</a></li>
+    <li><a href="#qa">7. QA matrix</a></li>
+  </ul>
+</div>
+
+<h2 id="utm">1. UTM convention</h2>
+<p>Every paid and organic destination URL carries a UTM block. The block is the same shape everywhere; only the values change.</p>
+<pre class="snippet">?utm_source={platform}
+&amp;utm_medium={medium}
+&amp;utm_campaign={campaign-name}
+&amp;utm_content={ad-id-or-post-id}
+&amp;utm_term={angle-or-keyword}</pre>
+
+<table>
+  <thead><tr><th>Field</th><th>Allowed values</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><code>utm_source</code></td><td><code>meta</code> · <code>tiktok</code> · <code>youtube</code> · <code>x</code> · <code>email</code> · <code>sms</code> · <code>ig-bio</code> · <code>tiktok-bio</code> · <code>fb-bio</code> · <code>yt-desc</code> · <code>direct</code></td><td><code>meta</code></td></tr>
+    <tr><td><code>utm_medium</code></td><td><code>paid</code> · <code>organic</code> · <code>email</code> · <code>sms</code> · <code>bio</code> · <code>partner</code></td><td><code>paid</code></td></tr>
+    <tr><td><code>utm_campaign</code></td><td><code>SP-COLD-EBOOK7</code> · <code>SP-COLD-FREEBIE</code> · <code>SP-RETARGET-CART</code> · <code>SP-RETARGET-BUYER</code> · <code>SP-EMAIL-WF02</code></td><td><code>SP-COLD-EBOOK7</code></td></tr>
+    <tr><td><code>utm_content</code></td><td>Stable ad ID or post slug</td><td><code>reel-mcchicken-v2</code></td></tr>
+    <tr><td><code>utm_term</code></td><td>Angle name (matches ad-copy swipe)</td><td><code>authority</code> · <code>story</code> · <code>pain</code> · <code>curiosity</code> · <code>direct</code></td></tr>
+  </tbody>
+</table>
+<div class="callout">
+  <strong>Lowercase + dashes.</strong> Never use spaces, underscores, or capitals in UTM values. <code>SP-COLD-EBOOK7</code> is the one exception (campaign codes are uppercase for readability in reports).
+</div>
+
+<h2 id="events">2. Conversion events</h2>
+<p>Use these <em>exact</em> event names in Meta Pixel, TikTok Pixel, GA4, and the GHL trigger when configuring purchase / form events. Renaming any event silently breaks attribution.</p>
+<table>
+  <thead><tr><th>Event</th><th>Fires on</th><th>Value</th><th>Currency</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>view_content</code></td><td>Sales page load</td><td>—</td><td>USD</td><td>Standard event. Pass <code>content_name</code> = <code>ebook7-sales</code>.</td></tr>
+    <tr><td><code>lead_freebie</code></td><td>Freebie opt-in submitted</td><td>0</td><td>USD</td><td>Custom event. Mirrors GHL tag <code>lead-freebie</code>.</td></tr>
+    <tr><td><code>begin_checkout</code></td><td>Checkout opened</td><td>7</td><td>USD</td><td>Standard event for $7 line; bumps fire their own.</td></tr>
+    <tr><td><code>add_payment_info</code></td><td>Card entered</td><td>7</td><td>USD</td><td>Standard event.</td></tr>
+    <tr><td><code>purchase_ebook7</code></td><td>$7 paid</td><td>7</td><td>USD</td><td>Custom event. Also fire generic <code>purchase</code>.</td></tr>
+    <tr><td><code>purchase_audio17</code></td><td>$17 audio paid</td><td>17</td><td>USD</td><td>Bump or upsell.</td></tr>
+    <tr><td><code>purchase_paperback27</code></td><td>$27 paperback paid</td><td>27</td><td>USD</td><td>Tangible.</td></tr>
+    <tr><td><code>purchase_course67</code></td><td>$67 course paid</td><td>67</td><td>USD</td><td>Implementation upgrade.</td></tr>
+    <tr><td><code>purchase_lifetime497</code></td><td>$497 lifetime paid</td><td>497</td><td>USD</td><td>Premium close.</td></tr>
+    <tr><td><code>start_skool_trial</code></td><td>Skool 7-day trial started</td><td>0</td><td>USD</td><td>Custom event.</td></tr>
+    <tr><td><code>start_skool_monthly</code></td><td>Skool $47/mo active</td><td>47</td><td>USD</td><td>Recurring start.</td></tr>
+    <tr><td><code>start_skool_annual</code></td><td>Skool $247/yr active</td><td>247</td><td>USD</td><td>Recurring annual.</td></tr>
+    <tr><td><code>refund_requested</code></td><td>Refund initiated</td><td>—</td><td>USD</td><td>Custom event. Suppress retargeting on fire.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="pixel">3. Pixel/event parameters</h2>
+<p>Pass these alongside every conversion event so retargeting and value-based audiences work:</p>
+<pre class="snippet">{
+  content_ids: ["ebook7"],          // or "audio17", "paperback27", "course67", "lifetime497"
+  content_name: "Soul Prosperity 7 eBook",
+  content_type: "product",
+  currency: "USD",
+  value: 7,
+  num_items: 1,
+  // optional but recommended for matching
+  email: "{{contact.email}}",       // hashed by the platform
+  external_id: "{{contact.id}}"     // GHL contact id
+}</pre>
+<p>Send <code>email</code> and <code>external_id</code> only on server-side conversions API (where you can hash properly), not in the browser pixel.</p>
+
+<h2 id="tytags">4. Thank-you-page firing</h2>
+<p>Each thank-you page fires the matching <code>purchase_*</code> event exactly once. Use a single shared snippet template:</p>
+<pre class="snippet">// On thank-you page load:
+window.fbq &amp;&amp; fbq('track', 'Purchase', {
+  content_ids: ['ebook7'],
+  content_name: 'Soul Prosperity 7 eBook',
+  content_type: 'product',
+  currency: 'USD',
+  value: 7,
+});
+window.fbq &amp;&amp; fbq('trackCustom', 'purchase_ebook7', {
+  currency: 'USD',
+  value: 7,
+});
+window.ttq &amp;&amp; ttq.track('CompletePayment', { value: 7, currency: 'USD' });
+window.gtag &amp;&amp; gtag('event', 'purchase', {
+  transaction_id: '{{order_id}}',
+  value: 7, currency: 'USD',
+  items: [{ id: 'ebook7', name: 'Soul Prosperity 7 eBook', price: 7, quantity: 1 }],
+});</pre>
+<p>Replicate the block on every thank-you page, swapping <code>ebook7</code>/<code>7</code> for the matching product/value.</p>
+
+<h2 id="ghl">5. GHL custom fields &amp; tags</h2>
+<p>Already documented in the GHL Build Sheet on the dashboard. The names below are the source of truth — copy from here when re-creating in GHL.</p>
+<table>
+  <thead><tr><th>Custom field</th><th>Type</th><th>Set by</th></tr></thead>
+  <tbody>
+    <tr><td><code>first_purchase_date</code></td><td>Date</td><td>WF-02 entry</td></tr>
+    <tr><td><code>last_purchase_product</code></td><td>Text</td><td>Each purchase WF</td></tr>
+    <tr><td><code>ltv_cents</code></td><td>Number</td><td>Each purchase WF (increment)</td></tr>
+    <tr><td><code>freebie_source</code></td><td>Text</td><td>Opt-in form (UTM passthrough)</td></tr>
+    <tr><td><code>skool_invite_sent</code></td><td>Date</td><td>WF-06 entry</td></tr>
+    <tr><td><code>refund_reason</code></td><td>Text</td><td>WF-08 capture</td></tr>
+    <tr><td><code>nps_score</code></td><td>Number</td><td>Post-course form</td></tr>
+    <tr><td><code>preferred_channel</code></td><td>Dropdown</td><td>Post-purchase form</td></tr>
+    <tr><td><code>utm_source</code></td><td>Text</td><td>Hidden field on every form</td></tr>
+    <tr><td><code>utm_medium</code></td><td>Text</td><td>Hidden field on every form</td></tr>
+    <tr><td><code>utm_campaign</code></td><td>Text</td><td>Hidden field on every form</td></tr>
+    <tr><td><code>utm_content</code></td><td>Text</td><td>Hidden field on every form</td></tr>
+    <tr><td><code>utm_term</code></td><td>Text</td><td>Hidden field on every form</td></tr>
+  </tbody>
+</table>
+
+<h2 id="dashboard">6. Command Center dashboard fields</h2>
+<p>The static dashboard surfaces the funnel via <code>config.js</code> and the on-page calculator. The calculator inputs (<code>data-calc</code>) are deliberately rough — they are not pulled from real analytics, just used for fast modeling.</p>
+<table>
+  <thead><tr><th>UI key</th><th>Source</th></tr></thead>
+  <tbody>
+    <tr><td><code>data-calc=leads</code></td><td>Manual — operator types projected lead count</td></tr>
+    <tr><td><code>data-calc=ebookRate</code></td><td>Manual — projected $7 conversion %</td></tr>
+    <tr><td><code>data-calc=bundleRate</code></td><td>Manual — bump take rate %</td></tr>
+    <tr><td><code>data-calc=courseRate</code></td><td>Manual — course take rate %</td></tr>
+    <tr><td><code>data-calc=skoolRate</code></td><td>Manual — Skool start rate %</td></tr>
+    <tr><td><code>SP_CONFIG.analytics</code></td><td>Operator-set URL — recommended GHL Reporting Dashboard</td></tr>
+    <tr><td><code>SP_CONFIG.ghl.analyticsUrl</code></td><td>GHL Reporting → Dashboard URL</td></tr>
+  </tbody>
+</table>
+
+<h2 id="qa">7. Tracking QA matrix</h2>
+<p>Walk this checklist with the platform pixel debugger open. Every row must pass before scaling.</p>
+<table>
+  <thead><tr><th>Check</th><th>Tool</th><th>Pass criteria</th></tr></thead>
+  <tbody>
+    <tr><td>Pixel installed sitewide</td><td>Meta Pixel Helper, TikTok Pixel Helper</td><td>Helper shows pixel firing on every page</td></tr>
+    <tr><td>UTMs land on contact record</td><td>GHL contact detail</td><td>Custom fields <code>utm_*</code> populated after a real test click</td></tr>
+    <tr><td><code>view_content</code> on sales page</td><td>Pixel debugger</td><td>Fires once on load</td></tr>
+    <tr><td><code>begin_checkout</code> on checkout open</td><td>Pixel debugger</td><td>Fires with <code>value=7</code></td></tr>
+    <tr><td><code>purchase_ebook7</code> on thank-you</td><td>Pixel debugger + GHL trigger</td><td>Fires once, GHL applies <code>buyer-ebook7</code></td></tr>
+    <tr><td>De-dup on refresh</td><td>Refresh thank-you page</td><td>Pixel does NOT double-fire (use <code>event_id</code> + once-per-tx flag)</td></tr>
+    <tr><td>Refund event suppresses retargeting</td><td>Issue test refund</td><td>Tag <code>refunded</code> applied; contact removed from cart retarget audience</td></tr>
+  </tbody>
+</table>
+
+<hr>
+<footer>Soul Prosperity · Tracking &amp; Analytics Spec · v1</footer>
+</div>
+</body>
+</html>

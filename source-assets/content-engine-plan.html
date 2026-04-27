@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soul Prosperity — Content Engine Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:#0d0d0d; color:#fff; font-family:'Barlow Condensed',Arial,sans-serif; line-height:1.55; }
+a { color:#FFD600; text-decoration:none; } a:hover { text-decoration:underline; }
+.wrap { max-width:1080px; margin:0 auto; padding:48px 32px 96px; }
+.eyebrow { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.25em; text-transform:uppercase; color:#FFD600; }
+h1 { font-family:'Bebas Neue',sans-serif; font-size:clamp(40px,7vw,72px); line-height:0.95; letter-spacing:0.02em; margin:8px 0 14px; }
+h1 span { color:#FFD600; }
+h2 { font-family:'Bebas Neue',sans-serif; font-size:clamp(26px,3vw,36px); letter-spacing:0.04em; margin:48px 0 12px; color:#fff; border-left:4px solid #FFD600; padding-left:14px; }
+h3 { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:0.05em; margin:24px 0 10px; color:#FFD600; }
+h4 { font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; margin:18px 0 8px; color:#fff; }
+p { color:#cfcfcf; margin:0 0 12px; }
+.lede { font-size:18px; color:#cfcfcf; max-width:760px; }
+.callout { padding:18px 22px; border:1px solid #2a2a2a; background:#141414; margin:18px 0 24px; border-left:4px solid #FFD600; }
+.callout strong { color:#FFD600; }
+ul, ol { margin:0 0 16px 22px; color:#cfcfcf; }
+li { margin-bottom:6px; }
+table { width:100%; border-collapse:collapse; margin:12px 0 24px; font-size:14px; }
+th, td { padding:10px 14px; text-align:left; vertical-align:top; border-bottom:1px solid #2a2a2a; color:#cfcfcf; }
+thead th { background:#191919; color:#FFD600; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; }
+code { font-family:'JetBrains Mono',monospace; font-size:12px; color:#FFD600; background:rgba(255,214,0,0.08); padding:2px 6px; border-radius:3px; }
+.calendar { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:10px; margin:14px 0 28px; }
+.day { padding:14px 16px; background:#141414; border:1px solid #2a2a2a; }
+.day .num { font-family:'JetBrains Mono',monospace; font-size:11px; color:#FFD600; letter-spacing:0.18em; text-transform:uppercase; }
+.day h4 { margin:6px 0; font-size:15px; }
+.day p { font-size:13px; color:#aaa; margin:0; }
+.day.cta { border-color:#FFD600; background:#1a1500; }
+.day.live { border-left:4px solid #FFD600; }
+.script { padding:18px 22px; background:#141414; border:1px solid #2a2a2a; margin:12px 0 24px; }
+.script .meta { font-family:'JetBrains Mono',monospace; font-size:11px; color:#FFD600; letter-spacing:0.16em; text-transform:uppercase; }
+.script h4 { margin:6px 0 10px; font-size:18px; }
+.script .beat { padding:6px 0; border-top:1px solid #222; color:#cfcfcf; }
+.script .beat:first-of-type { border-top:0; }
+.script .beat strong { color:#FFD600; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; margin-right:10px; }
+.toc { background:#141414; border:1px solid #2a2a2a; padding:18px 22px; margin-bottom:36px; }
+.toc ul { list-style:none; margin:0; columns:2; column-gap:24px; }
+.toc li { margin:4px 0; color:#cfcfcf; }
+.toc a { color:#cfcfcf; }
+.toc a:hover { color:#FFD600; }
+.back { display:inline-block; margin-bottom:24px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:#8a8a8a; }
+.back:hover { color:#FFD600; }
+hr { border:0; border-top:1px solid #2a2a2a; margin:32px 0; }
+footer { color:#666; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; text-align:center; padding:32px 0 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<a class="back" href="../index.html#blueprint">← Command Center</a>
+
+<p class="eyebrow">Launch Blueprint · Content Engine</p>
+<h1>Daily content with <span>one destination</span>.</h1>
+<p class="lede">A 30-day organic content engine for the Soul Prosperity ebook. Daily prompts, short-form video scripts, post types, hashtag stacks, and a clear repurposing pipeline so one piece of source content becomes seven outputs across platforms.</p>
+
+<div class="toc" aria-label="Table of contents">
+  <strong>Table of contents</strong>
+  <ul>
+    <li><a href="#rules">1. Operating rules</a></li>
+    <li><a href="#calendar">2. 30-day calendar</a></li>
+    <li><a href="#scripts">3. Short-form video scripts</a></li>
+    <li><a href="#hashtags">4. Hashtag &amp; caption stacks</a></li>
+    <li><a href="#emailmap">5. Email sequence map</a></li>
+    <li><a href="#repurpose">6. Repurposing pipeline</a></li>
+    <li><a href="#kpis">7. Content KPIs</a></li>
+  </ul>
+</div>
+
+<h2 id="rules">1. Operating rules</h2>
+<ol>
+  <li>Every post has one destination: freebie opt-in, $7 ebook, or Skool.</li>
+  <li>Don't pitch every day. The ratio is roughly <strong>2 value + 1 story + 1 pitch</strong> per 4 posts.</li>
+  <li>One source pillar per week. Repurpose the same pillar across formats.</li>
+  <li>Hooks live or die in the first 1.5 seconds. Open with motion + a sentence that creates a question.</li>
+  <li>Captions exist to extend dwell, not to repeat the video. Three lines max above the fold.</li>
+  <li>Single CTA per post. Bio link routes to <code>socialBioLink</code> in <code>config.js</code>.</li>
+</ol>
+
+<h2 id="calendar">2. 30-day calendar</h2>
+<p>Days marked <span style="color:#FFD600">●</span> are pitch days; everything else is value, story, or community. Adjust by 1–2 days for sabbath / personal cadence — keep the ratio.</p>
+
+<div class="calendar">
+  <div class="day live"><span class="num">Day 1 · Mon</span><h4>McChicken story Reel</h4><p>Origin story → "$7 ebook in bio."</p></div>
+  <div class="day"><span class="num">Day 2 · Tue</span><h4>Faith-is-WiFi quote</h4><p>Static graphic, save/share CTA.</p></div>
+  <div class="day"><span class="num">Day 3 · Wed</span><h4>3-tip carousel</h4><p>"3 ways your story is already a book."</p></div>
+  <div class="day cta"><span class="num">Day 4 · Thu ●</span><h4>Direct $7 pitch</h4><p>"Get the ebook. 60 minutes. $7."</p></div>
+  <div class="day"><span class="num">Day 5 · Fri</span><h4>BTS reel</h4><p>Behind the scenes of writing day.</p></div>
+  <div class="day"><span class="num">Day 6 · Sat</span><h4>Weekend thread</h4><p>5-tweet thread, link in bio.</p></div>
+  <div class="day cta"><span class="num">Day 7 · Sun ●</span><h4>Live training invite</h4><p>"Join Skool 7-day trial."</p></div>
+
+  <div class="day"><span class="num">Day 8 · Mon</span><h4>Unpopular opinion reel</h4><p>"Most Christian writing advice is wrong."</p></div>
+  <div class="day"><span class="num">Day 9 · Tue</span><h4>Reader testimony</h4><p>Screenshot DM + reframe.</p></div>
+  <div class="day"><span class="num">Day 10 · Wed</span><h4>Mini-tutorial reel</h4><p>"Outline a chapter in 7 minutes."</p></div>
+  <div class="day cta"><span class="num">Day 11 · Thu ●</span><h4>Freebie push</h4><p>"Free first chapter — link in bio."</p></div>
+  <div class="day"><span class="num">Day 12 · Fri</span><h4>Quote graphic</h4><p>"Discipline is freedom in disguise."</p></div>
+  <div class="day"><span class="num">Day 13 · Sat</span><h4>Story carousel</h4><p>"6 slides: how I wrote it."</p></div>
+  <div class="day cta"><span class="num">Day 14 · Sun ●</span><h4>Weekend $7 pitch</h4><p>"Read it Sunday afternoon."</p></div>
+
+  <div class="day"><span class="num">Day 15 · Mon</span><h4>Authority reel</h4><p>"Stop waiting for a publisher."</p></div>
+  <div class="day"><span class="num">Day 16 · Tue</span><h4>Frequently misunderstood</h4><p>"Faith is not a feeling."</p></div>
+  <div class="day"><span class="num">Day 17 · Wed</span><h4>Carousel — outline framework</h4><p>"The 4-part book skeleton."</p></div>
+  <div class="day cta"><span class="num">Day 18 · Thu ●</span><h4>$17 audio cross-pitch</h4><p>"Listen instead of read."</p></div>
+  <div class="day"><span class="num">Day 19 · Fri</span><h4>BTS reel</h4><p>Recording the audiobook.</p></div>
+  <div class="day"><span class="num">Day 20 · Sat</span><h4>Saturday thread</h4><p>"7 lessons from writing in public."</p></div>
+  <div class="day cta"><span class="num">Day 21 · Sun ●</span><h4>Skool trial pitch</h4><p>Direct invite, deadline language.</p></div>
+
+  <div class="day"><span class="num">Day 22 · Mon</span><h4>Reader Q&amp;A reel</h4><p>Answer one DM out loud.</p></div>
+  <div class="day"><span class="num">Day 23 · Tue</span><h4>Counter-cultural quote</h4><p>"Comfort is the enemy of vision."</p></div>
+  <div class="day"><span class="num">Day 24 · Wed</span><h4>3-tip carousel</h4><p>"3 myths that kill first drafts."</p></div>
+  <div class="day cta"><span class="num">Day 25 · Thu ●</span><h4>Paperback pitch</h4><p>"The study copy and gift copy."</p></div>
+  <div class="day"><span class="num">Day 26 · Fri</span><h4>Method reel</h4><p>"How I write a chapter in 90 min."</p></div>
+  <div class="day"><span class="num">Day 27 · Sat</span><h4>Long-form caption</h4><p>"The week I almost quit."</p></div>
+  <div class="day cta"><span class="num">Day 28 · Sun ●</span><h4>$67 course pitch</h4><p>"Build your book this month."</p></div>
+
+  <div class="day"><span class="num">Day 29 · Mon</span><h4>Recap carousel</h4><p>"Top 5 lessons from this month."</p></div>
+  <div class="day cta"><span class="num">Day 30 · Tue ●</span><h4>Lifetime pitch</h4><p>"Lifetime $497 — open this week only."</p></div>
+</div>
+
+<h2 id="scripts">3. Short-form video scripts</h2>
+<p>Every script follows a 4-beat structure: <strong>Hook → Promise → Proof → CTA.</strong> Captions are burned in. CTA matches that day's destination.</p>
+
+<div class="script">
+  <div class="meta">Script S1 · Authority · 22s</div>
+  <h4>Stop waiting for a publisher.</h4>
+  <div class="beat"><strong>0–2s Hook</strong>Stop waiting for a publisher. They aren't coming.</div>
+  <div class="beat"><strong>2–8s Promise</strong>You don't need permission. You need a system that turns one chapter into a week of writing.</div>
+  <div class="beat"><strong>8–18s Proof</strong>I wrote my first chapter on a McChicken receipt. I sold the second one. The system is the same.</div>
+  <div class="beat"><strong>18–22s CTA</strong>$7 ebook. Link in bio. Read it tonight.</div>
+</div>
+
+<div class="script">
+  <div class="meta">Script S2 · Story · 28s</div>
+  <h4>The McChicken receipt.</h4>
+  <div class="beat"><strong>0–2s Hook</strong>I wrote the first chapter of my book on a McChicken receipt.</div>
+  <div class="beat"><strong>2–10s Setup</strong>I had no laptop, no office, and no audience. I had a pen and a paper bag.</div>
+  <div class="beat"><strong>10–22s Insight</strong>Writers wait for the perfect setup. Writers who finish, write on whatever's in front of them.</div>
+  <div class="beat"><strong>22–28s CTA</strong>The system is in the $7 ebook. Bio link. Don't overthink it.</div>
+</div>
+
+<div class="script">
+  <div class="meta">Script S3 · Pain · 24s</div>
+  <h4>47 unfinished Google Docs.</h4>
+  <div class="beat"><strong>0–2s Hook</strong>You have 47 unfinished Google Docs.</div>
+  <div class="beat"><strong>2–8s Pain</strong>You start. You stop. You start again. You never finish. It is killing your confidence.</div>
+  <div class="beat"><strong>8–18s Reframe</strong>The problem isn't discipline. It's that nobody taught you a finishing system.</div>
+  <div class="beat"><strong>18–24s CTA</strong>The $7 ebook is the finishing system. Link in bio.</div>
+</div>
+
+<div class="script">
+  <div class="meta">Script S4 · Curiosity · 26s</div>
+  <h4>Most Christian writing advice is wrong.</h4>
+  <div class="beat"><strong>0–2s Hook</strong>Most Christian writing advice is wrong. Here's the part nobody says.</div>
+  <div class="beat"><strong>2–14s Reveal</strong>You don't need to be holier. You don't need a bigger platform. You need a clearer chapter.</div>
+  <div class="beat"><strong>14–22s Proof</strong>Paul wrote half the New Testament from prison. No platform. No editor. One chapter at a time.</div>
+  <div class="beat"><strong>22–26s CTA</strong>The method is in the $7 ebook. Bio link. Read it tonight.</div>
+</div>
+
+<div class="script">
+  <div class="meta">Script S5 · Direct · 18s</div>
+  <h4>$7. Today. Done.</h4>
+  <div class="beat"><strong>0–2s Hook</strong>Three words: $7. Today. Done.</div>
+  <div class="beat"><strong>2–10s Promise</strong>One ebook. 60 minutes of reading. The exact system to write your first book.</div>
+  <div class="beat"><strong>10–14s Trust</strong>30-day refund if it doesn't help.</div>
+  <div class="beat"><strong>14–18s CTA</strong>Link in bio. Don't bookmark this — buy it.</div>
+</div>
+
+<h2 id="hashtags">4. Hashtag &amp; caption stacks</h2>
+<table>
+  <thead><tr><th>Stack</th><th>Tags</th></tr></thead>
+  <tbody>
+    <tr><td>Faith / writing</td><td>#christianauthor #faithdrivenwriter #christianbooks #soulprosperity #faithful</td></tr>
+    <tr><td>Self-publishing</td><td>#writeabook #selfpublish #selfpublishedauthor #firstbook #writingsystem</td></tr>
+    <tr><td>Story-led</td><td>#testimony #storymatters #christianliving #livingbyfaith</td></tr>
+    <tr><td>Pain-led</td><td>#unfinished #writersblock #consistency #discipline</td></tr>
+  </tbody>
+</table>
+<p>Caption pattern (3-line): hook line · turn line · CTA line. Don't repeat the video script — extend it.</p>
+
+<h2 id="emailmap">5. Email sequence map</h2>
+<p>Same content engine pumps the email layer. Maps to GHL workflows in <a href="./email-sms-sequences.html">email/SMS sequence templates</a> and the <a href="./ghl-automation-sequences.html">automation sequences asset</a>.</p>
+<table>
+  <thead><tr><th>Trigger</th><th>Workflow</th><th>Cadence</th><th>Goal</th></tr></thead>
+  <tbody>
+    <tr><td>Freebie opt-in</td><td>WF-01</td><td>Day 0, 1, 2 SMS, 3, 5</td><td>Convert to $7 buyer</td></tr>
+    <tr><td>$7 purchase</td><td>WF-02</td><td>Min 0, Min 5 SMS, H1, D1, D2</td><td>Deliver + $17/$27 bumps</td></tr>
+    <tr><td>$7 buyer, no audio</td><td>WF-03</td><td>H2, D1 SMS, D3</td><td>$17 audio recovery</td></tr>
+    <tr><td>$7/$17 buyer, no paperback</td><td>WF-04</td><td>D2, D4, D7</td><td>$27 paperback</td></tr>
+    <tr><td>Engaged buyer</td><td>WF-05</td><td>D5–D10</td><td>$67 course</td></tr>
+    <tr><td>Course buyer</td><td>WF-06</td><td>D0, D2 SMS, D5, D6</td><td>Skool trial</td></tr>
+    <tr><td>Skool monthly/annual</td><td>WF-07</td><td>D21 / D60</td><td>Annual / lifetime</td></tr>
+    <tr><td>Cart abandon / refund</td><td>WF-08</td><td>30m, H4, D1, D2</td><td>Save / extend</td></tr>
+  </tbody>
+</table>
+
+<h2 id="repurpose">6. Repurposing pipeline</h2>
+<p>One pillar per week. The pillar is a long-form thought (a 12-minute YouTube video, a podcast episode, or a deep journal entry). From that pillar, the week's outputs:</p>
+<ol>
+  <li><strong>2 short-form video Reels/TikToks</strong> — 15–45s clips with one idea each.</li>
+  <li><strong>1 carousel</strong> — repackaged as 5–7 slides on Instagram + LinkedIn.</li>
+  <li><strong>1 quote graphic</strong> — the strongest line, designed.</li>
+  <li><strong>1 long caption / X thread</strong> — 5–7 tweets connected.</li>
+  <li><strong>1 email broadcast</strong> — same idea, different voice, link to $7 ebook.</li>
+  <li><strong>1 SMS broadcast</strong> — single-line tease + bio link, only on pitch days.</li>
+</ol>
+<div class="callout">
+  <strong>Cadence guard.</strong> If a week is missed, do not double-post the next week. Catch up by reusing
+  evergreen Reels. The engine is built to survive bad weeks; do not punish your audience for them.
+</div>
+
+<h2 id="kpis">7. Content KPIs</h2>
+<table>
+  <thead><tr><th>KPI</th><th>Where</th><th>Sanity check</th></tr></thead>
+  <tbody>
+    <tr><td>Reels avg watch %</td><td>IG insights</td><td>Hook is working if &gt;55%</td></tr>
+    <tr><td>Profile-visit-to-link-click rate</td><td>IG/TikTok bio analytics</td><td>Bio link should be tested weekly</td></tr>
+    <tr><td>Freebie opt-ins / day</td><td>GHL <code>lead-freebie</code> count</td><td>Trend, not absolute</td></tr>
+    <tr><td>$7 purchases / 100 link clicks</td><td>GHL + analytics</td><td>1–4% is normal range from cold organic</td></tr>
+    <tr><td>Email open rate</td><td>GHL campaigns</td><td>Below 20% → list hygiene problem</td></tr>
+  </tbody>
+</table>
+
+<hr>
+<footer>Soul Prosperity · Content Engine Plan · v1</footer>
+</div>
+</body>
+</html>

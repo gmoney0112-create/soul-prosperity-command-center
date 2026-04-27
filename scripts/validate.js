@@ -178,6 +178,38 @@ function checkRequiredFiles() {
   }
 }
 
+// Launch-critical operator assets. These are the files the dashboard
+// links to from the Launch Blueprint section and the asset dock; if
+// any one of them is missing the static site will 404 in production.
+// Treated as hard errors (not warnings) because they're the difference
+// between "operator can launch" and "operator opens a broken link".
+const LAUNCH_BLUEPRINT_ASSETS = [
+  "source-assets/launch-blueprint.html",
+  "source-assets/funnel-map.html",
+  "source-assets/paid-traffic-plan.html",
+  "source-assets/content-engine-plan.html",
+  "source-assets/email-sms-sequences.html",
+  "source-assets/ad-copy-swipe-file.html",
+  "source-assets/tracking-spec.html",
+  "source-assets/ghl-automation-sequences.html",
+  "source-assets/preflight-qa.html",
+  "source-assets/launch-day-runbook.html",
+  "source-assets/social-content-pack.html",
+  "source-assets/launch-checklist.html",
+  "source-assets/sales-page-7-ebook.html",
+  "source-assets/soul-prosperity-wealth-report-v2.html",
+  "docs/GHL_SETUP.md",
+  "docs/LAUNCH_BLUEPRINT.md",
+];
+
+function checkLaunchBlueprintAssets() {
+  for (const rel of LAUNCH_BLUEPRINT_ASSETS) {
+    if (!fs.existsSync(path.join(repoRoot, rel))) {
+      errors.push(`Launch blueprint asset missing: ${rel}`);
+    }
+  }
+}
+
 // Serverless layer: routes under api/ghl/* are Vercel Node functions.
 // We don't execute them here, but we do enforce: (1) syntax via
 // require-with-stub, (2) shape — each route exports a function, (3)
@@ -263,6 +295,7 @@ function checkServerEnvLaunch() {
 }
 
 checkRequiredFiles();
+checkLaunchBlueprintAssets();
 checkReferencedAssets();
 checkForbiddenBrowserApis();
 checkGhlConfig();

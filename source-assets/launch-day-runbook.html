@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soul Prosperity — Launch Day Runbook</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:#0d0d0d; color:#fff; font-family:'Barlow Condensed',Arial,sans-serif; line-height:1.55; }
+a { color:#FFD600; text-decoration:none; } a:hover { text-decoration:underline; }
+.wrap { max-width:1080px; margin:0 auto; padding:48px 32px 96px; }
+.eyebrow { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.25em; text-transform:uppercase; color:#FFD600; }
+h1 { font-family:'Bebas Neue',sans-serif; font-size:clamp(40px,7vw,72px); line-height:0.95; letter-spacing:0.02em; margin:8px 0 14px; }
+h1 span { color:#FFD600; }
+h2 { font-family:'Bebas Neue',sans-serif; font-size:clamp(26px,3vw,36px); letter-spacing:0.04em; margin:48px 0 12px; color:#fff; border-left:4px solid #FFD600; padding-left:14px; }
+.lede { font-size:18px; color:#cfcfcf; max-width:760px; }
+.callout { padding:18px 22px; border:1px solid #2a2a2a; background:#141414; margin:18px 0 24px; border-left:4px solid #FFD600; }
+.callout strong { color:#FFD600; }
+.window { background:#141414; border:1px solid #2a2a2a; padding:18px 22px; margin:14px 0 18px; }
+.window h3 { font-family:'Bebas Neue',sans-serif; font-size:24px; letter-spacing:0.04em; color:#FFD600; margin:0 0 4px; }
+.window .when { font-family:'JetBrains Mono',monospace; font-size:11px; color:#8a8a8a; letter-spacing:0.18em; text-transform:uppercase; margin-bottom:10px; }
+.window ol { margin-left:20px; color:#cfcfcf; }
+.window li { margin-bottom:8px; }
+.window li code { font-family:'JetBrains Mono',monospace; font-size:12px; color:#FFD600; background:rgba(255,214,0,0.08); padding:2px 6px; border-radius:3px; }
+.window li strong { color:#fff; }
+.kill { padding:18px 22px; background:#1a0d0d; border:1px solid #ff6969; border-left-width:6px; margin:24px 0; }
+.kill h3 { color:#ff6969; font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:0.04em; margin:0 0 6px; }
+.kill ul { margin-left:20px; color:#cfcfcf; }
+.kill li { margin-bottom:6px; }
+.back { display:inline-block; margin-bottom:24px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:#8a8a8a; }
+.back:hover { color:#FFD600; }
+hr { border:0; border-top:1px solid #2a2a2a; margin:32px 0; }
+footer { color:#666; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; text-align:center; padding:32px 0 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<a class="back" href="../index.html#blueprint">← Command Center</a>
+
+<p class="eyebrow">Launch Blueprint · Day 1</p>
+<h1>Walk it minute by minute on <span>launch day</span>.</h1>
+<p class="lede">A time-boxed runbook for the day you flip ads on. Don't improvise. The job today is to validate that real spend produces real <code>purchase_ebook7</code> events without surprises — not to scale.</p>
+
+<div class="callout">
+  <strong>Prereq.</strong> The <a href="./preflight-qa.html">preflight QA</a> is fully green and the
+  <a href="./paid-traffic-plan.html#preflight">pre-launch checks</a> are walked. If either is incomplete,
+  do not start this runbook.
+</div>
+
+<div class="window">
+  <p class="when">T-24h · The day before</p>
+  <h3>Final calm sweep</h3>
+  <ol>
+    <li>Re-run the test purchase — confirm pixel + WF-02 still fire.</li>
+    <li>Send yourself a fresh test freebie opt-in; confirm WF-01 day-0 email arrives.</li>
+    <li>Refresh the GHL Reporting → Dashboard so the numbers start from zero in your head.</li>
+    <li>Stage all creatives in the ad accounts as <strong>paused</strong>. Do not enable yet.</li>
+    <li>Triple-check the destination URL and UTMs on every paused ad — paste them into a spreadsheet and visually diff.</li>
+    <li>Sleep. The launch isn't about the first hour, it's about the first 7 days.</li>
+  </ol>
+</div>
+
+<div class="window">
+  <p class="when">T-0 · Morning of</p>
+  <h3>Open the doors</h3>
+  <ol>
+    <li>Open: GHL conversations, GHL contacts smart list (last 24h), Stripe dashboard, ad-platform manager, Meta Pixel Helper, the live sales page in incognito.</li>
+    <li>Run one final <strong>real $7 test purchase</strong> from a clean device. Watch the sequence: pixel → thank-you page → GHL tag → WF-02 delivery email.</li>
+    <li>If anything misses, stop and fix. If everything fires, proceed.</li>
+    <li>Enable cold-ebook7 ad sets one at a time, broad first, lookalikes second.</li>
+    <li>Set a <strong>weekly</strong> budget ceiling in your head. Don't think in daily numbers.</li>
+    <li>Post the day-1 organic Reel from the <a href="./content-engine-plan.html#calendar">content calendar</a>.</li>
+  </ol>
+</div>
+
+<div class="window">
+  <p class="when">T+1h to T+4h</p>
+  <h3>Watch, do not adjust</h3>
+  <ol>
+    <li>Resist the urge to optimize anything in the first 4 hours. Platforms need time to learn.</li>
+    <li>Watch refund / support inbox. If the same question comes from 3 separate buyers, fix the asset that caused it before the next batch.</li>
+    <li>Confirm: at least one impression on every active ad, at least one click on the highest-spend ad set, no <em>policy / rejected</em> notifications.</li>
+  </ol>
+</div>
+
+<div class="window">
+  <p class="when">T+4h to T+24h</p>
+  <h3>Validate the path</h3>
+  <ol>
+    <li>Look for the first real-world <code>purchase_ebook7</code>. If it landed, the wiring is real.</li>
+    <li>Spot-check a buyer contact — confirm <code>buyer-ebook7</code> applied, WF-02 step 1 sent, UTMs captured.</li>
+    <li>Reply to the first 3 inbound emails personally. Set the tone.</li>
+    <li>Do <strong>not</strong> change budget, audience, or creative inside 24h.</li>
+  </ol>
+</div>
+
+<div class="window">
+  <p class="when">Day 2</p>
+  <h3>Sanity check, then leave it alone</h3>
+  <ol>
+    <li>Pull last 24h: spend, link clicks, $7 purchases, refunds, opt-outs.</li>
+    <li>If CPP is clearly above target with at least one ad set having spent &gt;1.5× target — keep ad set, kill its losing creative variant.</li>
+    <li>If zero conversions across the whole campaign at total spend = 3× target CPP — pause cold-ebook7, replace creatives. Audience first move = wrong move.</li>
+    <li>Post day-2 organic Reel. Reply to comments inside 4 hours.</li>
+  </ol>
+</div>
+
+<div class="window">
+  <p class="when">Days 3–7</p>
+  <h3>First scale window</h3>
+  <ol>
+    <li>Step working ad sets up by 20% per 24h, no more.</li>
+    <li>Add the cart-retargeting ad set on day 3 if abandoned-checkout audience has at least 100 matched users.</li>
+    <li>Refresh fatigued creatives mid-week with the next batch from the <a href="./ad-copy-swipe-file.html">swipe file</a>.</li>
+    <li>Read 30-day LTV at day 30, not before. Do not panic at day-3 ROAS.</li>
+  </ol>
+</div>
+
+<div class="kill" role="alert">
+  <h3>Emergency stop conditions</h3>
+  <ul>
+    <li>Buyer contact created without WF-02 firing → pause spend, fix the trigger.</li>
+    <li>Refund rate &gt; 10% inside 48 hours → pause spend, audit the promise on the sales page.</li>
+    <li>Pixel stops firing across the site → pause spend, fix tag, then resume.</li>
+    <li>Stripe / payment provider flags account → pause spend until cleared.</li>
+    <li>Operator can't reach support inbox for &gt;24h → pause spend until coverage is restored.</li>
+  </ul>
+</div>
+
+<hr>
+<footer>Soul Prosperity · Launch Day Runbook · v1</footer>
+</div>
+</body>
+</html>

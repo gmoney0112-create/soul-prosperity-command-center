@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soul Prosperity — Pre-flight QA</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:#0d0d0d; color:#fff; font-family:'Barlow Condensed',Arial,sans-serif; line-height:1.55; }
+a { color:#FFD600; text-decoration:none; } a:hover { text-decoration:underline; }
+.wrap { max-width:1080px; margin:0 auto; padding:48px 32px 96px; }
+.eyebrow { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.25em; text-transform:uppercase; color:#FFD600; }
+h1 { font-family:'Bebas Neue',sans-serif; font-size:clamp(40px,7vw,72px); line-height:0.95; letter-spacing:0.02em; margin:8px 0 14px; }
+h1 span { color:#FFD600; }
+h2 { font-family:'Bebas Neue',sans-serif; font-size:clamp(26px,3vw,36px); letter-spacing:0.04em; margin:48px 0 12px; color:#fff; border-left:4px solid #FFD600; padding-left:14px; }
+.lede { font-size:18px; color:#cfcfcf; max-width:760px; }
+.callout { padding:18px 22px; border:1px solid #2a2a2a; background:#141414; margin:18px 0 24px; border-left:4px solid #FFD600; }
+.callout strong { color:#FFD600; }
+.section { background:#141414; border:1px solid #2a2a2a; padding:18px 22px; margin:14px 0 22px; }
+.section h3 { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:0.04em; color:#FFD600; margin:0 0 4px; }
+.section .meta { font-family:'JetBrains Mono',monospace; font-size:11px; color:#8a8a8a; letter-spacing:0.14em; text-transform:uppercase; margin-bottom:10px; }
+.section ul { margin-left:20px; color:#cfcfcf; }
+.section li { margin-bottom:8px; line-height:1.5; }
+.section li strong { color:#fff; }
+.section li code { font-family:'JetBrains Mono',monospace; font-size:12px; color:#FFD600; background:rgba(255,214,0,0.08); padding:2px 6px; border-radius:3px; }
+.gate { padding:14px 18px; background:#1a1500; border:1px solid #FFD600; border-left-width:6px; margin:24px 0; font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:0.04em; color:#FFD600; }
+.gate small { display:block; font-family:'Barlow Condensed',sans-serif; font-size:14px; letter-spacing:0; color:#cfcfcf; text-transform:none; margin-top:4px; }
+.back { display:inline-block; margin-bottom:24px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:#8a8a8a; }
+.back:hover { color:#FFD600; }
+hr { border:0; border-top:1px solid #2a2a2a; margin:32px 0; }
+footer { color:#666; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; text-align:center; padding:32px 0 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<a class="back" href="../index.html#blueprint">← Command Center</a>
+
+<p class="eyebrow">Launch Blueprint · Preflight QA</p>
+<h1>The checklist before <span>traffic flips on</span>.</h1>
+<p class="lede">A human-runnable preflight that a non-technical operator can walk top to bottom in 60 minutes. Every item is a yes/no test against a real test contact and a real test transaction. If any item fails, ads do not turn on.</p>
+
+<div class="callout">
+  <strong>Rule.</strong> Use a real throwaway email and a real test card. The point is to flush out problems
+  no validator can catch — broken links, missing footers, wrong product images, refund flow that doesn't fire.
+</div>
+
+<div class="section">
+  <p class="meta">Section A · Static dashboard</p>
+  <h3>Configuration &amp; UI</h3>
+  <ul>
+    <li><strong>config.js has no placeholders</strong> — open the GHL Wiring panel; "required missing" is 0 and "placeholders" is 0 for production fields.</li>
+    <li><strong>npm run check passes</strong> — <code>node --check</code> + validator + serverless smoke all green.</li>
+    <li><strong>Dashboard renders on prod URL</strong> — open the live Vercel URL on desktop and mobile; readiness meter renders, links resolve.</li>
+    <li><strong>Theme toggle works</strong> — light/dark switches without breaking layout.</li>
+    <li><strong>Asset dock links open</strong> — every <code>asset-dock a</code> in the launch panel resolves to a non-404 page.</li>
+  </ul>
+</div>
+
+<div class="section">
+  <p class="meta">Section B · Funnel pages</p>
+  <h3>Sales pages, opt-ins, checkouts</h3>
+  <ul>
+    <li><strong>$7 sales page loads</strong> — buy button uses real Stripe-connected GHL checkout link; price displays as <code>$7</code>.</li>
+    <li><strong>Order bump checkbox</strong> — $17 audio appears on the $7 checkout, fires <code>purchase_audio17</code> when ticked.</li>
+    <li><strong>Upsell page → $27 paperback</strong> — accept and decline both route somewhere sensible.</li>
+    <li><strong>Course $67 sales page</strong> — direct purchase fires <code>purchase_course67</code> and applies <code>buyer-course67</code>.</li>
+    <li><strong>Skool trial link</strong> — <code>skoolTrial</code> resolves to the live Skool group join URL.</li>
+    <li><strong>Freebie opt-in</strong> — submitting creates a contact, applies <code>lead-freebie</code>, captures UTMs into custom fields.</li>
+    <li><strong>Privacy policy + terms linked</strong> — every checkout, footer, and opt-in page links to current legal docs.</li>
+  </ul>
+</div>
+
+<div class="section">
+  <p class="meta">Section C · GHL automation</p>
+  <h3>Workflows fire end-to-end</h3>
+  <ul>
+    <li><strong>WF-01 freebie nurture</strong> — opt-in test contact receives Day 0 delivery email within 5 minutes.</li>
+    <li><strong>WF-02 $7 buyer delivery</strong> — real $7 test transaction triggers PDF delivery email and applies <code>buyer-ebook7</code>.</li>
+    <li><strong>WF-03 audio recovery</strong> — buyer without <code>buyer-audio17</code> receives bridge email at H+2.</li>
+    <li><strong>WF-04 paperback upgrade</strong> — Day 2 pitch email lands in inbox.</li>
+    <li><strong>WF-05 course pitch</strong> — Day 5 method teaser arrives.</li>
+    <li><strong>WF-06 Skool trial invite</strong> — course buyer receives invite within 30 minutes.</li>
+    <li><strong>WF-07 annual / lifetime</strong> — monthly subscriber at day 21 receives annual pitch (use a date-shifted test contact to verify).</li>
+    <li><strong>WF-08 cart save</strong> — abandoned checkout for 30+ minutes triggers <code>abandoned-checkout</code> tag and save sequence.</li>
+    <li><strong>Tag-based exit conditions</strong> — apply <code>buyer-course67</code> mid-WF-03; verify the contact exits.</li>
+  </ul>
+</div>
+
+<div class="section">
+  <p class="meta">Section D · Tracking</p>
+  <h3>Pixel, UTMs, attribution</h3>
+  <ul>
+    <li><strong>Meta Pixel Helper green</strong> — opens on sales page with <code>view_content</code> firing.</li>
+    <li><strong>begin_checkout fires</strong> — visible in pixel helper and in Events Manager test mode.</li>
+    <li><strong>purchase_ebook7 fires once</strong> — refresh thank-you page; should NOT double-fire.</li>
+    <li><strong>UTM passthrough</strong> — click a <code>utm_source=meta&amp;utm_term=authority</code> test link, complete opt-in; GHL contact has <code>utm_source=meta</code>, <code>utm_term=authority</code> in custom fields.</li>
+    <li><strong>Server-side conversions</strong> (if configured) — Conversions API event lands in Events Manager within 5 minutes of test purchase.</li>
+    <li><strong>Refund event flows through</strong> — issue test refund; <code>refunded</code> tag applied, contact suppressed from retargeting audiences.</li>
+  </ul>
+</div>
+
+<div class="section">
+  <p class="meta">Section E · Compliance &amp; deliverability</p>
+  <h3>Legal &amp; inbox</h3>
+  <ul>
+    <li><strong>Email footer</strong> — physical address + unsubscribe link present on every WF email.</li>
+    <li><strong>Unsubscribe works</strong> — click in test email, contact tagged <code>unsubscribed-email</code>, no further sends.</li>
+    <li><strong>SMS STOP works</strong> — reply STOP, contact tagged <code>sms-opt-out</code>, no further SMS.</li>
+    <li><strong>Quiet hours</strong> — no SMS scheduled between 9pm and 9am contact-local.</li>
+    <li><strong>SPF / DKIM / DMARC</strong> — sending domain authenticated; mail-tester or similar shows 9+/10.</li>
+    <li><strong>Inbox placement</strong> — test deliveries land in primary, not promotions, on Gmail / Apple Mail / Outlook.</li>
+  </ul>
+</div>
+
+<div class="section">
+  <p class="meta">Section F · Operations</p>
+  <h3>Support, refunds, monitoring</h3>
+  <ul>
+    <li><strong>Support inbox</strong> — replies from contact land somewhere a human will see them within 24h.</li>
+    <li><strong>Refund SLA</strong> — refund processed inside 48h, refund email is human-toned (WF-08 sequence B).</li>
+    <li><strong>Stripe payout schedule</strong> — confirmed; bank account verified.</li>
+    <li><strong>Operator can pause ads</strong> — admin access to all ad accounts confirmed; pause button known.</li>
+    <li><strong>Backup operator</strong> — at least one other person has access to GHL + Stripe + ad accounts in case of emergency.</li>
+  </ul>
+</div>
+
+<div class="gate">
+  Gate to traffic
+  <small>If any of the above fails, do not turn on paid spend. Fix first, retest the failed row, then proceed to the <a href="./launch-day-runbook.html">launch-day runbook</a>.</small>
+</div>
+
+<hr>
+<footer>Soul Prosperity · Preflight QA · v1</footer>
+</div>
+</body>
+</html>

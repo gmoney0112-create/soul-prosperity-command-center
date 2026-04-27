@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soul Prosperity — Email &amp; SMS Sequence Templates</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:#0d0d0d; color:#fff; font-family:'Barlow Condensed',Arial,sans-serif; line-height:1.55; }
+a { color:#FFD600; text-decoration:none; } a:hover { text-decoration:underline; }
+.wrap { max-width:1080px; margin:0 auto; padding:48px 32px 96px; }
+.eyebrow { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.25em; text-transform:uppercase; color:#FFD600; }
+h1 { font-family:'Bebas Neue',sans-serif; font-size:clamp(40px,7vw,72px); line-height:0.95; letter-spacing:0.02em; margin:8px 0 14px; }
+h1 span { color:#FFD600; }
+h2 { font-family:'Bebas Neue',sans-serif; font-size:clamp(26px,3vw,36px); letter-spacing:0.04em; margin:48px 0 12px; color:#fff; border-left:4px solid #FFD600; padding-left:14px; }
+h3 { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:0.05em; margin:24px 0 10px; color:#FFD600; }
+p { color:#cfcfcf; margin:0 0 12px; }
+.lede { font-size:18px; color:#cfcfcf; max-width:760px; }
+.callout { padding:18px 22px; border:1px solid #2a2a2a; background:#141414; margin:18px 0 24px; border-left:4px solid #FFD600; }
+.callout strong { color:#FFD600; }
+ul, ol { margin:0 0 16px 22px; color:#cfcfcf; }
+li { margin-bottom:6px; }
+.msg { background:#141414; border:1px solid #2a2a2a; padding:18px 22px; margin:14px 0 22px; }
+.msg.sms { border-left:4px solid #65a8ff; }
+.msg.email { border-left:4px solid #FFD600; }
+.msg .hd { display:flex; flex-wrap:wrap; gap:12px; align-items:baseline; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#FFD600; margin-bottom:8px; }
+.msg.sms .hd { color:#65a8ff; }
+.msg .hd span { color:#8a8a8a; }
+.msg h4 { font-family:'Bebas Neue',sans-serif; letter-spacing:0.04em; font-size:20px; color:#fff; margin:0 0 8px; }
+.msg pre { white-space:pre-wrap; font-family:'Barlow Condensed',Arial,sans-serif; font-size:15px; color:#cfcfcf; line-height:1.65; }
+code { font-family:'JetBrains Mono',monospace; font-size:12px; color:#FFD600; background:rgba(255,214,0,0.08); padding:2px 6px; border-radius:3px; }
+.toc { background:#141414; border:1px solid #2a2a2a; padding:18px 22px; margin-bottom:36px; }
+.toc ul { list-style:none; margin:0; columns:2; column-gap:24px; }
+.toc li { margin:4px 0; color:#cfcfcf; }
+.toc a { color:#cfcfcf; }
+.toc a:hover { color:#FFD600; }
+.back { display:inline-block; margin-bottom:24px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:#8a8a8a; }
+.back:hover { color:#FFD600; }
+hr { border:0; border-top:1px solid #2a2a2a; margin:32px 0; }
+footer { color:#666; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; text-align:center; padding:32px 0 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<a class="back" href="../index.html#blueprint">← Command Center</a>
+
+<p class="eyebrow">Launch Blueprint · Email &amp; SMS</p>
+<h1>Ready-to-paste sequences for <span>every workflow</span>.</h1>
+<p class="lede">Drop these messages directly into GoHighLevel. Each block names the workflow, the step delay, and the merge fields. SMS includes the legally required STOP clause on the first message of each sequence. Personalize names and product titles, but keep the structure.</p>
+
+<div class="callout">
+  <strong>Compliance.</strong> GHL respects unsubscribe and STOP automatically when the contact carries
+  <code>unsubscribed-email</code> or <code>sms-opt-out</code> tags (configured in the GHL Build Sheet). Every
+  email must include the physical address and unsubscribe link in the footer; first SMS in any sequence must
+  include the opt-out instruction.
+</div>
+
+<div class="toc" aria-label="Table of contents">
+  <strong>Table of contents</strong>
+  <ul>
+    <li><a href="#wf01">WF-01 Freebie nurture</a></li>
+    <li><a href="#wf02">WF-02 $7 buyer delivery</a></li>
+    <li><a href="#wf03">WF-03 $17 audio recovery</a></li>
+    <li><a href="#wf04">WF-04 $27 paperback upgrade</a></li>
+    <li><a href="#wf05">WF-05 $67 course pitch</a></li>
+    <li><a href="#wf06">WF-06 Skool trial invite</a></li>
+    <li><a href="#wf07">WF-07 Annual / lifetime</a></li>
+    <li><a href="#wf08">WF-08 Cart save &amp; refund save</a></li>
+  </ul>
+</div>
+
+<h2 id="wf01">WF-01 · Freebie nurture</h2>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Day 0 · Minute 1<span>Subject: The first chapter is yours.</span></div>
+  <h4>Delivery</h4>
+<pre>Hey {{contact.first_name}},
+
+Here's the first chapter. No fluff, no upsell stuck in the middle:
+
+{{custom_values.freebie_link}}
+
+Read it tonight. If it lands, the full $7 ebook builds the rest of the system around what you just read:
+
+{{custom_values.ebook7_link}}
+
+— Terrance</pre>
+</div>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Day 1 · 9:00am<span>Subject: I wrote this on a McChicken receipt.</span></div>
+  <h4>Story</h4>
+<pre>I didn't have a laptop. I didn't have a publisher. I had a pen and a paper bag.
+
+The first chapter you opened yesterday started on a McChicken receipt at 11pm in a Walmart parking lot.
+
+That's not a flex. That's the point.
+
+You don't need permission to write the book. You need a chapter and a system that finishes it.
+
+Both are inside the $7 ebook:
+{{custom_values.ebook7_link}}
+
+— T</pre>
+</div>
+
+<div class="msg sms">
+  <div class="hd">SMS · Day 2 · 11:30am<span>~140 chars</span></div>
+  <h4>Nudge</h4>
+<pre>Did you read the first chapter yet?
+
+If yes — the $7 full ebook is here: {{custom_values.ebook7_link}}
+
+Reply STOP to opt out.</pre>
+</div>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Day 3 · 9:00am<span>Subject: $7. Today. Done.</span></div>
+  <h4>Pitch</h4>
+<pre>Three words: $7. Today. Done.
+
+The full ebook is the system the first chapter pointed at. 60 minutes of reading. No filler.
+
+If it doesn't help, the 30-day refund is one click — no email, no friction.
+
+{{custom_values.ebook7_link}}
+
+— T</pre>
+</div>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Day 5 · 9:00am<span>Subject: Last note from me on this.</span></div>
+  <h4>Final pitch</h4>
+<pre>I'm not going to keep emailing you about the $7 book — you read the chapter or you didn't.
+
+If you're still on the fence, here's the only honest reason to grab it:
+
+You already have the message. You don't have the finishing system. The book is the finishing system.
+
+{{custom_values.ebook7_link}}
+
+— T</pre>
+</div>
+
+<h2 id="wf02">WF-02 · $7 buyer delivery</h2>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Minute 0<span>Subject: Your ebook (download inside).</span></div>
+  <h4>Delivery</h4>
+<pre>{{contact.first_name}} — thank you. Here's the full ebook:
+
+{{custom_values.ebook7_pdf}}
+
+If you'd rather listen than read, the audiobook is $17 and you can grab it in one click:
+{{custom_values.audio17_link}}
+
+I'll send one more note tomorrow with how to get the most out of the read.
+
+— Terrance</pre>
+</div>
+
+<div class="msg sms">
+  <div class="hd">SMS · Minute 5<span>~110 chars</span></div>
+  <h4>Inbox check</h4>
+<pre>Quick — your Soul Prosperity ebook is in your inbox. Check spam if you don't see it. Reply STOP to opt out.</pre>
+</div>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Hour 1<span>Subject: Want it in your ears too?</span></div>
+  <h4>$17 audio bump</h4>
+<pre>One add-on most readers grab in the first hour: the audiobook.
+
+Same content, narrated by me, $17. Listen on the way to work, the way home, on the treadmill.
+
+{{custom_values.audio17_link}}
+
+If you'd rather just read it, ignore this one — the ebook is already yours.</pre>
+</div>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Day 1 · 9:00am<span>Subject: Want a copy on your shelf?</span></div>
+  <h4>$27 paperback</h4>
+<pre>Some books belong on the shelf, not just in your inbox.
+
+The paperback is $27. Same content, but you can dog-ear it, gift it, mark up the margins, and remember where you wrote your favorite line.
+
+{{custom_values.paperback27_link}}
+
+— T</pre>
+</div>
+
+<h2 id="wf03">WF-03 · $17 audio recovery</h2>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Hour 2<span>Subject: Read or listen — your call.</span></div>
+  <h4>Audio bridge</h4>
+<pre>You bought the ebook. You haven't grabbed the audiobook yet.
+
+If you read fast, you don't need it. If you commute, you do.
+
+Same words, my voice, $17:
+{{custom_values.audio17_link}}</pre>
+</div>
+
+<div class="msg sms">
+  <div class="hd">SMS · Day 1<span>~120 chars</span></div>
+  <h4>Listen instead</h4>
+<pre>Still on chapter 1? Try listening — audiobook is $17 here: {{custom_values.audio17_link}} Reply STOP to opt out.</pre>
+</div>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Day 3<span>Subject: Last call on the audiobook.</span></div>
+  <h4>Final $17</h4>
+<pre>Last note on the audiobook. After today the email sequence rotates and you'll have to dig for the link.
+
+{{custom_values.audio17_link}}
+
+— T</pre>
+</div>
+
+<h2 id="wf04">WF-04 · $27 paperback upgrade</h2>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Day 2<span>Subject: The study copy.</span></div>
+  <h4>Paperback pitch 1</h4>
+<pre>You'll mark this book up. Underline. Annotate. Write in the margins.
+
+You can't do that to a PDF. The paperback is $27 — the study copy:
+{{custom_values.paperback27_link}}</pre>
+</div>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Day 4<span>Subject: The gift copy.</span></div>
+  <h4>Paperback pitch 2</h4>
+<pre>Three readers in the last week wrote me to say they bought a second copy as a gift.
+
+Pastor. Cousin. Recovery sponsor. The book ends up in someone else's hands every time.
+
+{{custom_values.paperback27_link}}</pre>
+</div>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Day 7<span>Subject: Last call on the paperback.</span></div>
+  <h4>Paperback pitch 3</h4>
+<pre>Last note on the paperback. Print runs are limited and shipping windows tighten near the end of the month.
+
+{{custom_values.paperback27_link}}
+
+— T</pre>
+</div>
+
+<h2 id="wf05">WF-05 · $67 course pitch</h2>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Day 5<span>Subject: From reading the method to running it.</span></div>
+  <h4>Method teaser</h4>
+<pre>The book teaches the method. The course makes you run it.
+
+If you've finished the ebook (even halfway) and the next step is "now write yours" — that's what the $67 course is for.
+
+{{custom_values.course67_link}}</pre>
+</div>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Day 6<span>Subject: How Marcus wrote his first chapter in 11 days.</span></div>
+  <h4>Case study</h4>
+<pre>Marcus joined the course in week one. He had a folder full of half-starts.
+
+11 days later — first chapter, 4,200 words, ready for an editor.
+
+He didn't get smarter in 11 days. He just stopped working alone.
+
+{{custom_values.course67_link}}</pre>
+</div>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Day 7<span>Subject: The curriculum, in one email.</span></div>
+  <h4>Curriculum</h4>
+<pre>What's actually inside the course:
+
+1. The 4-part chapter skeleton (so you stop staring at blank pages)
+2. The voice exercise that fixes "I sound boring on the page"
+3. The 90-minute writing session structure
+4. The accountability ritual that finishes books
+
+{{custom_values.course67_link}}</pre>
+</div>
+
+<div class="msg sms">
+  <div class="hd">SMS · Day 8<span>~140 chars</span></div>
+  <h4>Direct CTA</h4>
+<pre>You read the book. Want help building yours? $67 course: {{custom_values.course67_link}} Reply STOP to opt out.</pre>
+</div>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Day 10<span>Subject: I'm closing the open enrollment window.</span></div>
+  <h4>Deadline</h4>
+<pre>Open enrollment for this round closes tonight. Next round is 30 days out.
+
+If "build my book" is on the list, today is the day.
+
+{{custom_values.course67_link}}
+
+— T</pre>
+</div>
+
+<h2 id="wf06">WF-06 · Skool 7-day trial invite</h2>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Day 0<span>Subject: 7 days inside the writing community.</span></div>
+  <h4>Trial invite</h4>
+<pre>You're in.
+
+Inside the Skool community: weekly live writing sessions, a critique thread, and a chapter-a-week challenge that's running right now.
+
+7-day trial — no card friction:
+{{custom_values.skool_trial_link}}
+
+— T</pre>
+</div>
+
+<div class="msg sms">
+  <div class="hd">SMS · Day 2<span>~130 chars</span></div>
+  <h4>Skool nudge</h4>
+<pre>Did you start the Skool trial? Most people who write the book join during the trial week. {{custom_values.skool_trial_link}}</pre>
+</div>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Day 5<span>Subject: What's actually happening in there.</span></div>
+  <h4>Social proof</h4>
+<pre>Today inside Skool:
+- 4 chapter drafts posted for critique
+- A live Q&amp;A about pricing your first book
+- Two members announced their launch dates
+
+Trial closes in 2 days:
+{{custom_values.skool_trial_link}}</pre>
+</div>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Day 6<span>Subject: Trial ends tomorrow.</span></div>
+  <h4>Trial ending</h4>
+<pre>Quick note — your Skool trial ends in 24 hours.
+
+If you stay, the monthly is $47 and you can pause anytime.
+
+{{custom_values.skool_trial_link}}
+
+— T</pre>
+</div>
+
+<h2 id="wf07">WF-07 · Annual / lifetime upgrade</h2>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Day 21 (monthly active)<span>Subject: Pay once for the year and save four months.</span></div>
+  <h4>Monthly → annual</h4>
+<pre>You're 3 weeks into Skool monthly.
+
+The annual is $247. That's effectively 8 months for the price of 12. Most members switch the second they realize the math.
+
+{{custom_values.skool_annual_link}}</pre>
+</div>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Day 60 (annual active)<span>Subject: One time. Lifetime.</span></div>
+  <h4>Annual → lifetime</h4>
+<pre>Two months in. You're using it.
+
+Lifetime is $497, one time, never billed again. For most members it pays back inside 18 months and the renewal stress is gone forever.
+
+{{custom_values.lifetime_link}}</pre>
+</div>
+
+<h2 id="wf08">WF-08 · Cart save &amp; refund save</h2>
+
+<div class="msg email">
+  <div class="hd">EMAIL · 30 minutes after cart abandon<span>Subject: You left the door open.</span></div>
+  <h4>Cart save 1</h4>
+<pre>You started checkout for the $7 ebook and didn't finish.
+
+Probably a slow connection. Probably a baby crying. Probably life.
+
+Pick it back up here:
+{{custom_values.ebook7_link}}
+
+If you decided it's not for you, no hard feelings — ignore this.</pre>
+</div>
+
+<div class="msg sms">
+  <div class="hd">SMS · 4 hours after cart abandon<span>~140 chars</span></div>
+  <h4>Cart save 2</h4>
+<pre>The $7 ebook checkout is still open if you want it: {{custom_values.ebook7_link}} Reply STOP to opt out.</pre>
+</div>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Refund requested · Minute 5<span>Subject: I saw the refund — talk to me.</span></div>
+  <h4>Refund save 1 (human-tone)</h4>
+<pre>Hey {{contact.first_name}} — Terrance here.
+
+I saw the refund request. I'd rather know what didn't land than just process it. If you reply with one sentence — too long, wrong fit, expected something else — I'll fix it on my end.
+
+If you'd still rather refund, the next email has the one-click button. No friction either way.
+
+— T</pre>
+</div>
+
+<div class="msg email">
+  <div class="hd">EMAIL · Refund requested · Hour 2<span>Subject: One option before the refund.</span></div>
+  <h4>Refund save 2 (offer downgrade)</h4>
+<pre>If the issue was time, not value — I'll swap your $67 course access for the $17 audiobook and refund the difference. No questions.
+
+Reply with a single word:
+- AUDIO — to swap
+- REFUND — to process the refund
+
+— T</pre>
+</div>
+
+<hr>
+
+<footer>Soul Prosperity · Email &amp; SMS Sequence Templates · v1</footer>
+
+</div>
+</body>
+</html>
