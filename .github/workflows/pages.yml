@@ -14,6 +14,13 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+env:
+  # Opt JavaScript actions into the Node 24 runtime ahead of GitHub's
+  # forced migration (default June 2026). This mitigates the runner's
+  # "Node.js 20" deprecation warnings without changing action versions.
+  # See: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     name: Build static artifact
@@ -33,14 +40,12 @@ jobs:
           if [ -f package-lock.json ]; then
             npm ci
           else
-            echo "No lockfile found; skipping npm ci"
+            echo "No lockfile found; falling back to npm install"
+            npm install --no-audit --no-fund
           fi
 
-      - name: Validate static site
-        run: |
-          node --check app.js
-          node --check config.js
-          node scripts/validate.js
+      - name: Run full check (syntax + validator + smoke tests)
+        run: npm run check
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
