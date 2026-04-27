@@ -52,7 +52,7 @@ window.SP_CONFIG = {
     // The HighLevel sub-account (location) this dashboard operates
     // against. Found in GHL → Settings → Business Profile, or in any
     // sub-account URL: app.gohighlevel.com/v2/location/<LOCATION_ID>/...
-    locationId: "REPLACE_GHL_LOCATION_ID",
+    locationId: "uoI2kRMGyVb8DjPA7mAa",
 
     // ── Operator entry URLs (where this dashboard's links go) ─────
     // Sub-account home dashboard
@@ -85,14 +85,19 @@ window.SP_CONFIG = {
     // and is NEVER performed in this static dashboard.
     oauth: {
       // Public Marketplace client_id — safe to expose
-      clientId: "REPLACE_GHL_CLIENT_ID",
+      clientId: "69d4380c8e3fd9c7576364c3-mogl4hiq",
       // Full chooselocation install URL with client_id, redirect_uri,
       // and scopes baked in. See docs/GHL_SETUP.md for the exact
       // string to construct.
-      installUrl: "#",
+      installUrl:
+        "https://marketplace.gohighlevel.com/oauth/chooselocation" +
+        "?response_type=code" +
+        "&redirect_uri=https%3A%2F%2Fsoul-prosperity-command-center.vercel.app%2Fapi%2Fghl%2Foauth%2Fcallback" +
+        "&client_id=69d4380c8e3fd9c7576364c3-mogl4hiq" +
+        "&scope=contacts.readonly%20contacts.write%20conversations.readonly%20conversations.write%20conversations%2Fmessage.write%20opportunities.readonly%20opportunities.write%20workflows.readonly%20locations.readonly",
       // Where HighLevel redirects after install with ?code=...
       // Must be HTTPS and registered in the Marketplace app.
-      redirectUri: "REPLACE_OAUTH_REDIRECT_URI",
+      redirectUri: "https://soul-prosperity-command-center.vercel.app/api/ghl/oauth/callback",
       // Space-separated v2 scope list. Recommended minimum:
       scopes:
         "contacts.readonly contacts.write conversations.readonly conversations.write conversations/message.write opportunities.readonly opportunities.write workflows.readonly locations.readonly",
@@ -120,7 +125,7 @@ window.SP_CONFIG = {
       // Public URL operators can hand to HighLevel. The receiver
       // itself is a separate backend / serverless function — this
       // static dashboard does NOT receive webhooks.
-      targetUrl: "REPLACE_WEBHOOK_TARGET_URL",
+      targetUrl: "https://soul-prosperity-command-center.vercel.app/api/ghl/webhook",
       // Subscribed event list (informational; configured in the
       // Marketplace UI, not by this file).
       events: [
