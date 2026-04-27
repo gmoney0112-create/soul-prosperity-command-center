@@ -124,7 +124,9 @@ work too). All values are server-only — never reflected to the browser.
 | `GHL_CLIENT_SECRET` | Marketplace app Auth page | **Required** |
 | `GHL_OAUTH_REDIRECT_URI` | `https://soul-prosperity-command-center.vercel.app/api/ghl/oauth/callback` | **Required** |
 | `GHL_USER_TYPE` | `Location` (default; use `Company` only for agency-scoped apps) | Optional |
-| `GHL_TOKEN_STORAGE_URL` | Your token sink (see 3.3) | **Required** for tokens to persist |
+| `KV_REST_API_URL` | **Injected automatically** by Vercel when you connect a KV store (see 3.3a) | **Required unless** `GHL_TOKEN_STORAGE_URL` is set |
+| `KV_REST_API_TOKEN` | **Injected automatically** alongside `KV_REST_API_URL` | **Required unless** `GHL_TOKEN_STORAGE_URL` is set |
+| `GHL_TOKEN_STORAGE_URL` | Your own HTTP sink (see 3.3b) — only needed if not using KV | Optional (fallback) |
 | `GHL_WEBHOOK_FORWARD_URL` | Your webhook sink (see 3.4) | Optional |
 | `GHL_ALLOWED_WEBHOOK_EVENTS` | Leave unset for the default allowlist | Optional |
 
@@ -133,33 +135,39 @@ work too). All values are server-only — never reflected to the browser.
 > public keys are baked into `api/_lib/ghl.js`. Verification works
 > without env config.
 
-### 3.3 Token storage sink (`GHL_TOKEN_STORAGE_URL`)
+### 3.3 Token storage — choose one
 
-After token exchange, the OAuth callback POSTs the token bundle as
-JSON to this URL. Pick any of:
+`ready.oauth` in `/api/ghl/health` requires credentials **and** storage.
 
-- **Vercel KV ingest** — write a tiny `/api/tokens/store` route in this
-  same project that writes to `@vercel/kv`.
-- **Upstash Redis** — Upstash exposes a REST URL you can POST to
-  directly (use a per-record key under the location id).
-- **Your own DB** — any HTTPS endpoint with auth that writes a row.
-- **A Make/Zapier webhook** — fastest path to get *something* writing
-  to a Google Sheet / Airtable while you build the real sink.
+#### 3.3a Vercel KV (recommended — zero external dependencies)
 
-Whatever you pick, it must:
+1. Open the Vercel project → **Storage** tab → **Connect KV Store**.
+2. Select an existing KV database or create one (free tier is fine).
+3. Click **Connect**. Vercel automatically adds `KV_REST_API_URL` and
+   `KV_REST_API_TOKEN` to the project's environment variables.
+4. Trigger a redeploy (or Vercel does it automatically on connect).
+5. Check `/api/ghl/health` — expect `tokenStorageBackend: "vercel-kv"`.
 
-- Be HTTPS.
+Tokens are stored under `ghl:oauth:<locationId>` with a 30-day TTL.
+Re-installing the app overwrites the entry.
+
+#### 3.3b HTTP sink fallback (`GHL_TOKEN_STORAGE_URL`)
+
+Use this only when Vercel KV is not available. After token exchange,
+the OAuth callback POSTs the full token bundle as JSON to this URL.
+The URL must be:
+
+- HTTPS.
 - Accept a JSON POST.
-- Authenticate the caller (e.g. with a shared header you also set as a
-  Vercel secret, then add a header check in `api/ghl/oauth/callback.js`
-  if you go that route).
-- Persist `access_token`, `refresh_token`, `expires_in`, `locationId`,
-  `companyId`, `scope`.
+- Server-owned — never client-accessible.
+- Persist `access_token`, `refresh_token`, `expires_in`, `location_id`.
 
-If unset, `/api/ghl/oauth/callback` will return `persisted: false`
-with an explicit operator warning. Tokens are not silently dropped, but
-they are not stored either — installs will appear successful but no
-API calls will be possible.
+Options: your own DB route, Upstash REST with a fixed key, a Make/
+Zapier webhook into a spreadsheet while you build the real sink.
+
+If neither KV nor URL is configured, `/api/ghl/oauth/callback` returns
+`persisted: false` with an operator warning. Tokens are not silently
+dropped, but they are not stored — no API calls will succeed.
 
 ### 3.4 Webhook forwarding sink (`GHL_WEBHOOK_FORWARD_URL`) — optional
 
@@ -194,19 +202,22 @@ moving on.
 
 1. **Create the GHL Marketplace app** (3.1). Capture `client_id`,
    `client_secret`, register the redirect URI.
-2. **Provision the token storage sink** (3.3). Note its HTTPS URL.
-3. **Set Vercel env vars** (3.2). Trigger a redeploy (push a commit or
-   click "Redeploy" in Vercel) so the new env values are picked up by
-   the running functions.
+2. **Connect a Vercel KV store** (3.3a) — Project → Storage → Connect
+   KV Store. This is the simplest path; Vercel injects `KV_REST_API_URL`
+   and `KV_REST_API_TOKEN` automatically. Skip if using an HTTP sink instead.
+3. **Set Vercel env vars** (3.2) — at minimum `GHL_CLIENT_ID`,
+   `GHL_CLIENT_SECRET`, `GHL_OAUTH_REDIRECT_URI`. Trigger a redeploy
+   (push a commit or click "Redeploy" in Vercel).
 4. **Verify health**:
    ```bash
    curl -s https://soul-prosperity-command-center.vercel.app/api/ghl/health | jq
    ```
-   Expect `ready.oauth: true`, `ready.webhook: true`.
+   Expect `ready.oauth: true` (requires credentials + storage),
+   `ready.webhook: true`, `tokenStorageBackend: "vercel-kv"` (or `"url"`).
 5. **Run a real install** from the Marketplace app's install URL
    against a throwaway sub-account. Confirm the callback responds
-   `installed: true, persisted: true` and your sink received the
-   token bundle.
+   `installed: true, persisted: true, backend: "vercel-kv"` and a KV
+   key `ghl:oauth:<locationId>` was written.
 6. **Configure the webhook in the Marketplace app** (Advanced Settings
    → Webhooks). Endpoint: `https://soul-prosperity-command-center.vercel.app/api/ghl/webhook`.
    Subscribe to the events in `docs/GHL_SETUP.md` §4.3. Click "Send

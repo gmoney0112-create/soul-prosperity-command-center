@@ -5,14 +5,21 @@
 // access + refresh token at services.leadconnectorhq.com/oauth/token.
 //
 // Secret boundary:
-//   - GHL_CLIENT_SECRET stays on the server. It is NEVER sent to the
-//     browser, NEVER reflected in any response body, and NEVER logged.
-//   - The exchanged tokens are NEVER returned in the HTTP response to
-//     the browser. They are forwarded to GHL_TOKEN_STORAGE_URL (an
-//     operator-controlled, server-side webhook / KV ingest endpoint).
-//   - If GHL_TOKEN_STORAGE_URL is not configured, the response tells
-//     the operator persistence is unconfigured and the install is
-//     incomplete. We do NOT pretend the tokens were stored.
+//   - GHL_CLIENT_SECRET stays on the server. NEVER sent to the browser,
+//     NEVER reflected in any response body, NEVER logged.
+//   - Exchanged tokens are NEVER returned in the HTTP response to the
+//     browser. They are stored server-side (see storage precedence below).
+//   - If no storage is configured the response tells the operator and
+//     the install is flagged incomplete. We do NOT silently drop tokens.
+//
+// Token storage precedence:
+//   1. Vercel KV (KV_REST_API_URL + KV_REST_API_TOKEN) -- preferred.
+//      Tokens stored under ghl:oauth:<locationId|companyId|default>
+//      with a 30-day TTL via the Upstash REST pipeline API.
+//   2. GHL_TOKEN_STORAGE_URL -- operator HTTP sink (fallback).
+//      If present and KV is not, tokens are POSTed to this URL.
+//   If both are set, KV takes precedence; URL is not forwarded to
+//   (configure GHL_WEBHOOK_FORWARD_URL if you need fan-out).
 
 "use strict";
 
@@ -22,6 +29,8 @@ const {
   methodNotAllowed,
   getOAuthConfig,
   isPlaceholder,
+  isKvConfigured,
+  storeTokenInKv,
   postForm,
   forwardJson,
   logSafe,
@@ -120,8 +129,7 @@ module.exports = async function handler(req, res) {
   }
 
   const tokens = exchange.json;
-  // Strip nothing — forward the full bundle to the operator's storage
-  // sink. The sink endpoint is server-to-server and operator-owned.
+  // Full token bundle for server-side storage. Never returned to browser.
   const persistencePayload = {
     kind: "ghl.oauth.tokens",
     received_at: new Date().toISOString(),
@@ -135,11 +143,34 @@ module.exports = async function handler(req, res) {
     refresh_token: tokens.refresh_token || null,
   };
 
+  // Deterministic KV key: ghl:oauth:<locationId|companyId|default>
+  const storageKey =
+    "ghl:oauth:" + (tokens.locationId || tokens.companyId || "default");
+
   let persistence = { configured: false };
-  if (!isPlaceholder(oauth.tokenStorageUrl)) {
+
+  if (isKvConfigured()) {
+    // Preferred path: Vercel KV (Upstash REST). Tokens stored server-side
+    // with a 30-day TTL; overwritten on each fresh install.
+    const kv = await storeTokenInKv(storageKey, persistencePayload);
+    persistence = {
+      configured: true,
+      backend: "vercel-kv",
+      delivered: !!kv.ok,
+      status: kv.status || null,
+    };
+    if (!kv.ok) {
+      logSafe("ghl.oauth.token_persist_kv_failed", {
+        status: kv.status || null,
+        error: kv.error || null,
+      });
+    }
+  } else if (!isPlaceholder(oauth.tokenStorageUrl)) {
+    // Fallback path: operator-supplied HTTP sink.
     const fwd = await forwardJson(oauth.tokenStorageUrl, persistencePayload);
     persistence = {
       configured: true,
+      backend: "url",
       delivered: !!fwd.ok,
       status: fwd.status || null,
     };
@@ -151,20 +182,26 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // Browser response: confirm install + persistence state, but never
-  // reveal the tokens. Operator can verify by checking their sink.
+  // Browser response: confirm install + persistence state. Tokens are
+  // never returned here; operator verifies via their storage sink.
   if (!persistence.configured) {
     return jsonResponse(res, 200, {
       ok: true,
       installed: true,
       persisted: false,
       warning:
-        "Token exchange succeeded but GHL_TOKEN_STORAGE_URL is not configured. Tokens were NOT persisted. Configure a server-side sink (Vercel KV ingest endpoint, your own /tokens/store route, or Upstash) and re-run the install before any API calls are attempted.",
+        "Token exchange succeeded but no token storage is configured. " +
+        "Tokens were NOT persisted. Connect a Vercel KV store to this project " +
+        "(Project -> Storage -> Connect KV Store) or set GHL_TOKEN_STORAGE_URL, " +
+        "then re-run the install from the Marketplace install URL.",
       location_id: tokens.locationId || null,
       scope: tokens.scope || null,
       expires_in: tokens.expires_in || null,
-      next_step:
-        "Set GHL_TOKEN_STORAGE_URL in Vercel project env vars and trigger a fresh install from the Marketplace install URL.",
+      next_steps: [
+        "Option A (preferred): Connect a KV store in the Vercel dashboard — KV_REST_API_URL and KV_REST_API_TOKEN are injected automatically.",
+        "Option B: Set GHL_TOKEN_STORAGE_URL to a server-side HTTPS sink you own.",
+        "After adding storage, verify /api/ghl/health shows ready.oauth=true, then trigger a fresh install.",
+      ],
     });
   }
 
@@ -174,8 +211,9 @@ module.exports = async function handler(req, res) {
       installed: true,
       persisted: false,
       error: "token_persistence_failed",
+      backend: persistence.backend,
       message:
-        "Token exchange succeeded but the configured GHL_TOKEN_STORAGE_URL did not accept the tokens. Check the sink and re-run the install.",
+        "Token exchange succeeded but the configured storage did not accept the tokens. Check the sink and re-run the install.",
       provider_status: persistence.status,
     });
   }
@@ -184,6 +222,7 @@ module.exports = async function handler(req, res) {
     ok: true,
     installed: true,
     persisted: true,
+    backend: persistence.backend,
     location_id: tokens.locationId || null,
     scope: tokens.scope || null,
     expires_in: tokens.expires_in || null,

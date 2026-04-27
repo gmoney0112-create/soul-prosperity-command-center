@@ -17,13 +17,17 @@ module.exports = async function handler(req, res) {
     return methodNotAllowed(res, ["GET", "HEAD"]);
   }
   const summary = readinessSummary();
+  // Token storage (Vercel KV or GHL_TOKEN_STORAGE_URL) is required for
+  // oauth=true so operators know tokens will actually be persisted after
+  // the install redirect. Without storage the OAuth round-trip succeeds
+  // but tokens go nowhere, making the install incomplete.
   const oauthReady =
     summary.oauth.clientId &&
     summary.oauth.clientSecret &&
-    summary.oauth.redirectUri;
+    summary.oauth.redirectUri &&
+    summary.oauth.tokenStorageConfigured;
   // Webhook signature verification uses HighLevel's published public
-  // keys baked into the repo — no env secret is required for it. The
-  // route is "ready" as long as the function can run.
+  // keys baked into the repo — no env secret is required for it.
   const webhookReady = summary.webhook.signatureVerification === true;
 
   return jsonResponse(res, 200, {

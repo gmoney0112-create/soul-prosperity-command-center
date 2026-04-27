@@ -245,7 +245,7 @@ const SERVER_ENV_LAUNCH = [
   "GHL_CLIENT_ID",
   "GHL_CLIENT_SECRET",
   "GHL_OAUTH_REDIRECT_URI",
-  "GHL_TOKEN_STORAGE_URL",
+  // GHL_TOKEN_STORAGE_URL handled separately below — KV is an alternative.
 ];
 
 function checkServerlessRoutes() {
@@ -294,6 +294,21 @@ function checkServerEnvLaunch() {
         `Server env ${name} is unset — required in production Vercel project before live OAuth/webhook traffic`
       );
     }
+  }
+  // Token storage: either Vercel KV (preferred) or GHL_TOKEN_STORAGE_URL.
+  // Vercel injects KV_REST_API_URL + KV_REST_API_TOKEN automatically when
+  // a KV store is connected (Project -> Storage -> Connect KV Store).
+  const hasKv =
+    !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_URL.trim()) &&
+    !!(process.env.KV_REST_API_TOKEN && process.env.KV_REST_API_TOKEN.trim());
+  const hasUrl =
+    !!(process.env.GHL_TOKEN_STORAGE_URL &&
+      process.env.GHL_TOKEN_STORAGE_URL.trim());
+  if (!hasKv && !hasUrl) {
+    warnings.push(
+      "Server env GHL_TOKEN_STORAGE_URL is unset — required in production Vercel project before live OAuth/webhook traffic" +
+        " (alternatively, connect a Vercel KV store so KV_REST_API_URL and KV_REST_API_TOKEN are injected automatically)"
+    );
   }
 }
 

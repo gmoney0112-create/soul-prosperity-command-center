@@ -188,6 +188,75 @@ async function run(name, fn) {
     assert(res.status === 405, "status 405");
   });
 
+  await run("health: oauth=false when credentials set but no storage", async () => {
+    process.env.GHL_CLIENT_ID = "test-client-id";
+    process.env.GHL_CLIENT_SECRET = "test-secret";
+    process.env.GHL_OAUTH_REDIRECT_URI = "https://example.com/api/ghl/oauth/callback";
+    delete process.env.GHL_TOKEN_STORAGE_URL;
+    delete process.env.KV_REST_API_URL;
+    delete process.env.KV_REST_API_TOKEN;
+    try {
+      const req = makeReq({ method: "GET", url: "/api/ghl/health" });
+      const res = makeRes();
+      await healthHandler(req, res);
+      const json = JSON.parse(res.body);
+      assert(json.ready.oauth === false, "oauth=false without storage");
+      assert(json.config.oauth.tokenStorageConfigured === false, "tokenStorageConfigured=false");
+      assert(json.config.oauth.tokenStorageBackend === "none", "tokenStorageBackend=none");
+    } finally {
+      delete process.env.GHL_CLIENT_ID;
+      delete process.env.GHL_CLIENT_SECRET;
+      delete process.env.GHL_OAUTH_REDIRECT_URI;
+    }
+  });
+
+  await run("health: oauth=true when credentials + URL storage configured", async () => {
+    process.env.GHL_CLIENT_ID = "test-client-id";
+    process.env.GHL_CLIENT_SECRET = "test-secret";
+    process.env.GHL_OAUTH_REDIRECT_URI = "https://example.com/api/ghl/oauth/callback";
+    process.env.GHL_TOKEN_STORAGE_URL = "https://sink.example.com/ghl/tokens";
+    delete process.env.KV_REST_API_URL;
+    delete process.env.KV_REST_API_TOKEN;
+    try {
+      const req = makeReq({ method: "GET", url: "/api/ghl/health" });
+      const res = makeRes();
+      await healthHandler(req, res);
+      const json = JSON.parse(res.body);
+      assert(json.ready.oauth === true, "oauth=true with URL storage");
+      assert(json.config.oauth.tokenStorageConfigured === true, "tokenStorageConfigured=true");
+      assert(json.config.oauth.tokenStorageBackend === "url", "tokenStorageBackend=url");
+    } finally {
+      delete process.env.GHL_CLIENT_ID;
+      delete process.env.GHL_CLIENT_SECRET;
+      delete process.env.GHL_OAUTH_REDIRECT_URI;
+      delete process.env.GHL_TOKEN_STORAGE_URL;
+    }
+  });
+
+  await run("health: oauth=true when credentials + KV env vars configured", async () => {
+    process.env.GHL_CLIENT_ID = "test-client-id";
+    process.env.GHL_CLIENT_SECRET = "test-secret";
+    process.env.GHL_OAUTH_REDIRECT_URI = "https://example.com/api/ghl/oauth/callback";
+    delete process.env.GHL_TOKEN_STORAGE_URL;
+    process.env.KV_REST_API_URL = "https://kv.upstash.io/abc123";
+    process.env.KV_REST_API_TOKEN = "kv-token-xyz";
+    try {
+      const req = makeReq({ method: "GET", url: "/api/ghl/health" });
+      const res = makeRes();
+      await healthHandler(req, res);
+      const json = JSON.parse(res.body);
+      assert(json.ready.oauth === true, "oauth=true with KV storage");
+      assert(json.config.oauth.tokenStorageConfigured === true, "tokenStorageConfigured=true");
+      assert(json.config.oauth.tokenStorageBackend === "vercel-kv", "tokenStorageBackend=vercel-kv");
+    } finally {
+      delete process.env.GHL_CLIENT_ID;
+      delete process.env.GHL_CLIENT_SECRET;
+      delete process.env.GHL_OAUTH_REDIRECT_URI;
+      delete process.env.KV_REST_API_URL;
+      delete process.env.KV_REST_API_TOKEN;
+    }
+  });
+
   // ── /api/ghl/oauth/callback ────────────────────────────────────
   await run("oauth: missing env returns 500 server_not_configured", async () => {
     delete process.env.GHL_CLIENT_ID;
@@ -255,6 +324,8 @@ async function run(name, fn) {
 
   await run("oauth: success without storage URL returns persisted=false", async () => {
     delete process.env.GHL_TOKEN_STORAGE_URL;
+    delete process.env.KV_REST_API_URL;
+    delete process.env.KV_REST_API_TOKEN;
     const originalFetch = global.fetch;
     global.fetch = async () => ({
       ok: true,
@@ -326,12 +397,120 @@ async function run(name, fn) {
       assert(res.status === 200, "status 200");
       const json = JSON.parse(res.body);
       assert(json.persisted === true, "persisted=true");
+      assert(json.backend === "url", "backend=url");
       assert(seen.length === 1, "sink received exactly one POST");
       assert(seen[0].access_token === "at_xyz", "sink got access_token");
       assert(seen[0].refresh_token === "rt_xyz", "sink got refresh_token");
       assert(!res.body.includes("at_xyz"), "browser response still has no token");
     } finally {
       global.fetch = originalFetch;
+      delete process.env.GHL_TOKEN_STORAGE_URL;
+    }
+  });
+
+  await run("oauth: success with KV storage stores token, persisted=true, no token in response", async () => {
+    delete process.env.GHL_TOKEN_STORAGE_URL;
+    process.env.KV_REST_API_URL = "https://kv.upstash.io/abc123";
+    process.env.KV_REST_API_TOKEN = "kv-token-xyz";
+    const seen = [];
+    const originalFetch = global.fetch;
+    global.fetch = async (url, init) => {
+      if (url === "https://services.leadconnectorhq.com/oauth/token") {
+        return {
+          ok: true,
+          status: 200,
+          text: async () =>
+            JSON.stringify({
+              access_token: "at_kv_xyz",
+              refresh_token: "rt_kv_xyz",
+              expires_in: 86399,
+              scope: "contacts.readonly",
+              locationId: "loc_kv_1",
+            }),
+        };
+      }
+      // KV pipeline call
+      if (url.startsWith("https://kv.upstash.io")) {
+        seen.push({ url, body: JSON.parse(init.body) });
+        return { ok: true, status: 200, text: async () => '{"result":"OK"}' };
+      }
+      throw new Error("unexpected fetch " + url);
+    };
+    try {
+      const req = makeReq({
+        method: "GET",
+        url: "/api/ghl/oauth/callback?code=good",
+      });
+      const res = makeRes();
+      await oauthHandler(req, res);
+      assert(res.status === 200, "status 200");
+      const json = JSON.parse(res.body);
+      assert(json.installed === true, "installed=true");
+      assert(json.persisted === true, "persisted=true");
+      assert(json.backend === "vercel-kv", "backend=vercel-kv");
+      assert(seen.length === 1, "KV pipeline received exactly one call");
+      const kvCmd = seen[0].body[0]; // first command in pipeline
+      assert(kvCmd[0] === "SET", "KV command is SET");
+      assert(
+        typeof kvCmd[1] === "string" && kvCmd[1].startsWith("ghl:oauth:"),
+        "KV key is deterministic ghl:oauth: prefix"
+      );
+      const stored = JSON.parse(kvCmd[2]);
+      assert(stored.access_token === "at_kv_xyz", "KV stored access_token");
+      assert(stored.refresh_token === "rt_kv_xyz", "KV stored refresh_token");
+      assert(kvCmd[3] === "EX", "KV has EX expiry flag");
+      assert(typeof kvCmd[4] === "number" && kvCmd[4] > 0, "KV TTL is positive");
+      // Tokens must never appear in the browser response.
+      assert(!res.body.includes("at_kv_xyz"), "browser response has no access_token");
+      assert(!res.body.includes("rt_kv_xyz"), "browser response has no refresh_token");
+      assert(!res.body.includes("super-secret"), "browser response has no client_secret");
+    } finally {
+      global.fetch = originalFetch;
+      delete process.env.KV_REST_API_URL;
+      delete process.env.KV_REST_API_TOKEN;
+    }
+  });
+
+  await run("oauth: KV storage failure produces safe 502 with no token leak", async () => {
+    delete process.env.GHL_TOKEN_STORAGE_URL;
+    process.env.KV_REST_API_URL = "https://kv.upstash.io/abc123";
+    process.env.KV_REST_API_TOKEN = "kv-token-xyz";
+    const originalFetch = global.fetch;
+    global.fetch = async (url) => {
+      if (url === "https://services.leadconnectorhq.com/oauth/token") {
+        return {
+          ok: true,
+          status: 200,
+          text: async () =>
+            JSON.stringify({
+              access_token: "at_fail",
+              refresh_token: "rt_fail",
+              expires_in: 86399,
+              locationId: "loc_fail",
+            }),
+        };
+      }
+      // KV endpoint returns 503
+      return { ok: false, status: 503, text: async () => '{"error":"unavailable"}' };
+    };
+    try {
+      const req = makeReq({
+        method: "GET",
+        url: "/api/ghl/oauth/callback?code=good",
+      });
+      const res = makeRes();
+      await oauthHandler(req, res);
+      assert(res.status === 502, "status 502 on KV failure");
+      const json = JSON.parse(res.body);
+      assert(json.ok === false, "ok=false");
+      assert(json.error === "token_persistence_failed", "error code");
+      assert(json.backend === "vercel-kv", "backend=vercel-kv in error");
+      assert(!res.body.includes("at_fail"), "no access_token in error response");
+      assert(!res.body.includes("rt_fail"), "no refresh_token in error response");
+    } finally {
+      global.fetch = originalFetch;
+      delete process.env.KV_REST_API_URL;
+      delete process.env.KV_REST_API_TOKEN;
     }
   });
 

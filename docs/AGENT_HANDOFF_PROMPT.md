@@ -169,19 +169,28 @@ You are working inside accounts the operator has already signed
 into (Vercel, Stripe, the chosen token-storage provider, the chosen
 webhook-forward sink). Your job is to:
 
-  1. **Provision the token storage sink.** The simplest option is
-     a new Vercel project route that writes to `@vercel/kv`, but a
-     Make / Zapier webhook into Google Sheets is acceptable as a
-     placeholder. Capture the resulting HTTPS URL.
+  1. **Connect a Vercel KV store** (preferred token storage — no code
+     required). In the Vercel dashboard, open the
+     `soul-prosperity-command-center` project → **Storage** tab →
+     **Connect KV Store** → select or create a store → **Connect**.
+     Vercel automatically adds `KV_REST_API_URL` and
+     `KV_REST_API_TOKEN` to the project's env vars and triggers a
+     redeploy. Skip to step 3 once done.
+
+     If you cannot connect KV, provision an HTTP sink instead (a Make/
+     Zapier webhook, an Upstash Redis REST endpoint, or your own
+     `/tokens/store` route) and capture its HTTPS URL for
+     `GHL_TOKEN_STORAGE_URL` in step 2.
 
   2. **Set Vercel env vars** on the
-     `soul-prosperity-command-center` project, Production scope:
-       - GHL_CLIENT_ID         = <from the Marketplace app>
-       - GHL_CLIENT_SECRET     = <from the Marketplace app — paste,
-                                 do NOT print, do NOT log>
+     `soul-prosperity-command-center` project, Production scope.
+     Required vars (KV vars are auto-injected from step 1 if used):
+       - GHL_CLIENT_ID          = <from the Marketplace app>
+       - GHL_CLIENT_SECRET      = <from the Marketplace app — paste,
+                                  do NOT print, do NOT log>
        - GHL_OAUTH_REDIRECT_URI = https://soul-prosperity-command-center.vercel.app/api/ghl/oauth/callback
-       - GHL_USER_TYPE         = Location
-       - GHL_TOKEN_STORAGE_URL = <the sink URL from step 1>
+       - GHL_USER_TYPE          = Location
+       - GHL_TOKEN_STORAGE_URL  = <only if not using KV from step 1>
        - GHL_WEBHOOK_FORWARD_URL = (optional) <forward sink URL>
      Trigger a redeploy after saving.
 
@@ -190,13 +199,16 @@ webhook-forward sink). Your job is to:
      and confirm:
        ready.oauth   == true
        ready.webhook == true
-     If either is false, stop and report the JSON response.
+       tokenStorageBackend == "vercel-kv"  (or "url" if using HTTP sink)
+     If ready.oauth is false, check that credentials AND storage are
+     both configured, then stop and report the full JSON response.
 
   4. **Run a real install** — open the Marketplace app's install
      URL (operator will provide), pick the throwaway sub-account,
      and confirm the callback returns
-     `{ ok: true, installed: true, persisted: true }`. Confirm the
-     token bundle landed in your sink.
+     `{ ok: true, installed: true, persisted: true, backend: "vercel-kv" }`.
+     Confirm the KV key `ghl:oauth:<locationId>` exists (or that the
+     HTTP sink received the bundle).
 
   5. **Stripe** — connect the Stripe account to the GHL sub-account
      and create the eight ladder products at the prices listed in

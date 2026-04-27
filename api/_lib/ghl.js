@@ -24,6 +24,9 @@ const DEFAULT_ALLOWED_EVENTS = [
 
 const TOKEN_URL = "https://services.leadconnectorhq.com/oauth/token";
 
+// Vercel KV token TTL: 30 days. Tokens get overwritten on each fresh install.
+const KV_TOKEN_TTL_SECONDS = 30 * 24 * 60 * 60; // 2592000
+
 // Official HighLevel webhook signing public keys.
 //
 // HighLevel publishes these in their developer docs. They are PUBLIC
@@ -155,6 +158,55 @@ function getWebhookConfig() {
     forwardUrl: readEnv("GHL_WEBHOOK_FORWARD_URL"),
     allowedEvents: getAllowedEvents(),
   };
+}
+
+// Returns Vercel KV (Upstash) REST credentials. Vercel injects
+// KV_REST_API_URL and KV_REST_API_TOKEN automatically when a KV store
+// is connected: Project -> Storage -> Connect KV Store in the dashboard.
+function getKvConfig() {
+  return {
+    restApiUrl: readEnv("KV_REST_API_URL"),
+    restApiToken: readEnv("KV_REST_API_TOKEN"),
+  };
+}
+
+// True when both Vercel KV env vars are present and non-placeholder.
+function isKvConfigured() {
+  const kv = getKvConfig();
+  return !isPlaceholder(kv.restApiUrl) && !isPlaceholder(kv.restApiToken);
+}
+
+// Store a token payload in Vercel KV under the given key with a 30-day TTL.
+// Uses the Upstash REST pipeline endpoint so the JSON value is stored
+// atomically as a Redis string without URL-encoding issues.
+// Never throws; callers inspect the return value.
+async function storeTokenInKv(key, payload) {
+  const kv = getKvConfig();
+  if (!isKvConfigured()) return { ok: false, skipped: true };
+  const value = JSON.stringify(payload);
+  const pipelineUrl = kv.restApiUrl + "/pipeline";
+  const ac = new AbortController();
+  const timer = setTimeout(() => ac.abort(), 5000);
+  try {
+    const resp = await fetch(pipelineUrl, {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + kv.restApiToken,
+        "Content-Type": "application/json",
+      },
+      // Each command is [cmd, ...args]. EX sets expiry in seconds.
+      body: JSON.stringify([["SET", key, value, "EX", KV_TOKEN_TTL_SECONDS]]),
+      signal: ac.signal,
+    });
+    return { ok: resp.ok, status: resp.status };
+  } catch (err) {
+    return {
+      ok: false,
+      error: err && err.message ? err.message : "kv_request_failed",
+    };
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function decodeSignature(sigHeader) {
@@ -367,23 +419,37 @@ async function postForm(url, params) {
   }
 }
 
-// Operator-readiness summary used by /api/ghl/health. Mirrors the
-// production-required keys in scripts/validate.js, but scoped to the
-// SERVER side: only env-var presence is reported, never values.
+// Operator-readiness summary used by /api/ghl/health. Only env-var
+// PRESENCE is reported (booleans), never values.
 //
-// Webhook signature verification is ALWAYS available because the
-// public keys are hardcoded from the HighLevel docs — we report that
-// as a static `true` rather than a configurable boolean.
+// Token storage precedence:
+//   1. Vercel KV (KV_REST_API_URL + KV_REST_API_TOKEN) -- preferred.
+//      Vercel injects these automatically when a KV store is connected
+//      in the dashboard (Project -> Storage -> Connect KV Store).
+//   2. GHL_TOKEN_STORAGE_URL -- operator HTTP sink (fallback).
+//   If neither is present, tokenStorageConfigured=false and
+//   ready.oauth will be false in /api/ghl/health.
+//
+// Webhook verification always reports true (public keys are baked in).
 function readinessSummary() {
   const oauth = getOAuthConfig();
   const wh = getWebhookConfig();
+  const kvConfigured = isKvConfigured();
+  const urlConfigured = !isPlaceholder(oauth.tokenStorageUrl);
+  const tokenStorageConfigured = kvConfigured || urlConfigured;
+  const tokenStorageBackend = kvConfigured
+    ? "vercel-kv"
+    : urlConfigured
+    ? "url"
+    : "none";
   return {
     oauth: {
       clientId: !isPlaceholder(oauth.clientId),
       clientSecret: !isPlaceholder(oauth.clientSecret),
       redirectUri: !isPlaceholder(oauth.redirectUri),
       userType: oauth.userType || "Location",
-      tokenStorageConfigured: !isPlaceholder(oauth.tokenStorageUrl),
+      tokenStorageConfigured,
+      tokenStorageBackend,
     },
     webhook: {
       signatureVerification: true,
@@ -396,6 +462,7 @@ function readinessSummary() {
 
 module.exports = {
   TOKEN_URL,
+  KV_TOKEN_TTL_SECONDS,
   DEFAULT_ALLOWED_EVENTS,
   GHL_ED25519_PUBLIC_KEY,
   GHL_RSA_PUBLIC_KEY,
@@ -408,6 +475,9 @@ module.exports = {
   getAllowedEvents,
   getOAuthConfig,
   getWebhookConfig,
+  getKvConfig,
+  isKvConfigured,
+  storeTokenInKv,
   verifyEd25519,
   verifyRsaSha256,
   verifyWebhookSignature,

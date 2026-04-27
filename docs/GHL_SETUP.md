@@ -313,7 +313,7 @@ live under `/api/ghl/`:
 | Route | Method | Purpose |
 | --- | --- | --- |
 | `/api/ghl/health` | `GET` | Returns JSON about which env vars are configured. Booleans only — never values. Safe to expose. |
-| `/api/ghl/oauth/callback` | `GET` | Receives `?code=` from HighLevel and exchanges it server-side at `services.leadconnectorhq.com/oauth/token`. Forwards the token bundle to `GHL_TOKEN_STORAGE_URL` and never returns tokens to the browser. |
+| `/api/ghl/oauth/callback` | `GET` | Receives `?code=` from HighLevel and exchanges it server-side at `services.leadconnectorhq.com/oauth/token`. Stores tokens in Vercel KV (preferred) or forwards to `GHL_TOKEN_STORAGE_URL` (fallback). Never returns tokens to the browser. |
 | `/api/ghl/webhook` | `POST` | Verifies HighLevel's webhook signature (`X-GHL-Signature` Ed25519, with `X-WH-Signature` RSA-SHA256 fallback) against the public keys baked into `api/_lib/ghl.js`. No env secret required. De-duplicates by `x-wh-id` / `x-ghl-webhook-id` best-effort in memory, validates event type against `GHL_ALLOWED_WEBHOOK_EVENTS`, and forwards to `GHL_WEBHOOK_FORWARD_URL` if set. |
 
 ### Environment variables
@@ -329,9 +329,16 @@ deployments to be exercised). For local serverless testing, copy
 | `GHL_CLIENT_SECRET` | Marketplace client_secret | **Yes** |
 | `GHL_OAUTH_REDIRECT_URI` | Must equal `https://<your-domain>/api/ghl/oauth/callback` | No |
 | `GHL_USER_TYPE` | `Location` (default) or `Company` | No |
-| `GHL_TOKEN_STORAGE_URL` | Server-side sink that stores the token bundle | **Yes** (URL may be sensitive) |
+| `KV_REST_API_URL` | Vercel KV (Upstash) endpoint — **injected automatically** when a KV store is connected to the project (Project → Storage → Connect KV Store). Preferred token storage. | No |
+| `KV_REST_API_TOKEN` | Vercel KV auth token — **injected automatically** alongside `KV_REST_API_URL`. | **Yes** |
+| `GHL_TOKEN_STORAGE_URL` | Fallback HTTP sink. Used only when KV vars above are absent. | **Yes** (URL may be sensitive) |
 | `GHL_WEBHOOK_FORWARD_URL` | Optional sink for accepted webhook payloads | Optional |
 | `GHL_ALLOWED_WEBHOOK_EVENTS` | Comma-separated allowlist (defaults to the recommended list in §4.3) | No |
+
+**Token storage is required for `ready.oauth=true`.** Either connect a
+Vercel KV store (easiest — Vercel injects the vars automatically) or
+set `GHL_TOKEN_STORAGE_URL`. Without at least one, `/api/ghl/health`
+will report `ready.oauth=false` even when client credentials are set.
 
 > Webhook signature verification does **not** use an env-var secret.
 > HighLevel signs deliveries with public-key crypto (Ed25519 / RSA);
@@ -355,17 +362,31 @@ The dashboard's GHL Wiring panel surfaces the browser-visible side;
 ### Token persistence boundary
 
 `/api/ghl/oauth/callback` does the token exchange in-process and then
-**forwards the token bundle as JSON to `GHL_TOKEN_STORAGE_URL`** —
-this is the only place tokens cross a process boundary. The
-serverless function is stateless; tokens are never written to disk in
-this repo and never returned in the HTTP response to the browser.
+stores tokens server-side. Tokens are **never** written to disk in
+this repo and **never** returned in the HTTP response to the browser.
 
-If `GHL_TOKEN_STORAGE_URL` is not set, the callback returns
-`{ ok: true, installed: true, persisted: false }` with an explicit
-operator warning. **Tokens are NOT silently dropped, but they are NOT
-stored either.** Configure a sink (your own API route writing to a
-DB, Vercel KV ingest, Upstash, an internal `/tokens/store` endpoint)
-before pointing real installs at the redirect URI.
+**Storage precedence:**
+
+1. **Vercel KV (preferred)** — when `KV_REST_API_URL` and
+   `KV_REST_API_TOKEN` are set, tokens are stored under
+   `ghl:oauth:<locationId>` with a 30-day TTL via the Upstash REST
+   pipeline API. Connect a KV store in the Vercel dashboard
+   (**Project → Storage → Connect KV Store**) and Vercel injects
+   both vars automatically — no code changes or packages required.
+   Health check: `ready.oauth=true`, `tokenStorageBackend=vercel-kv`.
+
+2. **HTTP sink fallback** — when KV is absent and
+   `GHL_TOKEN_STORAGE_URL` is set, the token bundle is POSTed as
+   JSON to that URL (an operator-owned, server-side endpoint).
+   Health check: `ready.oauth=true`, `tokenStorageBackend=url`.
+
+3. **No storage** — if neither is configured, the callback returns
+   `{ ok: true, installed: true, persisted: false }` with an explicit
+   operator warning. **Tokens are NOT silently dropped but they are
+   NOT stored.** Health check: `ready.oauth=false`.
+
+Configure at least one storage option before pointing real installs
+at the redirect URI.
 
 ### Webhook de-duplication boundary
 
