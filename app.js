@@ -25,12 +25,125 @@ const LINK_DEFINITIONS = [
 
 const CONFIG_KEY_ORDER = LINK_DEFINITIONS.map((def) => def.key);
 
+// GHL production wiring — nested under window.SP_CONFIG.ghl.*
+// These are surfaced in the dedicated "GHL Wiring" panel and do NOT
+// participate in the Config Builder (they include IDs and OAuth
+// metadata, not just URLs). Operators edit config.js directly for
+// these values; the panel reports placeholder vs. ready.
+const GHL_WIRING_DEFINITIONS = [
+  {
+    path: "ghl.locationId",
+    label: "Location ID",
+    purpose: "HighLevel sub-account ID this dashboard targets.",
+    kind: "id",
+    required: true,
+  },
+  {
+    path: "ghl.dashboardUrl",
+    label: "GHL dashboard URL",
+    purpose: "Operator entry to the sub-account home.",
+    kind: "url",
+    required: false,
+  },
+  {
+    path: "ghl.workflowsUrl",
+    label: "Workflows URL",
+    purpose: "Direct link to Automation → Workflows.",
+    kind: "url",
+    required: false,
+  },
+  {
+    path: "ghl.campaignsUrl",
+    label: "Campaigns URL",
+    purpose: "Direct link to Marketing → Campaigns.",
+    kind: "url",
+    required: false,
+  },
+  {
+    path: "ghl.contactsUrl",
+    label: "Contacts URL",
+    purpose: "Direct link to Contacts → Smart List.",
+    kind: "url",
+    required: false,
+  },
+  {
+    path: "ghl.opportunitiesUrl",
+    label: "Opportunities URL",
+    purpose: "Pipeline board for the Soul Prosperity Ladder.",
+    kind: "url",
+    required: false,
+  },
+  {
+    path: "ghl.conversationsUrl",
+    label: "Conversations URL",
+    purpose: "Inbox for inbound email/SMS replies.",
+    kind: "url",
+    required: false,
+  },
+  {
+    path: "ghl.analyticsUrl",
+    label: "Analytics URL",
+    purpose: "Reporting → Dashboard for revenue + attribution.",
+    kind: "url",
+    required: false,
+  },
+  {
+    path: "ghl.calendarBookingUrl",
+    label: "Calendar booking URL",
+    purpose: "Public booking page used in nurture and bio.",
+    kind: "url",
+    required: false,
+  },
+  {
+    path: "ghl.oauth.clientId",
+    label: "OAuth client_id",
+    purpose: "Public Marketplace client_id (safe to expose).",
+    kind: "id",
+    required: true,
+  },
+  {
+    path: "ghl.oauth.installUrl",
+    label: "OAuth install URL",
+    purpose: "Marketplace chooselocation install link operators paste.",
+    kind: "url",
+    required: true,
+  },
+  {
+    path: "ghl.oauth.redirectUri",
+    label: "OAuth redirect URI",
+    purpose: "Where HighLevel redirects with ?code=... after install.",
+    kind: "url",
+    required: true,
+  },
+  {
+    path: "ghl.webhook.targetUrl",
+    label: "Webhook target URL",
+    purpose: "Public HTTPS endpoint that receives HighLevel webhooks.",
+    kind: "url",
+    required: true,
+  },
+];
+
 function getConfig() {
   return (typeof window !== "undefined" && window.SP_CONFIG) || {};
 }
 
+function getConfigPath(path) {
+  const config = getConfig();
+  if (!path) return undefined;
+  const parts = String(path).split(".");
+  let cur = config;
+  for (const part of parts) {
+    if (cur == null || typeof cur !== "object") return undefined;
+    cur = cur[part];
+  }
+  return cur;
+}
+
 function isPlaceholder(value) {
-  if (!value) return true;
+  if (value == null) return true;
+  if (Array.isArray(value)) return value.length === 0;
+  if (typeof value === "object") return Object.keys(value).length === 0;
   const trimmed = String(value).trim();
   if (!trimmed || trimmed === "#") return true;
   if (trimmed.toUpperCase().startsWith("REPLACE_")) return true;
@@ -93,13 +206,15 @@ function applyConfigLinks() {
   const config = getConfig();
   document.querySelectorAll("[data-config-link]").forEach((el) => {
     const key = el.dataset.configLink;
-    const value = config[key];
+    const value = key && key.includes(".") ? getConfigPath(key) : config[key];
     const pending = isPlaceholder(value);
     const hideWhenPending = el.hasAttribute("data-config-fallback-hide");
 
     if (pending) {
-      el.setAttribute("href", "#wiring");
+      const fallbackTarget = key && key.startsWith("ghl.") ? "#ghl-wiring" : "#wiring";
+      el.setAttribute("href", fallbackTarget);
       el.setAttribute("data-pending", "true");
+      el.setAttribute("title", "Pending — click to see exact next setup step.");
       if (hideWhenPending) {
         el.setAttribute("hidden", "");
       }
@@ -109,6 +224,7 @@ function applyConfigLinks() {
       el.setAttribute("rel", "noopener noreferrer");
       el.removeAttribute("data-pending");
       el.removeAttribute("hidden");
+      el.removeAttribute("title");
     }
   });
 }
@@ -490,6 +606,126 @@ function bindEvents() {
   });
 }
 
+function renderGhlWiring() {
+  const list = document.querySelector("[data-ghl-wiring-list]");
+  if (!list) return;
+
+  let ready = 0;
+  let pending = 0;
+  let requiredPending = 0;
+  const fragment = document.createDocumentFragment();
+
+  GHL_WIRING_DEFINITIONS.forEach((def) => {
+    const value = getConfigPath(def.path);
+    const isPending = isPlaceholder(value);
+    if (isPending) {
+      pending += 1;
+      if (def.required) requiredPending += 1;
+    } else {
+      ready += 1;
+    }
+
+    const item = document.createElement("li");
+    item.className = "wiring-item";
+    item.dataset.status = isPending ? "pending" : "ready";
+    item.dataset.required = def.required ? "true" : "false";
+
+    const head = document.createElement("div");
+    head.className = "wiring-head";
+
+    const title = document.createElement("strong");
+    title.textContent = def.label;
+
+    const badge = document.createElement("span");
+    badge.className = "wiring-badge";
+    if (isPending) {
+      badge.textContent = def.required ? "placeholder · required" : "placeholder";
+    } else {
+      badge.textContent = "ready";
+    }
+
+    head.appendChild(title);
+    head.appendChild(badge);
+
+    const purpose = document.createElement("p");
+    purpose.className = "wiring-purpose";
+    purpose.textContent = def.purpose;
+
+    const meta = document.createElement("p");
+    meta.className = "wiring-meta";
+    if (isPending) {
+      meta.textContent = `config.js → SP_CONFIG.${def.path} (not set) — see docs/GHL_SETUP.md`;
+    } else if (def.kind === "url") {
+      const link = document.createElement("a");
+      link.href = String(value);
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = String(value);
+      meta.appendChild(document.createTextNode(`SP_CONFIG.${def.path}: `));
+      meta.appendChild(link);
+    } else {
+      const code = document.createElement("code");
+      code.textContent = String(value);
+      meta.appendChild(document.createTextNode(`SP_CONFIG.${def.path}: `));
+      meta.appendChild(code);
+    }
+
+    item.appendChild(head);
+    item.appendChild(purpose);
+    item.appendChild(meta);
+    fragment.appendChild(item);
+  });
+
+  list.replaceChildren(fragment);
+
+  const total = GHL_WIRING_DEFINITIONS.length;
+  const setText = (selector, value) => {
+    const el = document.querySelector(selector);
+    if (el) el.textContent = String(value);
+  };
+  setText("[data-ghl-ready]", ready);
+  setText("[data-ghl-pending]", pending);
+  setText("[data-ghl-required-pending]", requiredPending);
+  setText("[data-ghl-total]", total);
+
+  // Render the static OAuth + API + webhook reference summary so the
+  // operator can see the exact endpoints without leaving the page.
+  const config = getConfig();
+  const ghl = (config && config.ghl) || {};
+  const api = ghl.api || {};
+  const webhook = ghl.webhook || {};
+  const oauth = ghl.oauth || {};
+
+  const setCode = (selector, text) => {
+    const el = document.querySelector(selector);
+    if (el) el.textContent = text || "—";
+  };
+  setCode("[data-ghl-api-base]", api.base);
+  setCode("[data-ghl-api-version]", api.version);
+  setCode("[data-ghl-api-token-url]", api.tokenUrl);
+  setCode("[data-ghl-api-auth-base]", api.authBaseUrl);
+  setCode("[data-ghl-oauth-scopes]", oauth.scopes);
+
+  const eventsList = document.querySelector("[data-ghl-webhook-events]");
+  if (eventsList) {
+    eventsList.replaceChildren();
+    const events = Array.isArray(webhook.events) ? webhook.events : [];
+    if (events.length === 0) {
+      const li = document.createElement("li");
+      li.textContent = "No events configured.";
+      eventsList.appendChild(li);
+    } else {
+      events.forEach((ev) => {
+        const li = document.createElement("li");
+        const code = document.createElement("code");
+        code.textContent = ev;
+        li.appendChild(code);
+        eventsList.appendChild(li);
+      });
+    }
+  }
+}
+
 setTheme(state.theme);
 bindEvents();
 bindBuilderEvents();
@@ -498,5 +734,6 @@ updateReadiness();
 updateCalculator();
 applyConfigLinks();
 renderWiringStatus();
+renderGhlWiring();
 renderBuilderForm();
 updateBuilder();

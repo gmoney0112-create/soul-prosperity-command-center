@@ -47,6 +47,7 @@
       <nav class="top-nav" aria-label="Page sections">
         <button class="nav-link" data-scroll-target="ladder">Ladder</button>
         <button class="nav-link" data-scroll-target="automation">GHL</button>
+        <button class="nav-link" data-scroll-target="ghl-wiring">GHL Wiring</button>
         <button class="nav-link" data-scroll-target="launch">Launch</button>
         <button class="nav-link" data-scroll-target="content">Content</button>
         <button class="nav-link" data-scroll-target="metrics">Money</button>
@@ -278,6 +279,73 @@
         </div>
       </section>
 
+      <section class="panel-section" id="ghl-wiring" aria-labelledby="ghl-wiring-title">
+        <div class="section-heading wide-heading">
+          <p class="eyebrow gold">GHL Production Wiring</p>
+          <h2 id="ghl-wiring-title">HighLevel install, location, webhook, and API connection</h2>
+          <p>
+            This panel reflects <code>window.SP_CONFIG.ghl.*</code> in
+            <code>config.js</code>. Required values must be replaced before
+            launch. Secrets (OAuth client_secret, access tokens, webhook
+            signing secret) are intentionally NOT stored here — they belong
+            in a backend / serverless function. See
+            <a href="./docs/GHL_SETUP.md">docs/GHL_SETUP.md</a> for the full
+            operator setup guide and exact next steps.
+          </p>
+        </div>
+
+        <div class="wiring-panel">
+          <div class="wiring-summary" aria-label="GHL wiring summary">
+            <article>
+              <span>Ready</span>
+              <strong data-ghl-ready>0</strong>
+            </article>
+            <article>
+              <span>Placeholders</span>
+              <strong data-ghl-pending>0</strong>
+            </article>
+            <article>
+              <span>Required missing</span>
+              <strong data-ghl-required-pending>0</strong>
+            </article>
+            <article>
+              <span>Total</span>
+              <strong data-ghl-total>0</strong>
+            </article>
+          </div>
+
+          <ul class="wiring-list" data-ghl-wiring-list role="list"></ul>
+
+          <div class="ghl-reference">
+            <h3>API endpoints (v2)</h3>
+            <dl class="ghl-reference-list">
+              <dt>Base</dt>
+              <dd><code data-ghl-api-base>—</code></dd>
+              <dt>Version header</dt>
+              <dd><code data-ghl-api-version>—</code> &middot; sent as <code>Version: 2021-07-28</code></dd>
+              <dt>Token endpoint</dt>
+              <dd><code data-ghl-api-token-url>—</code></dd>
+              <dt>Marketplace install base</dt>
+              <dd><code data-ghl-api-auth-base>—</code></dd>
+              <dt>Auth header</dt>
+              <dd><code>Authorization: Bearer &lt;access_token&gt;</code></dd>
+            </dl>
+
+            <h3>OAuth scopes (configured in Marketplace app)</h3>
+            <p><code data-ghl-oauth-scopes>—</code></p>
+
+            <h3>Subscribed webhook events</h3>
+            <ul class="ghl-event-list" data-ghl-webhook-events></ul>
+            <p class="ghl-reference-note">
+              Receivers must respond <strong>2xx within 10s</strong>, verify the
+              <code>x-wh-signature</code> webhook signature, and de-duplicate by
+              webhook id. Use upsert / search Contacts endpoints rather than the
+              deprecated plain "Get Contacts" list.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section class="panel-section" id="launch" aria-labelledby="launch-title">
         <div class="section-heading wide-heading">
           <p class="eyebrow gold">Launch Readiness</p>
@@ -355,6 +423,11 @@
           <a href="#" data-config-link="ghlWorkflows">GHL workflows</a>
           <a href="#" data-config-link="analytics">Analytics</a>
           <a href="#" data-config-link="socialBioLink">Social bio link</a>
+          <a href="#" data-config-link="ghl.contactsUrl">GHL contacts</a>
+          <a href="#" data-config-link="ghl.opportunitiesUrl">GHL opportunities</a>
+          <a href="#" data-config-link="ghl.conversationsUrl">GHL conversations</a>
+          <a href="#" data-config-link="ghl.calendarBookingUrl">Booking calendar</a>
+          <a href="#" data-config-link="ghl.oauth.installUrl">Install GHL app</a>
         </div>
       </section>
 

@@ -1,0 +1,36 @@
+{
+  "_meta": {
+    "purpose": "Sample HighLevel webhook payload for the ContactCreate event. Shape is approximate and reflects HighLevel v2 (api.leadconnectorhq.com / services.leadconnectorhq.com) as of 2026. Use this as a reference when building your webhook receiver — verify the live shape against your own test deliveries.",
+    "headers_to_expect": {
+      "content-type": "application/json",
+      "x-wh-signature": "<HMAC-SHA256 hex of the raw body, signed with the webhook signing secret issued in the Marketplace app>",
+      "x-wh-id": "<unique webhook delivery id — use for de-duplication>"
+    },
+    "receiver_requirements": [
+      "Respond 2xx within 10 seconds.",
+      "Verify x-wh-signature with timing-safe comparison before trusting the body.",
+      "De-duplicate by x-wh-id across at least the last 24h.",
+      "Process work asynchronously (queue + ack)."
+    ]
+  },
+  "type": "ContactCreate",
+  "locationId": "abc123XYZ",
+  "companyId": "comp_456",
+  "webhookId": "wh_01HSAMPLE0123456789",
+  "timestamp": "2026-04-27T14:31:02.123Z",
+  "contact": {
+    "id": "contact_01HSAMPLE0123",
+    "locationId": "abc123XYZ",
+    "firstName": "Soul",
+    "lastName": "Prosperity",
+    "email": "buyer@example.com",
+    "phone": "+15551234567",
+    "tags": ["lead-freebie"],
+    "source": "instagram-reel",
+    "dateAdded": "2026-04-27T14:31:02.000Z",
+    "customFields": [
+      { "id": "cf_freebie_source", "key": "freebie_source", "value": "instagram-reel" },
+      { "id": "cf_preferred_channel", "key": "preferred_channel", "value": "email" }
+    ]
+  }
+}

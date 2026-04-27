@@ -75,6 +75,31 @@ The **Launch Links** panel at the bottom of the page lists every required link, 
 
 No build step is required — edit `config.js`, save, and reload the page.
 
+## GoHighLevel production wiring
+
+The dashboard also exposes a structured `window.SP_CONFIG.ghl` block in `config.js` covering:
+
+- Sub-account `locationId` and operator entry URLs (dashboard, workflows, campaigns, contacts, opportunities, conversations, analytics, booking calendar).
+- Marketplace OAuth metadata: public `clientId`, full `installUrl` (the v2 `chooselocation` URL), `redirectUri`, and the recommended scope list.
+- Fixed v2 API endpoints (`https://services.leadconnectorhq.com`, token URL, marketplace install base, version header `2021-07-28`).
+- Webhook target URL and the recommended subscribed events list (`ContactCreate`, `ContactUpdate`, `ContactTagUpdate`, `OpportunityCreate`, `OpportunityStatusUpdate`, `InboundMessage`, `OutboundMessage`, `OrderCreate`, `AppInstall`, `AppUninstall`).
+
+The **GHL Wiring** section in the top nav shows live status for each value (`ready` / `placeholder` / `placeholder · required`) and renders the static API endpoint reference so an operator never has to leave the page to find the auth header or token URL.
+
+**Secrets do not live in this repo.** OAuth `client_secret`, per-location access/refresh tokens, and the webhook signing secret stay on a backend or serverless function you own. The static dashboard never sees them.
+
+See [`docs/GHL_SETUP.md`](./docs/GHL_SETUP.md) for the full operator setup guide:
+
+- Creating the Marketplace app and choosing scopes.
+- Building the install URL and exchanging the auth code at `https://services.leadconnectorhq.com/oauth/token`.
+- Production API call shape (`Authorization: Bearer …`, `Version: 2021-07-28`, base `https://services.leadconnectorhq.com`).
+- Webhook receiver requirements (2xx in 10s, signature verification, webhook-id de-duplication, install/uninstall handling).
+- Exact `config.js` paths to populate.
+
+A populated example is at [`config.sample.js`](./config.sample.js); a sample inbound webhook payload is at [`samples/ghl-webhook-payload.json`](./samples/ghl-webhook-payload.json).
+
+`npm run check` enforces that the `SP_CONFIG.ghl` schema keys are all present in `config.js`. Production-required values that are still on placeholders (`ghl.locationId`, `ghl.oauth.clientId`, `ghl.oauth.installUrl`, `ghl.oauth.redirectUri`, `ghl.webhook.targetUrl`) are reported as **launch checklist warnings** — they do not fail the build, but the dashboard will display them as `placeholder · required` until resolved.
+
 ## Config Builder (operator workflow)
 
 The **Config Builder** section (reachable from the top nav) is a local utility for generating the exact `config.js` block without hand-editing the file.
