@@ -88,6 +88,32 @@ The **GHL Wiring** section in the top nav shows live status for each value (`rea
 
 **Secrets do not live in this repo.** OAuth `client_secret`, per-location access/refresh tokens, and the webhook signing secret stay on a backend or serverless function you own. The static dashboard never sees them.
 
+### Bundled serverless layer (`/api/ghl/*`)
+
+This repo also ships a minimal Vercel-compatible serverless layer that implements the OAuth callback and webhook receiver. The static dashboard is unchanged — these routes are additive and only run when deployed to Vercel (or invoked locally via `vercel dev`).
+
+| Route | Purpose |
+| --- | --- |
+| `GET /api/ghl/health` | Returns JSON about which server env vars are configured. Booleans only — never values. |
+| `GET /api/ghl/oauth/callback` | Exchanges `?code=` server-side at `services.leadconnectorhq.com/oauth/token` and forwards the token bundle to `GHL_TOKEN_STORAGE_URL`. Tokens never reach the browser. |
+| `POST /api/ghl/webhook` | Verifies `x-wh-signature` HMAC, de-duplicates by `x-wh-id` (best-effort in-memory), allowlists event types, and forwards to `GHL_WEBHOOK_FORWARD_URL` if set. |
+
+Configure these env vars in the Vercel project (see `.env.example` and [`docs/GHL_SETUP.md`](./docs/GHL_SETUP.md) §5b for full details):
+
+- `GHL_CLIENT_ID`, `GHL_CLIENT_SECRET`, `GHL_OAUTH_REDIRECT_URI`, `GHL_USER_TYPE`
+- `GHL_TOKEN_STORAGE_URL` — server-to-server sink for the exchanged token bundle. Required for tokens to actually persist; if unset, the callback returns `persisted: false` with an explicit operator warning rather than silently dropping the tokens.
+- `GHL_WEBHOOK_SIGNING_SECRET`, `GHL_WEBHOOK_FORWARD_URL`, `GHL_ALLOWED_WEBHOOK_EVENTS`
+
+`GHL_OAUTH_REDIRECT_URI` must exactly match `SP_CONFIG.ghl.oauth.redirectUri`; the canonical value is `https://<your-domain>/api/ghl/oauth/callback`. Likewise, `SP_CONFIG.ghl.webhook.targetUrl` should be `https://<your-domain>/api/ghl/webhook`.
+
+Smoke-test the handlers locally without booting Vercel:
+
+```bash
+npm run smoke:serverless
+```
+
+`npm run check` runs the same smoke tests in addition to static validation.
+
 See [`docs/GHL_SETUP.md`](./docs/GHL_SETUP.md) for the full operator setup guide:
 
 - Creating the Marketplace app and choosing scopes.

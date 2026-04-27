@@ -178,10 +178,96 @@ function checkRequiredFiles() {
   }
 }
 
+// Serverless layer: routes under api/ghl/* are Vercel Node functions.
+// We don't execute them here, but we do enforce: (1) syntax via
+// require-with-stub, (2) shape — each route exports a function, (3)
+// no client-side secret leakage (i.e. no `window.SP_CONFIG = ...`
+// assignments and no `localStorage`/`sessionStorage` usage in the
+// server code, which would indicate confused-deputy code), and (4)
+// production launch warnings for missing env vars when running in CI
+// with the relevant env present.
+const SERVERLESS_ROUTES = [
+  {
+    file: "api/ghl/health.js",
+    expectsFunction: true,
+  },
+  {
+    file: "api/ghl/oauth/callback.js",
+    expectsFunction: true,
+  },
+  {
+    file: "api/ghl/webhook.js",
+    expectsFunction: true,
+  },
+  {
+    file: "api/_lib/ghl.js",
+    expectsFunction: false,
+  },
+];
+
+const SERVER_ENV_LAUNCH = [
+  "GHL_CLIENT_ID",
+  "GHL_CLIENT_SECRET",
+  "GHL_OAUTH_REDIRECT_URI",
+  "GHL_TOKEN_STORAGE_URL",
+  "GHL_WEBHOOK_SIGNING_SECRET",
+];
+
+function checkServerlessRoutes() {
+  const forbiddenInServer = [
+    "window.SP_CONFIG",
+    "localStorage",
+    "sessionStorage",
+    "document.cookie",
+  ];
+  for (const route of SERVERLESS_ROUTES) {
+    const full = path.join(repoRoot, route.file);
+    if (!fs.existsSync(full)) {
+      errors.push(`Serverless route missing: ${route.file}`);
+      continue;
+    }
+    const src = read(full);
+    for (const token of forbiddenInServer) {
+      if (src.includes(token)) {
+        errors.push(
+          `Forbidden client API '${token}' found in server file ${route.file}`
+        );
+      }
+    }
+    let mod;
+    try {
+      // Clear cache so repeated runs reflect edits.
+      delete require.cache[require.resolve(full)];
+      mod = require(full);
+    } catch (err) {
+      errors.push(`Serverless route failed to load (${route.file}): ${err.message}`);
+      continue;
+    }
+    if (route.expectsFunction && typeof mod !== "function") {
+      errors.push(
+        `Serverless route ${route.file} must module.exports a (req, res) handler function`
+      );
+    }
+  }
+}
+
+function checkServerEnvLaunch() {
+  for (const name of SERVER_ENV_LAUNCH) {
+    const v = process.env[name];
+    if (!v || !String(v).trim()) {
+      warnings.push(
+        `Server env ${name} is unset — required in production Vercel project before live OAuth/webhook traffic`
+      );
+    }
+  }
+}
+
 checkRequiredFiles();
 checkReferencedAssets();
 checkForbiddenBrowserApis();
 checkGhlConfig();
+checkServerlessRoutes();
+checkServerEnvLaunch();
 
 if (errors.length > 0) {
   console.error("Validation failed:");

@@ -277,6 +277,116 @@ The **GHL Wiring** panel will turn each row from `placeholder` /
 
 ---
 
+## 5b. Serverless layer in this repo (Vercel)
+
+This repo ships a minimal Vercel-compatible serverless layer that
+implements the OAuth callback and webhook receiver described above.
+The static dashboard is unchanged — these routes are additive. They
+live under `/api/ghl/`:
+
+| Route | Method | Purpose |
+| --- | --- | --- |
+| `/api/ghl/health` | `GET` | Returns JSON about which env vars are configured. Booleans only — never values. Safe to expose. |
+| `/api/ghl/oauth/callback` | `GET` | Receives `?code=` from HighLevel and exchanges it server-side at `services.leadconnectorhq.com/oauth/token`. Forwards the token bundle to `GHL_TOKEN_STORAGE_URL` and never returns tokens to the browser. |
+| `/api/ghl/webhook` | `POST` | Verifies `x-wh-signature` (when `GHL_WEBHOOK_SIGNING_SECRET` is set), de-duplicates by `x-wh-id` best-effort in memory, validates event type against `GHL_ALLOWED_WEBHOOK_EVENTS`, and forwards to `GHL_WEBHOOK_FORWARD_URL` if set. |
+
+### Environment variables
+
+Configure these in **Vercel → Project → Settings → Environment
+Variables** for **Production** (and **Preview** if you want PR
+deployments to be exercised). For local serverless testing, copy
+`.env.example` to `.env.local` and run `vercel dev`.
+
+| Variable | Purpose | Secret? |
+| --- | --- | --- |
+| `GHL_CLIENT_ID` | Public Marketplace client_id | No |
+| `GHL_CLIENT_SECRET` | Marketplace client_secret | **Yes** |
+| `GHL_OAUTH_REDIRECT_URI` | Must equal `https://<your-domain>/api/ghl/oauth/callback` | No |
+| `GHL_USER_TYPE` | `Location` (default) or `Company` | No |
+| `GHL_TOKEN_STORAGE_URL` | Server-side sink that stores the token bundle | **Yes** (URL may be sensitive) |
+| `GHL_WEBHOOK_SIGNING_SECRET` | HMAC-SHA256 key for webhook verification | **Yes** |
+| `GHL_WEBHOOK_FORWARD_URL` | Optional sink for accepted webhook payloads | Optional |
+| `GHL_ALLOWED_WEBHOOK_EVENTS` | Comma-separated allowlist (defaults to the recommended list in §4.3) | No |
+
+### Mapping back to `config.js`
+
+Operators must keep these in sync:
+
+- `SP_CONFIG.ghl.oauth.redirectUri` (browser-visible) **must equal**
+  `GHL_OAUTH_REDIRECT_URI` (server-only).
+- `SP_CONFIG.ghl.webhook.targetUrl` (browser-visible) **must equal**
+  `https://<your-domain>/api/ghl/webhook`.
+- `SP_CONFIG.ghl.oauth.clientId` (browser-visible) **must equal**
+  `GHL_CLIENT_ID` (server-only).
+
+The dashboard's GHL Wiring panel surfaces the browser-visible side;
+`/api/ghl/health` surfaces the server-side. They should agree.
+
+### Token persistence boundary
+
+`/api/ghl/oauth/callback` does the token exchange in-process and then
+**forwards the token bundle as JSON to `GHL_TOKEN_STORAGE_URL`** —
+this is the only place tokens cross a process boundary. The
+serverless function is stateless; tokens are never written to disk in
+this repo and never returned in the HTTP response to the browser.
+
+If `GHL_TOKEN_STORAGE_URL` is not set, the callback returns
+`{ ok: true, installed: true, persisted: false }` with an explicit
+operator warning. **Tokens are NOT silently dropped, but they are NOT
+stored either.** Configure a sink (your own API route writing to a
+DB, Vercel KV ingest, Upstash, an internal `/tokens/store` endpoint)
+before pointing real installs at the redirect URI.
+
+### Webhook de-duplication boundary
+
+`/api/ghl/webhook` keeps an in-memory `Map` of recently seen webhook
+ids with a 24h TTL. **This is best-effort dev-grade de-dup only** —
+Vercel serverless instances are short-lived and not shared across
+invocations. For production, add a Redis / Vercel KV / Upstash check
+either inside this function or in the sink at `GHL_WEBHOOK_FORWARD_URL`.
+The current behavior is documented as a TODO in the function header.
+
+### Local testing
+
+```bash
+# 1. Install Vercel CLI once
+npm i -g vercel
+
+# 2. Run the full stack locally (static + functions)
+cp .env.example .env.local
+# fill GHL_* values in .env.local, then:
+vercel dev
+
+# 3. Smoke tests (no Vercel needed — runs handlers in-process)
+npm run smoke:serverless
+
+# 4. Static + serverless validation (CI parity)
+npm run check
+```
+
+### curl examples
+
+```bash
+# Readiness
+curl -s https://<your-domain>/api/ghl/health | jq
+
+# Webhook (signed)
+SECRET="$GHL_WEBHOOK_SIGNING_SECRET"
+BODY='{"type":"ContactCreate","webhookId":"wh_test_001","contact":{"email":"x@y.z"}}'
+SIG=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $2}')
+curl -s -X POST https://<your-domain>/api/ghl/webhook \
+  -H "Content-Type: application/json" \
+  -H "x-wh-signature: $SIG" \
+  -H "x-wh-id: wh_test_001" \
+  --data "$BODY"
+
+# OAuth callback (HighLevel calls this; you don't normally curl it)
+# To test the missing-env path:
+curl -s "https://<your-domain>/api/ghl/oauth/callback?code=fake"
+```
+
+---
+
 ## 6. What stays out of this repo
 
 These values are **secrets**. They never go in `config.js`, never go
