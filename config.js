@@ -33,7 +33,7 @@ window.SP_CONFIG = {
 
   // Skool community paths
   skoolTrial: "https://skool.com/money-masters-academy-5443/about",
-  skoolAnnual: "#",
+  skoolAnnual: "https://skool.com/money-masters-academy-5443/about",
   lifetimeAccess: "https://link.fastpaydirect.com/payment-link/69ef60c87dd3512d9207b2ac",
 
   // Operations tooling (legacy flat shortcuts — kept for back compat)
