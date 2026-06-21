@@ -26,13 +26,13 @@ window.SP_CONFIG = {
   // Checkout links for each paid offer
   ebook7Checkout: "https://link.fastpaydirect.com/payment-link/69ef5c807dd3512d9207b2a2",
   audio17Checkout: "https://link.fastpaydirect.com/payment-link/69ef5e77557558e89e524ca3",
-  paperback27Checkout: "#",
+  paperback27Checkout: "https://link.fastpaydirect.com/payment-link/69ef5ed97dd3512d9207b2a6",
   course67Checkout: "https://link.fastpaydirect.com/payment-link/69ef5fc0557558e89e524ca5",
 
   // Skool community paths
   skoolTrial: "https://skool.com/money-masters-academy-5443/about",
   skoolAnnual: "#",
-  lifetimeAccess: "#",
+  lifetimeAccess: "https://link.fastpaydirect.com/payment-link/69ef60c87dd3512d9207b2ac",
 
   // Operations tooling (legacy flat shortcuts — kept for back compat)
   ghlDashboard: "#",
