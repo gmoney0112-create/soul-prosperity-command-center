@@ -14,6 +14,7 @@ const LINK_DEFINITIONS = [
   { key: "audio17Checkout", label: "$17 audiobook checkout", purpose: "Order bump after the $7 buy." },
   { key: "paperback27Checkout", label: "$27 paperback checkout", purpose: "Physical bundle upsell." },
   { key: "course67Checkout", label: "$67 course checkout", purpose: "Implementation course upsell." },
+  { key: "toolkit97Checkout", label: "$97 course + AI toolkit", purpose: "Bundle upsell: online course + AI Writing Toolkit." },
   { key: "skoolTrial", label: "Skool trial", purpose: "7-day community trial landing." },
   { key: "skoolAnnual", label: "Skool annual", purpose: "$247/yr community commitment path." },
   { key: "lifetimeAccess", label: "Lifetime access", purpose: "$497 premium close." },
@@ -338,7 +339,7 @@ function buildConfigSource(values) {
     { comment: "// Freebie lead magnet opt-in page / form", keys: ["freebieOptIn"] },
     {
       comment: "// Checkout links for each paid offer",
-      keys: ["ebook7Checkout", "audio17Checkout", "paperback27Checkout", "course67Checkout"],
+      keys: ["ebook7Checkout", "audio17Checkout", "paperback27Checkout", "course67Checkout", "toolkit97Checkout"],
     },
     {
       comment: "// Skool community paths",

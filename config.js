@@ -28,6 +28,8 @@ window.SP_CONFIG = {
   audio17Checkout: "https://link.fastpaydirect.com/payment-link/69ef5e77557558e89e524ca3",
   paperback27Checkout: "https://link.fastpaydirect.com/payment-link/69ef5ed97dd3512d9207b2a6",
   course67Checkout: "https://link.fastpaydirect.com/payment-link/69ef5fc0557558e89e524ca5",
+  // $97 bundle: Online Course + AI Writing Toolkit
+  toolkit97Checkout: "https://link.fastpaydirect.com/payment-link/69fe563e34d67b041e7e8747",
 
   // Skool community paths
   skoolTrial: "https://skool.com/money-masters-academy-5443/about",
