@@ -37,9 +37,9 @@ window.SP_CONFIG = {
   lifetimeAccess: "https://link.fastpaydirect.com/payment-link/69ef60c87dd3512d9207b2ac",
 
   // Operations tooling (legacy flat shortcuts — kept for back compat)
-  ghlDashboard: "#",
-  ghlWorkflows: "#",
-  analytics: "#",
+  ghlDashboard: "https://app.gohighlevel.com/v2/location/ucphPUkSafuQF0ZCZh1T/dashboard",
+  ghlWorkflows: "https://app.gohighlevel.com/v2/location/ucphPUkSafuQF0ZCZh1T/automation/workflows",
+  analytics: "https://app.gohighlevel.com/v2/location/ucphPUkSafuQF0ZCZh1T/reporting/overview",
 
   // Public bio link used across social profiles
   socialBioLink: "#",
@@ -58,20 +58,20 @@ window.SP_CONFIG = {
 
     // ── Operator entry URLs (where this dashboard's links go) ─────
     // Sub-account home dashboard
-    dashboardUrl: "#",
+    dashboardUrl: "https://app.gohighlevel.com/v2/location/ucphPUkSafuQF0ZCZh1T/dashboard",
     // Automation → Workflows
-    workflowsUrl: "#",
+    workflowsUrl: "https://app.gohighlevel.com/v2/location/ucphPUkSafuQF0ZCZh1T/automation/workflows",
     // Marketing → Campaigns (email/SMS)
-    campaignsUrl: "#",
+    campaignsUrl: "https://app.gohighlevel.com/v2/location/ucphPUkSafuQF0ZCZh1T/marketing/campaigns",
     // Contacts → Smart List
-    contactsUrl: "#",
-    // Opportunities pipeline board for "Soul Prosperity Ladder"
-    opportunitiesUrl: "#",
+    contactsUrl: "https://app.gohighlevel.com/v2/location/ucphPUkSafuQF0ZCZh1T/contacts/smart_list/All",
+    // Opportunities pipeline board — update with the specific pipeline ID once "Soul Prosperity Ladder" is created
+    opportunitiesUrl: "https://app.gohighlevel.com/v2/location/ucphPUkSafuQF0ZCZh1T/opportunities",
     // Conversations inbox
-    conversationsUrl: "#",
+    conversationsUrl: "https://app.gohighlevel.com/v2/location/ucphPUkSafuQF0ZCZh1T/conversations/conversations",
     // Reporting → Dashboard (revenue + attribution)
-    analyticsUrl: "#",
-    // Public booking calendar (used in nurture emails / bio)
+    analyticsUrl: "https://app.gohighlevel.com/v2/location/ucphPUkSafuQF0ZCZh1T/reporting/overview",
+    // Public booking calendar — replace with real Calendly/GHL booking page URL once created
     calendarBookingUrl: "#",
 
     // ── Marketplace / OAuth (Authorization Code Grant, v2) ────────
