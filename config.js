@@ -54,7 +54,7 @@ window.SP_CONFIG = {
     // The HighLevel sub-account (location) this dashboard operates
     // against. Found in GHL → Settings → Business Profile, or in any
     // sub-account URL: app.gohighlevel.com/v2/location/<LOCATION_ID>/...
-    locationId: "uoI2kRMGyVb8DjPA7mAa",
+    locationId: "ucphPUkSafuQF0ZCZh1T",
 
     // ── Operator entry URLs (where this dashboard's links go) ─────
     // Sub-account home dashboard
