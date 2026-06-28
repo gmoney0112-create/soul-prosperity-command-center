@@ -32,6 +32,9 @@ const {
   logSafe,
   isPlaceholder,
   sanitizeForLog,
+  resolveTagFromOrder,
+  extractContactId,
+  addTagToContact,
 } = require("../_lib/ghl");
 
 function getHeader(req, name) {
@@ -120,6 +123,38 @@ module.exports = async function handler(req, res) {
     });
   }
 
+  // ── OrderCreate: apply buyer tag via GHL Contacts API ──────────────────────
+  // When a GHL payment link purchase completes, apply the matching buyer tag so
+  // the nurture workflow (WF-02 through WF-08) fires automatically. Uses the
+  // GHL_PIT_KEY env var — no OAuth required. Never blocks the 2xx ack.
+  let orderTagResult = null;
+  if (eventType === "OrderCreate") {
+    const contactId = extractContactId(payload);
+    if (contactId) {
+      const tag = resolveTagFromOrder(payload);
+      if (tag) {
+        orderTagResult = await addTagToContact(contactId, tag);
+        logSafe("ghl.webhook.order_tag", {
+          contactId,
+          tag,
+          ok: orderTagResult.ok,
+          status: orderTagResult.status || null,
+          error: orderTagResult.ok ? undefined : orderTagResult.error,
+        });
+      } else {
+        logSafe("ghl.webhook.order_no_tag_match", {
+          paymentLinkId: payload.paymentLinkId || null,
+          amount: payload.amount ?? payload.totalAmount ?? null,
+          itemIds: (Array.isArray(payload.items) ? payload.items : []).map(
+            (i) => i.priceId || i.productId || null
+          ),
+        });
+      }
+    } else {
+      logSafe("ghl.webhook.order_no_contact", { webhook_id: webhookId });
+    }
+  }
+
   // Ack first, forward second — but in serverless we can't truly
   // background the forward without orchestration. Run it inline with a
   // short timeout and never let its outcome change our 2xx ack.
@@ -162,5 +197,6 @@ module.exports = async function handler(req, res) {
     webhook_id: webhookId,
     signature_scheme: verification.scheme,
     forwarded: forwardResult,
+    ...(orderTagResult !== null && { order_tag: orderTagResult }),
   });
 };

@@ -460,12 +460,135 @@ function readinessSummary() {
   };
 }
 
+// ── Order → buyer-tag resolution ─────────────────────────────────────────────
+//
+// Maps GHL payment link IDs (the path segment from config.js checkout URLs)
+// to the buyer tag that should be applied when that order completes.
+const PAYMENT_LINK_TAG_MAP = {
+  "69ef5c807dd3512d9207b2a2": "buyer-ebook7",      // $7
+  "69ef5e77557558e89e524ca3": "buyer-audio17",     // $17
+  "69ef5ed97dd3512d9207b2a6": "buyer-paperback27", // $27
+  "69ef5fc0557558e89e524ca5": "buyer-course67",    // $67
+  "69fe563e34d67b041e7e8747": "buyer-toolkit97",   // $97
+  "69ef60c87dd3512d9207b2ac": "lifetime",          // $497
+};
+
+// Fallback: map order amount in cents → tag.
+// Used when the payment link ID isn't in the payload.
+const AMOUNT_CENTS_TAG_MAP = {
+  700:   "buyer-ebook7",
+  1700:  "buyer-audio17",
+  2700:  "buyer-paperback27",
+  6700:  "buyer-course67",
+  9700:  "buyer-toolkit97",
+  49700: "lifetime",
+};
+
+// Resolve the buyer tag from an OrderCreate payload.
+// Tries three strategies in order:
+//   1. paymentLinkId field (most specific)
+//   2. item priceId / productId (GHL often puts the payment link ID here)
+//   3. order amount (try raw value as cents, then raw * 100 as cents)
+function resolveTagFromOrder(payload) {
+  // Strategy 1 — payment link ID field
+  const linkId = payload.paymentLinkId || payload.payment_link_id;
+  if (linkId && PAYMENT_LINK_TAG_MAP[linkId]) return PAYMENT_LINK_TAG_MAP[linkId];
+
+  // Strategy 2 — item-level IDs
+  const items = Array.isArray(payload.items)
+    ? payload.items
+    : Array.isArray(payload.lineItems)
+    ? payload.lineItems
+    : [];
+  for (const item of items) {
+    const ids = [
+      item.priceId,
+      item.price_id,
+      item.productId,
+      item.product_id,
+    ].filter(Boolean);
+    for (const id of ids) {
+      if (PAYMENT_LINK_TAG_MAP[id]) return PAYMENT_LINK_TAG_MAP[id];
+    }
+  }
+
+  // Strategy 3 — amount (try as-is, then as dollars→cents)
+  const rawAmount =
+    payload.amount ??
+    payload.totalAmount ??
+    payload.total_amount ??
+    payload.price ??
+    null;
+  if (rawAmount != null) {
+    const n = parseFloat(rawAmount);
+    if (!isNaN(n)) {
+      const asCents = Math.round(n);
+      const fromDollars = Math.round(n * 100);
+      if (AMOUNT_CENTS_TAG_MAP[asCents]) return AMOUNT_CENTS_TAG_MAP[asCents];
+      if (AMOUNT_CENTS_TAG_MAP[fromDollars]) return AMOUNT_CENTS_TAG_MAP[fromDollars];
+    }
+  }
+
+  return null;
+}
+
+// Extract the GHL contact ID from an OrderCreate payload.
+// GHL may nest it in different shapes depending on the event schema version.
+function extractContactId(payload) {
+  return (
+    payload.contactId ||
+    payload.contact_id ||
+    (payload.contact && (payload.contact.id || payload.contact.contactId)) ||
+    (payload.contactSnapshot && payload.contactSnapshot.id) ||
+    null
+  );
+}
+
+// Add a tag to a GHL contact using the PIT key (no OAuth required).
+// POST /contacts/{contactId}/tags  →  { tags: [tag] }
+// Returns { ok, status, json } — never throws.
+async function addTagToContact(contactId, tag) {
+  const pitKey = readEnv("GHL_PIT_KEY");
+  if (!pitKey) return { ok: false, error: "no_pit_key" };
+
+  const url = `https://services.leadconnectorhq.com/contacts/${contactId}/tags`;
+  const ac = new AbortController();
+  const timer = setTimeout(() => ac.abort(), 8000);
+  try {
+    const resp = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + pitKey,
+        "Content-Type": "application/json",
+        Version: "2021-07-28",
+      },
+      body: JSON.stringify({ tags: [tag] }),
+      signal: ac.signal,
+    });
+    const text = await resp.text();
+    let json = null;
+    try {
+      json = text ? JSON.parse(text) : null;
+    } catch (_err) {}
+    return { ok: resp.ok, status: resp.status, json };
+  } catch (err) {
+    return {
+      ok: false,
+      error: err && err.message ? err.message : "fetch_failed",
+    };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 module.exports = {
   TOKEN_URL,
   KV_TOKEN_TTL_SECONDS,
   DEFAULT_ALLOWED_EVENTS,
   GHL_ED25519_PUBLIC_KEY,
   GHL_RSA_PUBLIC_KEY,
+  PAYMENT_LINK_TAG_MAP,
+  AMOUNT_CENTS_TAG_MAP,
   jsonResponse,
   methodNotAllowed,
   readRawBody,
@@ -487,4 +610,7 @@ module.exports = {
   forwardJson,
   postForm,
   readinessSummary,
+  resolveTagFromOrder,
+  extractContactId,
+  addTagToContact,
 };
