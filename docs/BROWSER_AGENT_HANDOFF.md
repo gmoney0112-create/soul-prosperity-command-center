@@ -24,10 +24,36 @@
 | Vercel KV token storage | ⏳ not yet connected |
 | Freebie opt-in URL | ⏳ pending |
 | Public booking/calendar URL | ⏳ pending |
-| GHL tags created | ⏳ your job |
-| GHL custom fields created | ⏳ your job |
-| GHL pipeline created | ⏳ your job |
-| GHL workflows WF-01..WF-08 built | ⏳ your job |
+| GHL tags created | ✅ created by browser agent |
+| GHL custom fields created | ✅ created by browser agent |
+| GHL pipeline "Soul Prosperity Ladder" created | ✅ created by browser agent |
+| WF-01 Freebie Opt-in Nurture | ✅ published |
+| WF-02 $7 eBook Buyer + $17 Upsell | ✅ published |
+| WF-03 $17 Audiobook Buyer + $27 Upsell | ✅ published |
+| WF-04 $27 Paperback Buyer + $67 Upsell | ✅ published |
+| WF-05 $67 Course Buyer + $97 Upsell | ✅ published |
+| WF-06 $97 Bundle Buyer + Skool Upsell | ✅ published |
+| WF-07 Skool Member Onboarding + Lifetime Upsell | ✅ published |
+| WF-08 Lifetime Member VIP Flow | ✅ published |
+| FastPayDirect → GHL purchase webhooks | ⏳ operator must configure |
+| Skool → GHL member webhook | ⏳ operator must configure |
+| `GHL_CLIENT_SECRET` added to Vercel | ⏳ operator must add manually |
+| End-to-end QA with test contact | ⏳ pending |
+
+> **Handoff note (2026-06-28):** Browser agent completed all 8 GHL workflows using GHL's "Build using AI" feature. Workflows are published but use AI-generated generic email/SMS copy — review and customize messaging before launching paid traffic. Tag-specific triggers may need verification (see Step 3D notes below).
+
+---
+
+## What Still Needs to Happen (priority order)
+
+1. **Add `GHL_CLIENT_SECRET` to Vercel** (operator-only, 2 min) — see Part 2 step 4
+2. **Connect Vercel KV store** (browser agent, 5 min) — see Part 1
+3. **Wire FastPayDirect → GHL** (critical — tags never auto-apply without this) — see `docs/FASTPAYDIRECT_GHL_WIRING.md`
+4. **Connect Skool → GHL** — see `docs/FASTPAYDIRECT_GHL_WIRING.md`
+5. **QA with a test contact** — see Part 4
+6. **Customize email/SMS copy** in all 8 workflows (GHL AI wrote generic drafts)
+7. **Update `config.js → ghl.opportunitiesUrl`** with pipeline-specific URL
+8. **Create booking calendar** and update `config.js → ghl.calendarBookingUrl`
 
 ---
 
