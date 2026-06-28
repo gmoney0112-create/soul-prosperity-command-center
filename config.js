@@ -31,7 +31,7 @@ window.SP_CONFIG = {
   // $97 bundle: Online Course + AI Writing Toolkit
   toolkit97Checkout: "https://link.fastpaydirect.com/payment-link/69fe563e34d67b041e7e8747",
 
-  // Skool community paths
+  // Skool community — free trial & annual both use the same join link
   skoolTrial: "https://skool.com/money-masters-academy-5443/about",
   skoolAnnual: "https://skool.com/money-masters-academy-5443/about",
   lifetimeAccess: "https://link.fastpaydirect.com/payment-link/69ef60c87dd3512d9207b2ac",
