@@ -21,7 +21,7 @@
 window.SP_CONFIG = {
   // ── Funnel destinations (public URLs) ────────────────────────────
   // Freebie lead magnet opt-in page / form
-  freebieOptIn: "#",
+  freebieOptIn: "https://gmoney0112-create.github.io/soul-prosperity-quiz-all-in-one/",
 
   // Checkout links for each paid offer
   ebook7Checkout: "https://link.fastpaydirect.com/payment-link/69ef5c807dd3512d9207b2a2",
@@ -42,7 +42,7 @@ window.SP_CONFIG = {
   analytics: "https://app.gohighlevel.com/v2/location/ucphPUkSafuQF0ZCZh1T/reporting/overview",
 
   // Public bio link used across social profiles
-  socialBioLink: "#",
+  socialBioLink: "https://gmoney0112-create.github.io/soul-prosperity/",
 
   // ── GoHighLevel production wiring ────────────────────────────────
   // Operators: every value below is a placeholder until you fill it
